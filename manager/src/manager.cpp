@@ -1,7 +1,7 @@
-#include "print.hpp"
+#include "libglobal.hpp"
 
 int main()
 {
-    print();
+    print("Printing manager!\n");
     return 0;
 }
