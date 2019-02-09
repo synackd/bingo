@@ -2,7 +2,7 @@ app_bingo   := bingo/
 app_manager := manager/
 lib_global  := lib/
 
-.PHONY: all clean $(app_manager) $(app_bingo)
+.PHONY: all clean $(app_manager) $(app_bingo) $(lib_global)
 
 # Toplevel target
 all: $(app_manager) $(app_bingo)
