@@ -1,7 +1,7 @@
-#include "printer.hpp"
+#include "libglobal.hpp"
 
 int main()
 {
-    print();
+    print("Printing bingo!\n");
     return 0;
 }
