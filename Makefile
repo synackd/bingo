@@ -2,7 +2,7 @@ app_bingo   := bingo/
 app_manager := manager/
 lib_global  := lib/
 
-.PHONY: all $(app_manager) $(app_bingo)
+.PHONY: all clean $(app_manager) $(app_bingo)
 
 # Toplevel target
 all: $(app_manager) $(app_bingo)
@@ -14,3 +14,9 @@ $(app_manager) $(app_bingo) $(lib_global):
 # Build library before apps
 $(app_manager): $(lib_global)
 $(app_bingo): $(lib_global)
+
+# Clean up
+clean:
+	$(MAKE) --directory=$(app_manager) clean
+	$(MAKE) --directory=$(app_bingo) clean
+	$(MAKE) --directory=$(lib_global) clean
