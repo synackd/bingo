@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "global.hpp"
+#include "libglobal.hpp"
 
 void print(const char *str)
 {
