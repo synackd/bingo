@@ -1,7 +1,11 @@
-**/*.swp    # Vim swapfiles
-build/      # Build files
+# Build files
+build/
+
+# Vim swapfiles
+*.swp
+*.swo
 
 # Application binaries/libraries
-**/*.a
+*.a
 bingo/bingo
 manager/manager
