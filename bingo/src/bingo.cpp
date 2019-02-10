@@ -1,9 +1,17 @@
-#include "libglobal.hpp"
-#include "status.hpp"
+/**
+ * @file manager.cpp
+ *
+ * This file contains the main runtime source for the bingo
+ * application.
+ */
 
-int main()
+#include "libglobal.hpp"
+#include "bingo.hpp"
+
+/**
+ * Main runtime of bingo application
+ */
+int main(int argc, char **argv)
 {
-    status();
-    print("Printing bingo!\n");
     return 0;
 }
