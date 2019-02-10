@@ -1,0 +1,11 @@
+# Build files
+build/
+
+# Vim swapfiles
+*.swp
+*.swo
+
+# Application binaries/libraries
+*.a
+bingo/bingo
+manager/manager
