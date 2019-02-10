@@ -11,18 +11,21 @@ all: $(app)
 
 # Create binary from object files
 $(app): $(obj)
-	$(AR) $(ARFLAGS) $@ $^
+	@echo ' [AR]   $@'
+	@$(AR) $(ARFLAGS) $@ $^
 
 # Create build folder if it doesn't exist
 build:
-	mkdir $@
+	@mkdir $@
 
 # Create object files
 build/%.cpp.o: src/%.cpp build
-	$(CC) $(CPPFLAGS) -c -o $@ $<
+	@echo ' [CC]   $@'
+	@$(CC) $(CPPFLAGS) -c -o $@ $<
 
 # Clean up
 .PHONY: clean
 clean:
-	rm -rf $(app)
-	rm -rf build
+	@echo ' [CLEAN]   $(app)'
+	@rm -rf $(app)
+	@rm -rf build
