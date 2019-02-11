@@ -29,13 +29,3 @@ void cprintf(FILE * stream, const char *color, const char * fmt, ...)
     va_end(vaList);
     fprintf(stream, "%s", RESET);
 }
-
-int main (int argc, char const *argv[]) {
-    cprintf(stdout, BOLD, "BOLD\n");
-    cprintf(stdout, ITALIC, "ITALIC\n");
-    cprintf(stdout, UNDERLINE, "UNDERLINE\n");
-    cprintf(stdout, STRIKETHROUGH, "STRIKETHROUGH\n");
-    cprintf(stdout, REVERSED, "REVERSED\n");
-
-    return 0;
-}
