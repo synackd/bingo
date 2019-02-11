@@ -5,7 +5,7 @@
  * application.
  */
 
-#include "libglobal.hpp"
+#include "colors.hpp"
 #include "manager.hpp"
 
 /**
