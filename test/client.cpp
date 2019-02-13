@@ -88,10 +88,10 @@ void str_cli(FILE *fp, int sockfd)
         }
 
         // Sending message if needed:
-        if (messageReady){
-
-            fputs(recvline, stdout);
-        }
+        // if (messageReady){
+        //
+        //     fputs(recvline, stdout);
+        // }
 
     }// end of while
 

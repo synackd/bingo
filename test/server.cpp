@@ -46,6 +46,7 @@ void EchoString(int sockfd)
           // Sending k players from list --> RANDOM PENDING!!!!!
           int gameID = 1; // RANDOM PENDING!!
           int playersLeft = receivedK;
+
           for (int i = 0; i < receivedK; i++){
               startGameResponse response;
               Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
@@ -54,21 +55,17 @@ void EchoString(int sockfd)
               response.playersLeft = playersLeft;
               playersLeft --;
 
+              printf("Sending: \n");
+              response.gamePlayer->PrintPlayer();
               write(sockfd, &response, sizeof(startGameResponse));
 
               // waiting for ACK:
-
           }
-
-
-        }else{
-            printf("Invalid command.\n");
         }
-
         // write(sockfd, line, n );
-    }
+    }// end of for loop
 
-}
+}// end of EchoString
 
 
 int main(int argc, char **argv)
@@ -85,7 +82,6 @@ int main(int argc, char **argv)
 
     // LIST OF REGISTERED PLAYERS:
     int numberOfRegPlayers = 5;
-
 
     for (int i = 0; i < numberOfRegPlayers; i++){
         string IP = "IP" + std::to_string(i);
