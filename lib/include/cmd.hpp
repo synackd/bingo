@@ -7,11 +7,68 @@
 #ifndef _CMD_HPP_
 #define _CMD_HPP_
 
+//****************
+//* Return Codes *
+//****************
+#define FAILURE        -1   /**< The command failed to complete successfully */
+#define SUCCESS         0   /**< The command completed successfully */
+
+//*****************
+//* Command Codes *
+//*****************
+/*
+ * "Standard" codes as specified by the
+ * instruction document
+ */
 #define REGISTER        1   /**< Register a player with the manager */
 #define DEREGISTER      2   /**< Deregister a player from the manager */
 #define QUERY_PLAYERS   3   /**< Query registered players from the manager */
 #define QUERY_GAMES     4   /**< Query current games from the manager */
 #define START_GAME      5   /**< Tell the manager to set up a new game */
 #define END             6   /**< Tell the manager to end an ongoing game */
+
+/*
+ * "Meta" codes defined by project
+ * collaborators
+ */
+// Manager-Player codes
+
+// Player-Caller codes
+
+//*********************
+//* Other Definitions *
+//*********************
+#define BUFMAX          100  /*< Maximum buffer size for strings */
+
+//***********************
+//* Payload Definitions *
+//***********************
+/**
+ * @brief The payload for communicating TO the manager.
+ * This structure defines how information should
+ * be sent to the manager for processing.
+ */
+typedef struct {
+    int command;        /**< The command code for the manager */
+    char[BUFMAX] name;  /**< The name of a player to register/deregister */
+    char[BUFMAX] ip;    /**< The default IP address of the player */
+    char[BUFMAX] port;  /**< The default port of the player */
+    int game_uid;       /**< A unique game identifier */
+} mgr_msg_t;
+
+/**
+ * @brief The response payload FROM the manager.
+ * Thus structure defines how information should
+ * be returned from the manager.
+ */
+typedef struct {
+    int ret_code;       /**< Return code by the previously sent command */
+    int msgs_left;      /**< The remaining number of responses after this response */
+    char[BUFMAX] name;  /**< The name of the queried player */
+    char[BUFMAX] ip;    /**< The default ip of the queried player */
+    char[BUFMAX] port;  /**< The default port of the queried player */
+    int game_uid;       /**< The queried unique game identifier */
+} mgr_rsp_t;
+
 
 #endif
