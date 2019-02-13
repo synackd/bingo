@@ -23,12 +23,12 @@ using namespace std;
 class Socket
 {
     public:
-        getSocket(void);
-        getConnection(void);
+        int getSocket(void);
+        int getConnection(void);
 
     private:
         int sockfd;     /**< File descriptor of socket */
         int connfd;     /**< File descriptor of connection */
-}
+};
 
 #endif

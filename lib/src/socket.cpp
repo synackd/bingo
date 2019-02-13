@@ -9,15 +9,15 @@ using namespace std;
 /**
  * Return a file descriptor of the socket.
  */
-Socket::getSocket()
+int Socket::getSocket()
 {
-    return this.sockfd;
+    return this->sockfd;
 }
 
 /**
  * Return a file descriptor of the connection.
  */
-Socket::getConnection()
+int Socket::getConnection()
 {
-    return this.connfd;
+    return this->connfd;
 }
