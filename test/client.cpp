@@ -69,18 +69,16 @@ void str_cli(FILE *fp, int sockfd)
 
                     // Waiting for k Players:
                     startGameResponse response;
-
-
                     for (int i = 0; i < kInt; i++){
                         // Wait until startGameResponse arrives:
                         n = read(sockfd, &response, sizeof(startGameResponse));
-                        printf("%i\n", n);
+                        cout << "N:" << n;
                         while (n != sizeof(startGameResponse)){
                             printf("waiting for player ... \n");
                             n = read(sockfd, &response, sizeof(startGameResponse));
                         }
                         printf("player received with port %i\"\n", response.gamePlayer->Port);
-                        
+
                     }
 
 
