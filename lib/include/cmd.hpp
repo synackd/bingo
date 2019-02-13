@@ -39,6 +39,15 @@
 //* Payload Definitions *
 //***********************
 /**
+ * @brief A generic struct for the recipient to read and
+ * determine what type of structure to use based on the
+ * command code.
+ */
+typedef struct {
+    int command;
+} any_cmd_t;
+
+/**
  * @brief The payload to the manager for the
  * 'register' command.
  */
