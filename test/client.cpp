@@ -49,22 +49,28 @@ void str_cli(FILE *fp, int sockfd)
         // Checking length of command to check for proper command:
         int commandLength = inputCommand.length();
 
-        if (commandLength > 9){
+        if (commandLength > 10){
             // Checking for "start game" command
             foundIndex = inputCommand.find("start game");
 
             if (foundIndex >= 0){
                 // Parsing command:
                 // 'start game' has 10 characters
-                std::size_t kIndex = foundIndex + 10;
-                string kStr = inputCommand.substr(kIndex);
-                int kInt = stoi(kStr);
-                printf("sending \"Start Game - %i\"\n", kInt);
 
-                // Populating message body:
-                outputMessage.commandCode = STARTGAME;
-                outputMessage.parameters = kInt;
-                messageReady = true;
+                try{
+                    std::size_t kIndex = foundIndex + 10;
+                    string kStr = inputCommand.substr(kIndex);
+                    if (kStr == "")
+                    int kInt = stoi(kStr);
+                    printf("sending \"Start Game - %i\"\n", kInt);
+
+                    // Populating message body:
+                    outputMessage.commandCode = STARTGAME;
+                    outputMessage.parameters = kInt;
+                    messageReady = true;
+                }catch(...){
+                    printf("Wrong command format. Check User Guide and try again.\n");
+                }
             }
         }else{
             printf("Invalid command. Trye again.\n");
