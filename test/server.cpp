@@ -12,10 +12,6 @@
 
 using namespace std;
 
-#define	ECHOMAX	255		/* Longest string to echo */
-#define BACKLOG	128
-#define STARTGAME 10
-
 vector<Player> playersList;
 
 void DieWithError(const char *errorMessage) /* External error handling function */
@@ -47,7 +43,7 @@ void EchoString(int sockfd)
           int gameID = 1; // RANDOM PENDING!!
           int playersLeft = receivedK;
 
-          for (int i = 0; i < receivedK; i++){
+          for (int i = 0; i < inputMessage.parameters; i++){
               startGameResponse response;
               Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
               response.gameID = gameID;
@@ -58,6 +54,20 @@ void EchoString(int sockfd)
               printf("Sending: \n");
               response.gamePlayer->PrintPlayer();
               write(sockfd, &response, sizeof(startGameResponse));
+              
+              bool ackReceived = false;
+
+              while (!ackReceived){
+                  printf("waiting for ACK ... \n");
+                  read(sockfd, &inputMessage, sizeof(message));
+                  if (inputMessage.commandCode == CALLERACK)
+                      ackReceived = true;
+
+              }
+
+
+
+
 
               // waiting for ACK:
           }

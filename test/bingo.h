@@ -7,6 +7,11 @@
 #include	<unistd.h>
 #include <iostream>
 
+#define	ECHOMAX	255		/* Longest string to echo */
+#define BACKLOG	128
+#define STARTGAME 10
+#define CALLERACK 1
+
 using namespace std;
 
 class Player{
