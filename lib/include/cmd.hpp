@@ -35,11 +35,6 @@
 
 // Player-Caller codes
 
-//*********************
-//* Other Definitions *
-//*********************
-#define BUFMAX          100  /*< Maximum buffer size for strings */
-
 //***********************
 //* Payload Definitions *
 //***********************
