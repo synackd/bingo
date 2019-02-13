@@ -6,6 +6,9 @@
 #include        <string.h>
 #include        <unistd.h>
 #include <iostream>
+#include <list>
+#include <iterator>
+#include "bingo.h" // Contains structs and classes
 
 using namespace std;
 
@@ -13,10 +16,6 @@ using namespace std;
 #define BACKLOG 128
 #define STARTGAME 10
 
-struct message{
-    int commandCode;
-    int parameters;
-};
 
 void DisplayMenu()
 {
@@ -54,10 +53,9 @@ void str_cli(FILE *fp, int sockfd)
             foundIndex = inputCommand.find("start game");
 
             if (foundIndex >= 0){
-                // Parsing command:
-                // 'start game' has 10 characters
-
                 try{
+                    // Parsing command:
+                    // 'start game' has 10 characters
                     std::size_t kIndex = foundIndex + 10;
                     string kStr = inputCommand.substr(kIndex);
                     int kInt = stoi(kStr);
@@ -66,7 +64,21 @@ void str_cli(FILE *fp, int sockfd)
                     // Populating message body:
                     outputMessage.commandCode = STARTGAME;
                     outputMessage.parameters = kInt;
-                    messageReady = true;
+                    // messageReady = true;
+
+                    write(sockfd, &outputMessage, sizeof(message));
+                    if ((n = read(sockfd, recvline, ECHOMAX)) == 0)
+                      DieWithError("str_cli: server terminated prematurely");
+                    // recvline[ n ] = '\0';
+
+                    // Waiting for k Players:
+                    startGameResponse response;
+                    for (int i = 0; i < kInt; i++){
+                        read(sockfd, &response, sizeof(startGameResponse));
+                        printf("player received with port %i\"\n", response.gamePlayer->Port);
+                    }
+
+
                 }catch(...){
                     printf("Wrong command format. Check User Guide and try again.\n");
                 }
@@ -77,10 +89,7 @@ void str_cli(FILE *fp, int sockfd)
 
         // Sending message if needed:
         if (messageReady){
-            write(sockfd, &outputMessage, sizeof(message));
-            if ((n = read(sockfd, recvline, ECHOMAX)) == 0)
-              DieWithError("str_cli: server terminated prematurely");
-            // recvline[ n ] = '\0';
+
             fputs(recvline, stdout);
         }
 

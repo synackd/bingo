@@ -7,6 +7,10 @@
 #include	<unistd.h>
 #include <iostream>
 
+#include <vector>
+#include "bingo.h"
+using namespace std;
+
 #define	ECHOMAX	255		/* Longest string to echo */
 #define BACKLOG	128
 #define STARTGAME 10
@@ -15,57 +19,20 @@
 
 using namespace std;
 
-struct player{
-	string IP;
-	int Port;
-};
-
-struct startGameResponse{
-	int GameID;
-	int playersCount;
-	player GamePlayers[MAXPLAYERS];
-};
-
-
-
 int main(int argc, char **argv)
 {
-	string sendline = "start game ";
-	int found = -1;
+	// LIST OF REGISTERED PLAYERS:
+    int numberOfRegPlayers = 5;
+    vector<Player> playersList;
 
-	int command_length = sendline.length();
-	printf("length: %i\n",command_length );
+    for (int i = 0; i < numberOfRegPlayers; i++){
+        string IP = "IP" + std::to_string(i);
+        Player tempPlayer(IP, i);
+		playersList.push_back(tempPlayer);
+    }
 
-	if(command_length >= 10){
-
-		found = sendline.find("start game");
-		printf("found: %i\n", found);
-	}
-
-	//
-	if (found >= 0){
-		printf("Start game command detected. \n");
-
-		// 'start game' has 10 characters
-
-
-		try{
-			int k_index = found + 10;
-			string k_str = sendline.substr(k_index);
-			int k_int = stoi(k_str);
-			printf("K value: %i\n", k_int);
-		}catch(...){
-			printf("Check format.\n");
-		}
-
-
-
-
-	}else{
-		printf("Invalid command. \n");
-
-	}
-
-	// string parsed = sendline.substr()
+	for (int i = 0; i < numberOfRegPlayers; i++){
+        playersList.at(i).PrintPlayer();
+    }
 
 }

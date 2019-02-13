@@ -6,6 +6,9 @@
 #include	<string.h>
 #include	<unistd.h>
 #include <iostream>
+#include <vector>
+
+#include "bingo.h" // Contains structs and classes
 
 using namespace std;
 
@@ -13,10 +16,7 @@ using namespace std;
 #define BACKLOG	128
 #define STARTGAME 10
 
-struct message{
-    int commandCode;
-    int parameters;
-};
+vector<Player> playersList;
 
 void DieWithError(const char *errorMessage) /* External error handling function */
 {
@@ -29,6 +29,7 @@ void EchoString(int sockfd)
     ssize_t n;
     char    line[ECHOMAX];
     int inputCode;
+    int receivedK;
 
     message inputMessage;
 
@@ -41,11 +42,30 @@ void EchoString(int sockfd)
         if (inputCode == STARTGAME){
           printf("Start Game command received!\n");
           printf("Sending %i players to caller.\n", inputMessage.parameters);
+
+          // Sending k players from list --> RANDOM PENDING!!!!!
+          int gameID = 1; // RANDOM PENDING!!
+          int playersLeft = receivedK;
+          for (int i = 0; i < receivedK; i++){
+              startGameResponse response;
+              Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
+              response.gameID = gameID;
+              response.gamePlayer = &tempPlayer;
+              response.playersLeft = playersLeft;
+              playersLeft --;
+
+              write(sockfd, &response, sizeof(startGameResponse));
+
+              // waiting for ACK:
+
+          }
+
+
         }else{
             printf("Invalid command.\n");
         }
 
-        write(sockfd, line, n );
+        // write(sockfd, line, n );
     }
 
 }
@@ -60,6 +80,22 @@ int main(int argc, char **argv)
     char echoBuffer[ECHOMAX];        /* Buffer for echo string */
     unsigned short echoServPort;     /* Server port */
     int recvMsgSize;                 /* Size of received message */
+
+    // TEMPORAL LIST OF PLAYERS FOR TESTING: //////////////////////
+
+    // LIST OF REGISTERED PLAYERS:
+    int numberOfRegPlayers = 5;
+
+
+    for (int i = 0; i < numberOfRegPlayers; i++){
+        string IP = "IP" + std::to_string(i);
+        Player tempPlayer(IP, i);
+		playersList.push_back(tempPlayer);
+    }
+
+
+    //////////////////////////////////////////////////////////////
+
 
     if (argc != 2)         /* Test for correct number of parameters */
     {
