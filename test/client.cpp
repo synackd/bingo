@@ -60,7 +60,6 @@ void str_cli(FILE *fp, int sockfd)
                 try{
                     std::size_t kIndex = foundIndex + 10;
                     string kStr = inputCommand.substr(kIndex);
-                    if (kStr == "")
                     int kInt = stoi(kStr);
                     printf("sending \"Start Game - %i\"\n", kInt);
 
