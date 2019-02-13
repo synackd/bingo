@@ -44,31 +44,24 @@
 //* Payload Definitions *
 //***********************
 /**
- * @brief The payload for communicating TO the manager.
- * This structure defines how information should
- * be sent to the manager for processing.
+ * @brief The payload to the manager for the
+ * 'register' command.
  */
 typedef struct {
     int command;        /**< The command code for the manager */
     char[BUFMAX] name;  /**< The name of a player to register/deregister */
     char[BUFMAX] ip;    /**< The default IP address of the player */
     char[BUFMAX] port;  /**< The default port of the player */
-    int game_uid;       /**< A unique game identifier */
-} mgr_msg_t;
+} mgr_cmd_register_t;
 
 /**
- * @brief The response payload FROM the manager.
- * Thus structure defines how information should
- * be returned from the manager.
+ * @brief The response from the manager for the
+ * 'register' command.
  */
 typedef struct {
     int ret_code;       /**< Return code by the previously sent command */
-    int msgs_left;      /**< The remaining number of responses after this response */
-    char[BUFMAX] name;  /**< The name of the queried player */
-    char[BUFMAX] ip;    /**< The default ip of the queried player */
-    char[BUFMAX] port;  /**< The default port of the queried player */
     int game_uid;       /**< The queried unique game identifier */
-} mgr_rsp_t;
+} mgr_rsp_register_t;
 
 
 #endif
