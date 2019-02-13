@@ -65,7 +65,10 @@ void str_cli(FILE *fp, int sockfd)
                     write(sockfd, &outputMessage, sizeof(message));
 
                     startGameResponse response;
-                    while (read(sockfd, &response, sizeof(startGameResponse)) != sizeof(startGameResponse)){
+                    n = read(sockfd, &response, ECHOMAX);
+                    while ( n != sizeof(startGameResponse)){
+                        n = read(sockfd, &response, ECHOMAX);
+                        cout << "N: " << n;
                         // waits until it receives a startGameResponse package.
                     }
 
@@ -75,16 +78,17 @@ void str_cli(FILE *fp, int sockfd)
 
                     // Waiting for k Players:
 
-                    // for (int i = 0; i < kInt; i++){
-                    //     // Wait until startGameResponse arrives:
-                    //     n = read(sockfd, &response, sizeof(startGameResponse));
-                    //     cout << "N:" << n;
-                    //     while (n != sizeof(startGameResponse)){
-                    //         printf("waiting for player ... \n");
-                    //         n = read(sockfd, &response, sizeof(startGameResponse));
-                    //     }
-                    //     printf("player received with port %i\"\n", response.gamePlayer->Port);
-                    // }
+                    for (int i = 0; i < kInt; i++){
+                        // Wait until startGameResponse arrives:
+                        n = read(sockfd, &response, sizeof(startGameResponse));
+                        cout << "N:" << n;
+                        while (n != sizeof(startGameResponse)){
+                            printf("waiting for player ... \n");
+                            n = read(sockfd, &response, sizeof(startGameResponse));
+                        }
+                        printf("player received with port %i\"\n", response.gamePlayer->Port);
+
+                    }
 
 
                 }catch(...){
