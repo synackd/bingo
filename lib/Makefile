@@ -23,6 +23,9 @@ build/%.cpp.o: src/%.cpp build
 	@echo ' [CC]   $@'
 	@$(CC) $(CPPFLAGS) -c -o $@ $<
 
+# Build socket base before subclasses
+build/server.cpp.o: build/socket.cpp.o
+
 # Clean up
 .PHONY: clean
 clean:

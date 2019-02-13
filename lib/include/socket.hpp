@@ -26,7 +26,7 @@ class Socket
         int getSocket(void);
         int getConnection(void);
 
-    private:
+    protected:
         int sockfd;     /**< File descriptor of socket */
         int connfd;     /**< File descriptor of connection */
 };
