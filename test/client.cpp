@@ -63,23 +63,28 @@ void str_cli(FILE *fp, int sockfd)
                     // messageReady = true;
 
                     write(sockfd, &outputMessage, sizeof(message));
-                    // if ((n = read(sockfd, recvline, ECHOMAX)) == 0)
-                    //   DieWithError("str_cli: server terminated prematurely");
+
+                    startGameResponse response;
+                    while (read(sockfd, &response, sizeof(startGameResponse)) != sizeof(startGameResponse)){
+                        // waits until it receives a startGameResponse package.
+                    }
+
+                    printf("player received with port %i\"\n", response.gamePlayer->Port);
+
                     // recvline[ n ] = '\0';
 
                     // Waiting for k Players:
-                    startGameResponse response;
-                    for (int i = 0; i < kInt; i++){
-                        // Wait until startGameResponse arrives:
-                        n = read(sockfd, &response, sizeof(startGameResponse));
-                        cout << "N:" << n;
-                        while (n != sizeof(startGameResponse)){
-                            printf("waiting for player ... \n");
-                            n = read(sockfd, &response, sizeof(startGameResponse));
-                        }
-                        printf("player received with port %i\"\n", response.gamePlayer->Port);
 
-                    }
+                    // for (int i = 0; i < kInt; i++){
+                    //     // Wait until startGameResponse arrives:
+                    //     n = read(sockfd, &response, sizeof(startGameResponse));
+                    //     cout << "N:" << n;
+                    //     while (n != sizeof(startGameResponse)){
+                    //         printf("waiting for player ... \n");
+                    //         n = read(sockfd, &response, sizeof(startGameResponse));
+                    //     }
+                    //     printf("player received with port %i\"\n", response.gamePlayer->Port);
+                    // }
 
 
                 }catch(...){

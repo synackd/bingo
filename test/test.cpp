@@ -28,4 +28,7 @@ int main(int argc, char **argv)
         playersList.at(i).PrintPlayer();
     }
 
+	startGameResponse testResponse;
+	cout << sizeof(startGameResponse);
+
 }
