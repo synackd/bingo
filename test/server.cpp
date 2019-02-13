@@ -14,7 +14,7 @@ using namespace std;
 #define STARTGAME 10
 
 struct message{
-    char command[ECHOMAX];
+    int commandCode;
     int parameters;
 };
 
@@ -28,7 +28,7 @@ void EchoString(int sockfd)
 {
     ssize_t n;
     char    line[ECHOMAX];
-    std::string input;
+    int inputCode;
 
     message inputMessage;
 
@@ -36,11 +36,11 @@ void EchoString(int sockfd)
 	    if ( (n = read(sockfd, &inputMessage, sizeof(message))) == 0 )
    	    	return; /* connection closed by other end */
 
-        input = inputMessage.command;
+        inputCode = inputMessage.commandCode;
 
-        if (input.compare("start game\n") == 0){
+        if (inputCode == STARTGAME){
           printf("Start Game command received!\n");
-
+          printf("Sending %i players to caller.\n", inputMessage.parameters);
         }else{
             printf("Invalid command.\n");
         }
@@ -53,7 +53,7 @@ void EchoString(int sockfd)
 
 int main(int argc, char **argv)
 {
-		int sock, connfd;                /* Socket */
+    int sock, connfd;                /* Socket */
     struct sockaddr_in echoServAddr; /* Local address */
     struct sockaddr_in echoClntAddr; /* Client address */
     unsigned int cliAddrLen;         /* Length of incoming message */
