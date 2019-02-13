@@ -15,6 +15,12 @@ using namespace std;
  */
 ServerSocket::ServerSocket(unsigned short port)
 {
+    /* Create socket */
+    if ((this->sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        // server: socket() failed
+        // Delete this
+    }
+
     /* Construct local address structure */
     memset(&this->srvAddr, 0, sizeof(this->srvAddr));       // Reset memory of server IP struct
     this->srvAddr.sin_family      = AF_INET;                // Internet address family
