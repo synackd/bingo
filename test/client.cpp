@@ -63,8 +63,8 @@ void str_cli(FILE *fp, int sockfd)
                     // messageReady = true;
 
                     write(sockfd, &outputMessage, sizeof(message));
-                    if ((n = read(sockfd, recvline, ECHOMAX)) == 0)
-                      DieWithError("str_cli: server terminated prematurely");
+                    // if ((n = read(sockfd, recvline, ECHOMAX)) == 0)
+                    //   DieWithError("str_cli: server terminated prematurely");
                     // recvline[ n ] = '\0';
 
                     // Waiting for k Players:
@@ -74,11 +74,13 @@ void str_cli(FILE *fp, int sockfd)
                     for (int i = 0; i < kInt; i++){
                         // Wait until startGameResponse arrives:
                         n = read(sockfd, &response, sizeof(startGameResponse));
+                        printf("%i\n", n);
                         while (n != sizeof(startGameResponse)){
                             printf("waiting for player ... \n");
                             n = read(sockfd, &response, sizeof(startGameResponse));
                         }
                         printf("player received with port %i\"\n", response.gamePlayer->Port);
+                        
                     }
 
 
