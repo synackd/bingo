@@ -5,6 +5,7 @@
 #include	<sys/types.h>
 #include	<string.h>
 #include	<unistd.h>
+#include <vector>
 #include <iostream>
 
 #define	ECHOMAX	255		/* Longest string to echo */
@@ -53,8 +54,8 @@ public:
         K = inputK;
     }
 
-    AddPlayer(Player inputPlayer){
+    void AddPlayer(Player inputPlayer){
         PlayersList.push_back(inputPlayer);
     }
 
-}
+};

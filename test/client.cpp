@@ -85,7 +85,7 @@ void str_cli(FILE *fp, int sockfd)
                             // Creating Player
                             Player tempPlayer = Player(response.playerIP, response.playerPort);
                             tempPlayer.PrintPlayer();
-                            
+
                             // Sending ACK back to manager:
                             outputMessage.commandCode = CALLERACK;
                             n = write(sockfd, &outputMessage, sizeof(message));
@@ -97,7 +97,7 @@ void str_cli(FILE *fp, int sockfd)
                     }
 
                     // Starting new Game:
-                    printf("Ready to start game %d\n", gameID);
+                    printf("Ready to start game %d\n", response.gameID);
 
                 }catch(...){
                     printf("Wrong command format. Check User Guide and try again.\n");
