@@ -7,12 +7,12 @@
 #include	<unistd.h>
 #include <iostream>
 #include <vector>
-
 #include "bingo.h" // Contains structs and classes
-
 using namespace std;
 
-vector<Player> playersList;
+// Global Variables:
+vector<Player> playersList;   // List of registered players
+
 
 void DieWithError(const char *errorMessage) /* External error handling function */
 {

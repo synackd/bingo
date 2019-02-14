@@ -17,6 +17,7 @@ void DisplayMenu()
 {
     printf("Welcome to Bingo!\n");
     printf("Type \"start game k\" to request a game with k players.\n");
+    printf("Type ");
 }
 
 void DieWithError(const char *errorMessage) /* External error handling function */
@@ -67,15 +68,15 @@ void str_cli(FILE *fp, int sockfd)
                     if (n < 0)
                         DieWithError("ERROR writing to socket");
 
-                    // Receiving Players:
-                    startGameResponse *response = new startGameResponse;
+                    // Receiving K Players:
+                    startGameResponse *response = (startGameResponse*) malloc(sizeof(startGameResponse));
                     for (int i = 0; i < kInt; i++){
                         n = read(sockfd, response, sizeof(startGameResponse));
                         if (n < 0)
                             DieWithError("ERROR reading from socket");
                         else{
 
-                            printf("Player received.\n");
+                            printf("Player received: IP=%s\n", response->gamePlayer->IP);
 
                             // Sending ACK back to manager:
                             outputMessage.commandCode = CALLERACK;
@@ -84,6 +85,9 @@ void str_cli(FILE *fp, int sockfd)
                                 DieWithError("ERROR writing to socket");
                         }
                     }
+
+                    // Starting new Game:
+
 
                 }catch(...){
                     printf("Wrong command format. Check User Guide and try again.\n");
