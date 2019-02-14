@@ -69,8 +69,8 @@ void str_cli(FILE *fp, int sockfd)
                         DieWithError("ERROR writing to socket");
 
                     // Receiving K Players:
-                    startGameResponse *response;
-                    response = (struct startGameResponse*) malloc(sizeof(struct startGameResponse));
+                    startGameResponse response;
+                    
                     for (int i = 0; i < kInt; i++){
                         n = read(sockfd, response, sizeof(startGameResponse));
                         if (n < 0)

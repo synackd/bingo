@@ -45,14 +45,14 @@ void EchoString(int sockfd)
 
           for (int i = 0; i < inputMessage.parameters; i++){
               startGameResponse response;
-              Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
+
               response.gameID = gameID;
-              response.gamePlayer = &tempPlayer;
               response.playersLeft = playersLeft;
+			  response.playerIP = playersList.at(i).IP;
+			  response.playerPort = playersList.at(i).Port;
               playersLeft --;
 
-			  printf("Sending: \n");
-              response.gamePlayer->PrintPlayer();
+			  printf("Sending Player: GameID=%d\t IP=%s\t Port=%d\n", gameID, response.playerIP, response.playerPort);
               write(sockfd, &response, sizeof(startGameResponse));
 			  if (n < 0)
 			  	DieWithError("ERROR writing to socket");

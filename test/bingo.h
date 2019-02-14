@@ -38,5 +38,6 @@ struct message{
 struct startGameResponse{
     int gameID;
     int playersLeft;
-    Player *gamePlayer;
+    string playerIP;
+    int playerIP;
 };
