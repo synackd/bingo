@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=
+CFLAGS=-std=c++11
 
 client: client
      $(CC) -o client client.cpp
