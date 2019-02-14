@@ -27,7 +27,6 @@ void EchoString(int sockfd)
     int inputCode;
     int receivedK;
 
-
     message inputMessage;
 
     for ( ; ; ) {
@@ -64,7 +63,7 @@ void EchoString(int sockfd)
 				  DieWithError("ERROR reading from socket");
 			  else{
 				  if (inputMessage.commandCode == CALLERACK)
-				  	printf("Caller ACK received.");
+				  	printf("Caller ACK received.\n");
 			  }
 
           }
