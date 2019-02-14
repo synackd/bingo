@@ -51,19 +51,22 @@ void EchoString(int sockfd)
               response.playersLeft = playersLeft;
               playersLeft --;
 
-              printf("Sending: \n");
-              response.gamePlayer->PrintPlayer();
-              write(sockfd, &response, sizeof(startGameResponse));
-              
-              bool ackReceived = false;
+			  for (int i=0; i< receivedK; i++){
+				  printf("Sending: \n");
+	              response.gamePlayer->PrintPlayer();
+	              write(sockfd, &response, sizeof(startGameResponse));
 
-              while (!ackReceived){
-                  printf("waiting for ACK ... \n");
-                  read(sockfd, &inputMessage, sizeof(message));
-                  if (inputMessage.commandCode == CALLERACK)
-                      ackReceived = true;
-
-              }
+			  }
+			  //
+              // bool ackReceived = false;
+			  //
+              // while (!ackReceived){
+              //     printf("waiting for ACK ... \n");
+              //     read(sockfd, &inputMessage, sizeof(message));
+              //     if (inputMessage.commandCode == CALLERACK)
+              //         ackReceived = true;
+			  //
+              // }
 
 
 

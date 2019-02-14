@@ -64,6 +64,7 @@ void str_cli(FILE *fp, int sockfd)
 
                     write(sockfd, &outputMessage, sizeof(message));
 
+                    usleep(1000);   // Sleep for a second
                     startGameResponse *response;
                     n = read(sockfd, response, kInt*sizeof(startGameResponse));
 
