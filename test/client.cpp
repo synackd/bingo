@@ -64,12 +64,12 @@ void str_cli(FILE *fp, int sockfd)
 
                     n = write(sockfd, &outputMessage, sizeof(message));
                     if (n < 0)
-                        error("ERROR writing to socket");
+                        DieWithError("ERROR writing to socket");
 
                     startGameResponse *response;
                     n = read(sockfd, response, kInt*sizeof(startGameResponse));
                     if (n < 0)
-                        error("ERROR reading from socket");
+                        DieWithError("ERROR reading from socket");
                     else{
                         printf("N: %d\n", n);
                     }
