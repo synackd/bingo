@@ -12,28 +12,19 @@
 using namespace std;
 
 
+
 int main(int argc, char **argv)
 {
-	// TESTING GAME LIST in caller:
-    // int MAXGAMES = 10;
-    // Game List[MAXGAMES];
-    //
-    // int numberOfRegPlayers = 3;
-    //
-    // for (int i = 0; i < numberOfRegPlayers; i++){
-    //     string IP = "IP" + std::to_string(i);
-    //     Player tempPlayer(IP, i);
-	// 	playersList.push_back(tempPlayer);
-	// 	playerCount ++;
-    // }
-    //
-    //
-    //
-    // // Saving Game with 3 players
-    // for (int i=0; i< 3; i++){
-    //
-    // }
+    int numberOfRegPlayers = 5;
 
+    vector<Player> playersList;
 
+    for (int i = 0; i < numberOfRegPlayers; i++){
+        string IP = "IP" + std::to_string(i);
+        Player tempPlayer(IP, i);
+        playersList.push_back(tempPlayer);
+    }
+
+    cout << playersList[0].IP;
 
 }

@@ -47,8 +47,9 @@ void EchoString(int sockfd)
               startGameResponse response;
               // Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
               response.gameID = gameID;
-              response.playerIP = playersList.at(i).IP;
-              response.playerPort = playersList.at(i).Port;
+			  response.playersLeft = playersLeft;
+              response.playerIP = playersList[i].IP;
+              response.playerPort = playersList[i].Port;
               playersLeft --;
 
 			  printf("Sending: \n");
