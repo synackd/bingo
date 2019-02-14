@@ -7,12 +7,12 @@
 #include	<unistd.h>
 #include <iostream>
 #include <vector>
+
 #include "bingo.h" // Contains structs and classes
+
 using namespace std;
 
-// Global Variables:
-vector<Player> playersList;   // List of registered players
-int playerCount = 0;
+vector<Player> playersList;
 
 void DieWithError(const char *errorMessage) /* External error handling function */
 {
@@ -45,14 +45,14 @@ void EchoString(int sockfd)
 
           for (int i = 0; i < inputMessage.parameters; i++){
               startGameResponse response;
-
+              Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
               response.gameID = gameID;
+              response.gamePlayer = &tempPlayer;
               response.playersLeft = playersLeft;
-			  response.playerIP = playersList.at(i).IP;
-			  response.playerPort = playersList.at(i).Port;
               playersLeft --;
 
-			  printf("Sending Player: GameID=%d\t IP=%s\t Port=%d\n", gameID, response.playerIP, response.playerPort);
+			  printf("Sending: \n");
+              response.gamePlayer->PrintPlayer();
               write(sockfd, &response, sizeof(startGameResponse));
 			  if (n < 0)
 			  	DieWithError("ERROR writing to socket");
@@ -93,7 +93,6 @@ int main(int argc, char **argv)
         string IP = "IP" + std::to_string(i);
         Player tempPlayer(IP, i);
 		playersList.push_back(tempPlayer);
-		playerCount ++;
     }
 
 
