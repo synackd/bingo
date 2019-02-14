@@ -34,8 +34,6 @@ int main(int argc, char **argv)
     sock->start();
 
     // Receive data from client and send response.
-    cprintf(stdout, BOLD, "[SRV] ");
-    fprintf(stdout, "Listening on port 4000...\n");
     size = sock->receive((void**) &rec, sizeof(*rec));
     cprintf(stdout, BOLD, "[SRV] ");
     fprintf(stdout, "Received %d bytes over socket.\n", size);

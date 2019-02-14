@@ -20,11 +20,15 @@ ServerSocket::ServerSocket(unsigned short port)
 {
     /* Create socket */
     errno = 0;
+    cprintf(stdout, BOLD, "[SRV] ");
+    fprintf(stdout, "Creating socket...\n");
     if ((this->sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         cprintf(stderr, BOLD, "[SRV][ERR] ");
         fprintf(stderr, "socket() failed: %s\n", strerror(errno));
         return;
     }
+    cprintf(stdout, BOLD, "[SRV] ");
+    fprintf(stdout, "Socket created.\n");
 
     /* Construct local address structure */
     memset(&this->srvAddr, 0, sizeof(this->srvAddr));       // Reset memory of server IP struct
@@ -34,14 +38,20 @@ ServerSocket::ServerSocket(unsigned short port)
 
     /* Bind to local address */
     errno = 0;
+    cprintf(stdout, BOLD, "[SRV] ");
+    fprintf(stdout, "Binding socket to port %d...\n", port);
     if (bind(this->sockfd, (struct sockaddr*) &this->srvAddr, sizeof(this->srvAddr)) < 0) {
         cprintf(stderr, BOLD, "[SRV][ERR] ");
         fprintf(stderr, "bind() failed: %s\n", strerror(errno));
         return;
     }
+    cprintf(stdout, BOLD, "[SRV] ");
+    fprintf(stdout, "Socket bound.\n");
 
     /* Listen for incoming requests */
     errno = 0;
+    cprintf(stdout, BOLD, "[SRV] ");
+    fprintf(stdout, "Listening on port %d...\n", port);
     if (listen(this->sockfd, BACKLOG) < 0) {
         cprintf(stderr, BOLD, "[SRV][ERR] ");
         fprintf(stderr, "listen() failed: %s\n", strerror(errno));
@@ -75,8 +85,12 @@ int ServerSocket::start(void)
     }
 
     /* Start accepting connections */
-    unsigned int cliAddrLen = sizeof(this->cliAddr);
+    this->cliAddrLen = sizeof(this->cliAddr);
     this->connfd = accept(this->sockfd, (struct sockaddr*) &this->cliAddr, &cliAddrLen);
+    if (this->connfd < 0) {
+        cprintf(stdout, BOLD, "[SRV] ");
+        fprintf(stdout, "accept() failed: %s\n", strerror(errno));
+    }
 
     /* Return connection file descriptor */
     return this->connfd;
@@ -112,7 +126,7 @@ ssize_t ServerSocket::receive(void** data, size_t size)
 
     /* Read data, store in 'data', and return # bytes read */
     errno = 0;
-    ssize_t bytes = read(this->sockfd, *data, size);
+    ssize_t bytes = read(this->connfd, *data, size);
     if (bytes < 0) {
         cprintf(stderr, BOLD, "[SRV][ERR] ");
         fprintf(stderr, "read() failed: %s\n", strerror(errno));

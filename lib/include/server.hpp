@@ -16,6 +16,7 @@ class ServerSocket: public Socket
     private:
         struct sockaddr_in srvAddr;     /**< The server's IP address */
         struct sockaddr_in cliAddr;     /**< The client's IP address */
+        socklen_t cliAddrLen;           /**< The length of the client's IP address */
 
     public:
         ServerSocket(unsigned short port);

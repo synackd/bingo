@@ -20,11 +20,15 @@ ClientSocket::ClientSocket(string ip, unsigned short port)
 {
     /* Create socket */
     errno = 0;
+    cprintf(stdout, BOLD, "[CLI] ");
+    fprintf(stdout, "Creating socket...\n");
     if ((this->sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         cprintf(stderr, BOLD, "[CLI][ERR] ");
         fprintf(stderr, "socket() failed: %s\n", strerror(errno));
         return;
     }
+    cprintf(stdout, BOLD, "[CLI] ");
+    fprintf(stdout, "Socket created.\n");
 
     /* Construct local address structure */
     memset(&this->srvAddr, 0, sizeof(this->srvAddr));           // Reset memory of client IP struct
@@ -57,7 +61,16 @@ int ClientSocket::start(void)
     }
 
     /* Connect to server */
-    return connect(this->sockfd, (struct sockaddr*) &this->srvAddr, sizeof(this->srvAddr));
+    errno = 0;
+    cprintf(stdout, BOLD, "[CLI] ");
+    fprintf(stdout, "Connecting to server...\n");
+    int status = connect(this->sockfd, (struct sockaddr*) &this->srvAddr, sizeof(this->srvAddr));
+    if (status < 0) {
+        cprintf(stderr, BOLD, "[CLI][ERR] ");
+        fprintf(stderr, "connect() failed: %s\n", strerror(errno));
+    }
+
+    return status;
 }
 
 /**
@@ -90,7 +103,7 @@ ssize_t ClientSocket::receive(void** data, size_t size)
 
     /* Read data, store in 'data', and return # bytes read */
     errno = 0;
-    ssize_t bytes = read(this->sockfd, *data, size);
+    ssize_t bytes = read(this->connfd, *data, size);
     if (bytes < 0) {
         cprintf(stderr, BOLD, "[SRV][ERR] ");
         fprintf(stderr, "read() failed: %s\n", strerror(errno));
