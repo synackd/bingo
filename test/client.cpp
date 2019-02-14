@@ -66,8 +66,8 @@ void str_cli(FILE *fp, int sockfd)
                     if (n < 0)
                         DieWithError("ERROR writing to socket");
 
-                    startGameResponse *response;
-                    n = read(sockfd, response, kInt*sizeof(startGameResponse));
+                    startGameResponse response;
+                    n = read(sockfd, &response, sizeof(startGameResponse));
                     if (n < 0)
                         DieWithError("ERROR reading from socket");
                     else{
