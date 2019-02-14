@@ -36,7 +36,6 @@ void str_cli(FILE *fp, int sockfd)
     while (fgets(sendline, ECHOMAX, fp) != NULL) {
 
         message outputMessage;
-        bool messageReady = false;
 
         // Converting char[] into String for processing:
         string inputCommand(sendline);
@@ -63,7 +62,6 @@ void str_cli(FILE *fp, int sockfd)
                     // Populating message body:
                     outputMessage.commandCode = STARTGAME;
                     outputMessage.parameters = kInt;
-                    // messageReady = true;
 
                     // Sending 'Start game K' command:
                     n = write(sockfd, &outputMessage, sizeof(message));
@@ -82,10 +80,6 @@ void str_cli(FILE *fp, int sockfd)
 
                             printf("Received Player: GameID=%d\t IP=%c\t Port=%d\n", response.gameID, response.playerIP, response.playerPort);
                             printf("ACK sent to manager.\n");
-
-                            // Creating Player
-                            Player tempPlayer = Player(response.playerIP, response.playerPort);
-                            tempPlayer.PrintPlayer();
 
                             // Sending ACK back to manager:
                             outputMessage.commandCode = CALLERACK;
