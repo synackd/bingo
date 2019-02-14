@@ -71,7 +71,7 @@ void str_cli(FILE *fp, int sockfd)
                     if (n < 0)
                         DieWithError("ERROR reading from socket");
                     else{
-                        printf("Player received: %s\t %d\n", response.Player->IP, response.Player->Port);
+                        printf("Player received: %s\t %d\n", response.gamePlayer->IP, response.gamePlayer->Port);
                     }
 
 
