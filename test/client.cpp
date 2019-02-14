@@ -81,6 +81,10 @@ void str_cli(FILE *fp, int sockfd)
                             printf("Received Player: GameID=%d\t IP=%c\t Port=%d\n", response.gameID, response.playerIP, response.playerPort);
                             printf("ACK sent to manager.\n");
 
+                            // Creating Player
+                            Player tempPlayer = Player(response.playerIP, response.playerPort);
+                            // tempPlayerrintPlayer();
+
                             // Sending ACK back to manager:
                             outputMessage.commandCode = CALLERACK;
                             n = write(sockfd, &outputMessage, sizeof(message));
