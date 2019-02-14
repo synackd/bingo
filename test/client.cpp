@@ -69,21 +69,21 @@ void str_cli(FILE *fp, int sockfd)
 
                     // Receiving Players:
                     startGameResponse *response = new startGameResponse;
+                    for (int i = 0; i < kInt; i++){
+                        n = read(sockfd, response, sizeof(startGameResponse));
+                        if (n < 0)
+                            DieWithError("ERROR reading from socket");
+                        else{
 
-                    n = read(sockfd, response, sizeof(startGameResponse));
-                    if (n < 0)
-                        DieWithError("ERROR reading from socket");
-                    else{
-                        printf("Player received: GameID=%d\n", response->gameID);
-                        Player receivedPlayer(response->gamePlayer->IP,response->gamePlayer->Port);
-                        receivedPlayer.PrintPlayer();
+                            printf("Player received.");
+
+                            // Sending ACK back to manager:
+                            outputMessage.commandCode = CALLERACK;
+                            n = write(sockfd, &outputMessage, sizeof(message));
+                            if (n < 0)
+                                DieWithError("ERROR writing to socket");
+                        }
                     }
-
-
-                    // recvline[ n ] = '\0';
-
-                    // Waiting for k Players:
-
 
                 }catch(...){
                     printf("Wrong command format. Check User Guide and try again.\n");
@@ -92,12 +92,6 @@ void str_cli(FILE *fp, int sockfd)
         }else{
             printf("Invalid command. Trye again.\n");
         }
-
-        // Sending message if needed:
-        // if (messageReady){
-        //
-        //     fputs(recvline, stdout);
-        // }
 
     }// end of while
 

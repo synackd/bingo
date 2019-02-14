@@ -27,6 +27,7 @@ void EchoString(int sockfd)
     int inputCode;
     int receivedK;
 
+
     message inputMessage;
 
     for ( ; ; ) {
@@ -43,7 +44,7 @@ void EchoString(int sockfd)
           int gameID = 1; // RANDOM PENDING!!
           int playersLeft = receivedK;
 
-          // for (int i = 0; i < inputMessage.parameters; i++){
+          for (int i = 0; i < inputMessage.parameters; i++){
               startGameResponse response;
               Player tempPlayer(playersList.at(0).IP, playersList.at(0).Port);
               response.gameID = gameID;
@@ -54,11 +55,21 @@ void EchoString(int sockfd)
 			  printf("Sending: \n");
               response.gamePlayer->PrintPlayer();
               write(sockfd, &response, sizeof(startGameResponse));
+			  if (n < 0)
+			  	DieWithError("ERROR writing to socket");
 
               // waiting for ACK:
-          // }
-        }
-        // write(sockfd, line, n );
+			  n = read(sockfd, &inputMessage, sizeof(message));
+			  if (n < 0)
+				  DieWithError("ERROR reading from socket");
+			  else{
+				  if (inputMessage.commandCode == CALLERACK)
+				  	printf("Caller ACK received.");
+			  }
+
+          }
+	  } // end of STARTGAME command processing
+
     }// end of for loop
 
 }// end of EchoString
