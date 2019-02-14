@@ -4,6 +4,9 @@
  * Class definitions for a server socket.
  */
 
+#include <errno.h>
+#include <string.h>
+#include "colors.hpp"
 #include "server.hpp"
 
 using namespace std;
@@ -16,9 +19,11 @@ using namespace std;
 ServerSocket::ServerSocket(unsigned short port)
 {
     /* Create socket */
+    errno = 0;
     if ((this->sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        // server: socket() failed
-        // Delete this
+        cprintf(stderr, BOLD, "[SRV][ERR] ");
+        fprintf(stderr, "socket() failed: %s\n", strerror(errno));
+        return;
     }
 
     /* Construct local address structure */
@@ -28,15 +33,19 @@ ServerSocket::ServerSocket(unsigned short port)
     this->srvAddr.sin_port        = htons(port);            // Convert unsigned short to port
 
     /* Bind to local address */
+    errno = 0;
     if (bind(this->sockfd, (struct sockaddr*) &this->srvAddr, sizeof(this->srvAddr)) < 0) {
-        // server: bind() failed
-        // Delete this
+        cprintf(stderr, BOLD, "[SRV][ERR] ");
+        fprintf(stderr, "bind() failed: %s\n", strerror(errno));
+        return;
     }
 
     /* Listen for incoming requests */
+    errno = 0;
     if (listen(this->sockfd, BACKLOG) < 0) {
-        // server: listen() failed
-        // Delete this
+        cprintf(stderr, BOLD, "[SRV][ERR] ");
+        fprintf(stderr, "listen() failed: %s\n", strerror(errno));
+        return;
     }
 }
 
@@ -60,7 +69,8 @@ int ServerSocket::start(void)
 {
     /* Check for valid socket */
     if (this->sockfd == 0) {
-        // server: no socket to listen on
+        cprintf(stderr, BOLD, "[SRV][ERR] ");
+        fprintf(stderr, "No socket to listen on!\n");
         return -1;
     }
 
@@ -94,11 +104,21 @@ int ServerSocket::stop(void)
 ssize_t ServerSocket::receive(void** data, size_t size)
 {
     /* Don't write to a nonexistent or NULL pointer */
-    if (data == NULL || *data == NULL)
+    if (data == NULL || *data == NULL) {
+        cprintf(stderr, BOLD, "[SRV][ERR] ");
+        fprintf(stderr, "Received data is NULL!\n");
         return -1;
+    }
 
     /* Read data, store in 'data', and return # bytes read */
-    return read(this->sockfd, *data, size);
+    errno = 0;
+    ssize_t bytes = read(this->sockfd, *data, size);
+    if (bytes < 0) {
+        cprintf(stderr, BOLD, "[SRV][ERR] ");
+        fprintf(stderr, "read() failed: %s\n", strerror(errno));
+    }
+
+    return bytes;
 }
 
 /**
@@ -112,8 +132,19 @@ ssize_t ServerSocket::receive(void** data, size_t size)
 ssize_t ServerSocket::send(void* data, size_t size)
 {
     /* Don't send NULL data */
-    if (data == NULL)
+    if (data == NULL) {
+        cprintf(stderr, BOLD, "[SRV][ERR] ");
+        fprintf(stderr, "Tried to send NULL data.\n");
         return -1;
+    }
 
-    return write(this->sockfd, data, size);
+    /* Write data to socket */
+    errno = 0;
+    ssize_t bytes = write(this->sockfd, data, size);
+    if (bytes < 0) {
+        cprintf(stderr, BOLD, "[CLI][ERR] ");
+        fprintf(stderr, "write() failed: %s\n", strerror(errno));
+    }
+
+    return bytes;
 }

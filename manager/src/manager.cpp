@@ -39,11 +39,11 @@ int main(int argc, char **argv)
     size = sock->receive((void**) &rec, sizeof(*rec));
     cprintf(stdout, BOLD, "[SRV] ");
     fprintf(stdout, "Received %d bytes over socket.\n", size);
-    cprintf(stdout, BOLD, "[CLI] ");
+    cprintf(stdout, BOLD, "[SRV] ");
     fprintf(stdout, "Command: %d\n", rec->command);
 
     size = sock->send(&general, sizeof(general));
-    cprintf(stdout, BOLD, "[CLI] ");
+    cprintf(stdout, BOLD, "[SRV] ");
     fprintf(stdout, "Sent %d bytes over socket.\n", size);
 
     return 0;
