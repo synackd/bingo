@@ -62,13 +62,18 @@ void str_cli(FILE *fp, int sockfd)
                     outputMessage.parameters = kInt;
                     // messageReady = true;
 
-                    write(sockfd, &outputMessage, sizeof(message));
+                    n = write(sockfd, &outputMessage, sizeof(message));
+                    if (n < 0)
+                        error("ERROR writing to socket");
 
-                    usleep(1000);   // Sleep for a second
                     startGameResponse *response;
                     n = read(sockfd, response, kInt*sizeof(startGameResponse));
+                    if (n < 0)
+                        error("ERROR reading from socket");
+                    else{
+                        printf("N: %d\n", n);
+                    }
 
-                    printf("N: %d\n", n);
 
                     // recvline[ n ] = '\0';
 
