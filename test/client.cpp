@@ -75,7 +75,7 @@ void str_cli(FILE *fp, int sockfd)
                             DieWithError("ERROR reading from socket");
                         else{
 
-                            printf("Player received.");
+                            printf("Player received.\n");
 
                             // Sending ACK back to manager:
                             outputMessage.commandCode = CALLERACK;

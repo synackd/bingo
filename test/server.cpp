@@ -46,7 +46,7 @@ void EchoString(int sockfd)
 
           for (int i = 0; i < inputMessage.parameters; i++){
               startGameResponse response;
-              Player tempPlayer(playersList.at(0).IP, playersList.at(0).Port);
+              Player tempPlayer(playersList.at(i).IP, playersList.at(is).Port);
               response.gameID = gameID;
               response.gamePlayer = &tempPlayer;
               response.playersLeft = playersLeft;
