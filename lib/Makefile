@@ -25,6 +25,7 @@ build/%.cpp.o: src/%.cpp build
 
 # Build socket base before subclasses
 build/server.cpp.o: build/socket.cpp.o
+build/client.cpp.o: build/socket.cpp.o
 
 # Clean up
 .PHONY: clean

@@ -7,6 +7,8 @@
 #ifndef _CMD_HPP_
 #define _CMD_HPP_
 
+#include "constants.hpp"
+
 //****************
 //* Return Codes *
 //****************
@@ -53,9 +55,9 @@ typedef struct {
  */
 typedef struct {
     int command;        /**< The command code for the manager */
-    char[BUFMAX] name;  /**< The name of a player to register/deregister */
-    char[BUFMAX] ip;    /**< The default IP address of the player */
-    char[BUFMAX] port;  /**< The default port of the player */
+    char name[BUFMAX];  /**< The name of a player to register/deregister */
+    char ip[BUFMAX];    /**< The default IP address of the player */
+    char port[BUFMAX];  /**< The default port of the player */
 } mgr_cmd_register_t;
 
 /**

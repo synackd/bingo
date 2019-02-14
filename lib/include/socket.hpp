@@ -25,8 +25,8 @@ class Socket
     public:
         int getSocket(void);
         int getConnection(void);
-        virtual ssize_t receive(void** data, size_t size);
-        virtual ssize_t send(void* data, size_t size);
+        virtual ssize_t receive(void** data, size_t size) = 0;
+        virtual ssize_t send(void* data, size_t size) = 0;
 
     protected:
         int sockfd;     /**< File descriptor of socket */
