@@ -12,6 +12,8 @@
 
 using namespace std;
 
+//Global Variables:
+
 
 void DisplayMenu()
 {
@@ -77,18 +79,25 @@ void str_cli(FILE *fp, int sockfd)
                             DieWithError("ERROR reading from socket");
                         else{
 
-                            printf("Received Player: GameID=%d\t IP=%s\t Port=%d\n", response.gameID, response.playerIP, response.playerPort);
+                            printf("Received Player: GameID=%d\t IP=%c\t Port=%d\n", response.gameID, response.playerIP, response.playerPort);
+                            printf("ACK sent to manager.\n");
 
+                            // Creating Player
+                            Player tempPlayer = Player(response.playerIP, response.playerPort);
+                            tempPlayer.PrintPlayer();
+                            
                             // Sending ACK back to manager:
                             outputMessage.commandCode = CALLERACK;
                             n = write(sockfd, &outputMessage, sizeof(message));
                             if (n < 0)
                                 DieWithError("ERROR writing to socket");
+
+
                         }
                     }
 
                     // Starting new Game:
-
+                    printf("Ready to start game %d\n", gameID);
 
                 }catch(...){
                     printf("Wrong command format. Check User Guide and try again.\n");

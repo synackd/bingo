@@ -12,7 +12,7 @@ using namespace std;
 
 // Global Variables:
 vector<Player> playersList;   // List of registered players
-
+int playerCount = 0;
 
 void DieWithError(const char *errorMessage) /* External error handling function */
 {
@@ -93,6 +93,7 @@ int main(int argc, char **argv)
         string IP = "IP" + std::to_string(i);
         Player tempPlayer(IP, i);
 		playersList.push_back(tempPlayer);
+		playerCount ++;
     }
 
 

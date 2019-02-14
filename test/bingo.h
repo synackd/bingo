@@ -41,3 +41,20 @@ struct startGameResponse{
     string playerIP;
     int playerPort;
 };
+
+class Game{
+public:
+    int GameID;
+    int K;
+    vector<Player>PlayersList;
+
+    Game(int inputGameID, int inputK){
+        GameID = inputGameID;
+        K = inputK;
+    }
+
+    AddPlayer(Player inputPlayer){
+        PlayersList.push_back(inputPlayer);
+    }
+
+}
