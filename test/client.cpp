@@ -71,10 +71,10 @@ void str_cli(FILE *fp, int sockfd)
                         DieWithError("ERROR writing to socket");
 
                     // Receiving K Players:
-                    // startGameResponse response;
+                    startGameResponse response;
 
                     for (int i = 0; i < kInt; i++){
-                        startGameResponse response;
+                        // startGameResponse response;
                         n = read(sockfd, &response, sizeof(startGameResponse));
                         if (n < 0)
                             DieWithError("ERROR reading from socket");
@@ -98,7 +98,7 @@ void str_cli(FILE *fp, int sockfd)
                     }
 
                     // Starting new Game:
-                    printf("Ready to start game %d\n", response.gameID);
+                    printf("Ready to start game.\n");
 
                 }catch(...){
                     printf("Wrong command format. Check User Guide and try again.\n");
