@@ -39,5 +39,5 @@ struct startGameResponse{
     int gameID;
     int playersLeft;
     string playerIP;
-    int playerIP;
+    int playerPort;
 };

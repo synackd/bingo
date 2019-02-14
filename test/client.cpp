@@ -70,14 +70,14 @@ void str_cli(FILE *fp, int sockfd)
 
                     // Receiving K Players:
                     startGameResponse response;
-                    
+
                     for (int i = 0; i < kInt; i++){
-                        n = read(sockfd, response, sizeof(startGameResponse));
+                        n = read(sockfd, &response, sizeof(startGameResponse));
                         if (n < 0)
                             DieWithError("ERROR reading from socket");
                         else{
 
-                            printf("Player received: IP=%s\n", response->gamePlayer->IP);
+                            printf("Received Player: GameID=%d\t IP=%s\t Port=%d\n", response.gameID, response.playerIP, response.playerPort);
 
                             // Sending ACK back to manager:
                             outputMessage.commandCode = CALLERACK;
