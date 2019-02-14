@@ -52,7 +52,7 @@ void EchoString(int sockfd)
               playersLeft --;
 
 			  printf("Sending: \n");
-              response.gamePlayer->PrintPlayer();
+              response.gamePlayer.PrintPlayer();
               write(sockfd, &response, sizeof(startGameResponse));
 
               // waiting for ACK:

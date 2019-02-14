@@ -38,5 +38,5 @@ struct message{
 struct startGameResponse{
     int gameID;
     int playersLeft;
-    Player *gamePlayer;
+    Player gamePlayer;
 };

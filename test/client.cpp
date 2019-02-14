@@ -62,16 +62,19 @@ void str_cli(FILE *fp, int sockfd)
                     outputMessage.parameters = kInt;
                     // messageReady = true;
 
+                    // Sending 'Start game K' command:
                     n = write(sockfd, &outputMessage, sizeof(message));
                     if (n < 0)
                         DieWithError("ERROR writing to socket");
+
+                    // Receiving Players:
 
                     startGameResponse response;
                     n = read(sockfd, &response, sizeof(startGameResponse));
                     if (n < 0)
                         DieWithError("ERROR reading from socket");
                     else{
-                        printf("Player received: %d\n", response.gameID);
+                        printf("Player received: GameID=%d\t IP=%s\t Port=%d\n", response.gameID, response.gamePlayer.IP, response.gamePlayer.Port);
                     }
 
 
