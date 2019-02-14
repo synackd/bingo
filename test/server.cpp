@@ -51,12 +51,11 @@ void EchoString(int sockfd)
               response.playersLeft = playersLeft;
               playersLeft --;
 
-			  for (int i=0; i< receivedK; i++){
-				  printf("Sending: \n");
-	              response.gamePlayer->PrintPlayer();
-	              write(sockfd, &response, sizeof(startGameResponse));
+			  printf("Sending: \n");
+              response.gamePlayer->PrintPlayer();
+              write(sockfd, &response, sizeof(startGameResponse));
 
-			  }
+			  
 			  //
               // bool ackReceived = false;
 			  //
