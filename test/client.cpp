@@ -69,11 +69,14 @@ void str_cli(FILE *fp, int sockfd)
 
                     // Receiving Players:
                     startGameResponse *response = new startGameResponse;
+
                     n = read(sockfd, response, sizeof(startGameResponse));
                     if (n < 0)
                         DieWithError("ERROR reading from socket");
                     else{
-                        printf("Player received: GameID=%d\t IP=%s\t Port=%d\n", response->gameID, response->gamePlayer->IP, response->gamePlayer->Port);
+                        printf("Player received: GameID=%d\n", response->gameID);
+                        Player receivedPlayer(response->gamePlayer->IP,response->gamePlayer->Port);
+                        receivedPlayer.PrintPlayer();
                     }
 
 
