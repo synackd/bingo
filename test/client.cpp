@@ -70,7 +70,7 @@ void str_cli(FILE *fp, int sockfd)
 
                     // Receiving K Players:
                     startGameResponse *response;
-                    response = (startGameResponse*) malloc(sizeof(startGameResponse));
+                    response = (struct startGameResponse*) malloc(sizeof(struct startGameResponse));
                     for (int i = 0; i < kInt; i++){
                         n = read(sockfd, response, sizeof(startGameResponse));
                         if (n < 0)
