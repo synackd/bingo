@@ -117,6 +117,13 @@ int ServerSocket::stop(void)
  */
 ssize_t ServerSocket::receive(void** data, size_t size)
 {
+    /* Make sure there's a connection */
+    if (this->connfd == 0) {
+        cprintf(stderr, BOLD, "[SRV][ERR] ");
+        fprintf(stderr, "No open connection!\n");
+        return -1;
+    }
+
     /* Don't write to a nonexistent or NULL pointer */
     if (data == NULL || *data == NULL) {
         cprintf(stderr, BOLD, "[SRV][ERR] ");
@@ -145,6 +152,13 @@ ssize_t ServerSocket::receive(void** data, size_t size)
  */
 ssize_t ServerSocket::send(void* data, size_t size)
 {
+    /* Make sure there's a connection */
+    if (this->connfd == 0) {
+        cprintf(stderr, BOLD, "[SRV][ERR] ");
+        fprintf(stderr, "No open connection!\n");
+        return -1;
+    }
+
     /* Don't send NULL data */
     if (data == NULL) {
         cprintf(stderr, BOLD, "[SRV][ERR] ");
@@ -154,9 +168,9 @@ ssize_t ServerSocket::send(void* data, size_t size)
 
     /* Write data to socket */
     errno = 0;
-    ssize_t bytes = write(this->sockfd, data, size);
+    ssize_t bytes = write(this->connfd, data, size);
     if (bytes < 0) {
-        cprintf(stderr, BOLD, "[CLI][ERR] ");
+        cprintf(stderr, BOLD, "[SRV][ERR] ");
         fprintf(stderr, "write() failed: %s\n", strerror(errno));
     }
 

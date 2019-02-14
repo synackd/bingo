@@ -94,6 +94,13 @@ int ClientSocket::stop(void)
  */
 ssize_t ClientSocket::receive(void** data, size_t size)
 {
+    /* Make sure there's a socket */
+    if (this->sockfd == 0) {
+        cprintf(stderr, BOLD, "[SRV][ERR] ");
+        fprintf(stderr, "No open connection!\n");
+        return -1;
+    }
+
     /* Don't write to a nonexistent or NULL pointer */
     if (data == NULL || *data == NULL) {
         cprintf(stderr, BOLD, "[SRC][ERR] ");
@@ -103,9 +110,9 @@ ssize_t ClientSocket::receive(void** data, size_t size)
 
     /* Read data, store in 'data', and return # bytes read */
     errno = 0;
-    ssize_t bytes = read(this->connfd, *data, size);
+    ssize_t bytes = read(this->sockfd, *data, size);
     if (bytes < 0) {
-        cprintf(stderr, BOLD, "[SRV][ERR] ");
+        cprintf(stderr, BOLD, "[CLI][ERR] ");
         fprintf(stderr, "read() failed: %s\n", strerror(errno));
     }
 
@@ -122,9 +129,16 @@ ssize_t ClientSocket::receive(void** data, size_t size)
  */
 ssize_t ClientSocket::send(void* data, size_t size)
 {
+    /* Make sure there's a connection */
+    if (this->sockfd == 0) {
+        cprintf(stderr, BOLD, "[CLI][ERR] ");
+        fprintf(stderr, "No open connection!\n");
+        return -1;
+    }
+
     /* Don't send NULL data */
     if (data == NULL) {
-        cprintf(stderr, BOLD, "[SRV][ERR] ");
+        cprintf(stderr, BOLD, "[CLI][ERR] ");
         fprintf(stderr, "Tried to send NULL data.\n");
         return -1;
     }

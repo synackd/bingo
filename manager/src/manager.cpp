@@ -26,7 +26,7 @@ int main(int argc, char **argv)
     ssize_t size = 0;
 
     // Create a general struct.
-    any_cmd_t general = { .command = SUCCESS };     // For sending
+    any_cmd_t general = { .command = DEREGISTER };     // For sending
     any_cmd_t *rec    = (any_cmd_t*) malloc(sizeof(any_cmd_t)); // Receiving
 
     // Create socket and start it.
