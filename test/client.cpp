@@ -73,7 +73,8 @@ void str_cli(FILE *fp, int sockfd)
                         DieWithError("ERROR writing to socket");
 
                     // Receiving K Players:
-
+                    string newIP;
+                    int newGameID;
 
                     for (int i = 0; i < kInt; i++){
                         // startGameResponse response;
@@ -82,8 +83,10 @@ void str_cli(FILE *fp, int sockfd)
                         if (n < 0)
                             DieWithError("ERROR reading from socket");
                         else{
+                            newGameID = response.gameID;
+                            newIP = response.playerIP;
 
-                            cout << "Receiving Player: GameID = " << response.gameID << "\tIP = " << response.playerIP << "\n";
+                            cout << "Receiving Player: GameID = " << newGameID << "\tIP = " << newIP << "\n";
                             cout << "ACK sent to manager.\n";
 
                             // Creating Player
