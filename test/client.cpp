@@ -13,6 +13,8 @@
 using namespace std;
 
 //Global Variables:
+message outputMessage;
+startGameResponse response;
 
 
 void DisplayMenu()
@@ -35,7 +37,7 @@ void str_cli(FILE *fp, int sockfd)
 
     while (fgets(sendline, ECHOMAX, fp) != NULL) {
 
-        message outputMessage;
+
 
         // Converting char[] into String for processing:
         string inputCommand(sendline);
@@ -71,7 +73,7 @@ void str_cli(FILE *fp, int sockfd)
                         DieWithError("ERROR writing to socket");
 
                     // Receiving K Players:
-                    startGameResponse response;
+
 
                     for (int i = 0; i < kInt; i++){
                         // startGameResponse response;
