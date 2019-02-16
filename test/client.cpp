@@ -60,10 +60,12 @@ void str_cli(FILE *fp, int sockfd)
                     printf("sending \"Start Game - %i\"\n", kInt);
 
                     // Populating message body:
+                    cout << "populating message body ...\n";
                     outputMessage.commandCode = STARTGAME;
                     outputMessage.parameters = kInt;
 
                     // Sending 'Start game K' command:
+                    cout << "sending command ...\n";
                     n = write(sockfd, &outputMessage, sizeof(message));
                     if (n < 0)
                         DieWithError("ERROR writing to socket");
@@ -73,13 +75,14 @@ void str_cli(FILE *fp, int sockfd)
 
                     for (int i = 0; i < kInt; i++){
                         // startGameResponse response;
+                        cout << "receiving first player ...\n";
                         n = read(sockfd, &response, sizeof(startGameResponse));
                         if (n < 0)
                             DieWithError("ERROR reading from socket");
                         else{
 
                             cout << "Received Player: GameID = " << response.gameID << "\tIP = " << response.playerIP << "\tPort = " << response.playerPort << "\n";
-                            printf("ACK sent to manager.\n");
+                            cout << "ACK sent to manager.\n";
 
                             // Creating Player
                             Player tempPlayer(response.playerIP, response.playerPort);
