@@ -94,7 +94,7 @@ void str_cli(FILE *fp, int sockfd)
                             // Creating Player
                             // Player tempPlayer(response.playerIP, response.playerPort);
                             // tempPlayerrintPlayer();
-                            usleep(2000);
+                            // usleep(2000);
 
                             // Sending ACK back to manager:
                             n = write(sockfd, &callerACK, sizeof(message));
