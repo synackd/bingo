@@ -19,7 +19,7 @@ void DisplayMenu()
 {
     printf("Welcome to Bingo!\n");
     printf("Type \"start game k\" to request a game with k players.\n");
-    printf("Type ");
+
 }
 
 void DieWithError(const char *errorMessage) /* External error handling function */
