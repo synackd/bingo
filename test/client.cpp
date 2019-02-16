@@ -82,7 +82,7 @@ void str_cli(FILE *fp, int sockfd)
                             printf("ACK sent to manager.\n");
 
                             // Creating Player
-                            Player tempPlayer = new Player(response.playerIP, response.playerPort);
+                            Player *tempPlayer = new Player(response.playerIP, response.playerPort);
                             // tempPlayerrintPlayer();
 
                             // Sending ACK back to manager:
