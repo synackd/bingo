@@ -48,7 +48,7 @@ void EchoString(int sockfd)
               // Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
               response.gameID = gameID;
 			  response.playersLeft = playersLeft;
-              response.playerIP = playersList[i].IP;
+              response.playerIP = playersList[i].playerIP;
               response.playerPort = playersList[i].Port;
               playersLeft --;
 

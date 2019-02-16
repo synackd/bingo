@@ -17,16 +17,16 @@ using namespace std;
 
 class Player{
 public:
-    string IP;
+    string playerIP;
     int Port;
 
     Player(string inputIP, int inputPort){
-        IP = inputIP;
+        playerIP = inputIP;
         Port = inputPort;
     }
 
     void PrintPlayer(){
-        cout << "Player IP: " << IP << "\t Port: " << Port << "\n";
+        cout << "Player IP: " << playerIP << "\t Port: " << Port << "\n";
     }
 
 };

@@ -20,11 +20,11 @@ int main(int argc, char **argv)
     vector<Player> playersList;
 
     for (int i = 0; i < numberOfRegPlayers; i++){
-        string IP = "IP" + std::to_string(i);
-        Player tempPlayer(IP, i);
+        string playerIP = "IP" + std::to_string(i);
+        Player tempPlayer(playerIP, i);
         playersList.push_back(tempPlayer);
     }
 
-    cout << playersList[0].IP;
+    cout << playersList[0].playerIP;
 
 }
