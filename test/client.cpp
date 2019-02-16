@@ -13,8 +13,7 @@
 using namespace std;
 
 //Global Variables:
-message outputMessage;
-startGameResponse response;
+
 
 
 void DisplayMenu()
@@ -36,8 +35,6 @@ void str_cli(FILE *fp, int sockfd)
     char    sendline[ECHOMAX], recvline[ECHOMAX];
 
     while (fgets(sendline, ECHOMAX, fp) != NULL) {
-
-
 
         // Converting char[] into String for processing:
         string inputCommand(sendline);
@@ -62,6 +59,7 @@ void str_cli(FILE *fp, int sockfd)
                     printf("sending \"Start Game - %i\"\n", kInt);
 
                     // Populating message body:
+                    message outputMessage;
                     cout << "populating message body ...\n";
                     outputMessage.commandCode = STARTGAME;
                     outputMessage.parameters = kInt;
@@ -78,6 +76,7 @@ void str_cli(FILE *fp, int sockfd)
 
                     for (int i = 0; i < kInt; i++){
                         // startGameResponse response;
+                        startGameResponse response;
                         cout << "receiving first player ...\n";
                         n = read(sockfd, &response, sizeof(startGameResponse));
                         if (n < 0)
