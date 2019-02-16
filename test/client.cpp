@@ -73,28 +73,31 @@ void str_cli(FILE *fp, int sockfd)
                     // Receiving K Players:
                     string newIP;
                     int newGameID;
+                    message callerACK;
+                    callerACK.commandCode = CALLERACK;
 
                     for (int i = 0; i < kInt; i++){
                         // startGameResponse response;
                         startGameResponse response;
-                        cout << "receiving first player ...\n";
+                        cout << "receiving player ...\n";
                         n = read(sockfd, &response, sizeof(startGameResponse));
                         if (n < 0)
                             DieWithError("ERROR reading from socket");
                         else{
-                            newGameID = response.gameID;
-                            newIP = response.playerIP;
+                            // newGameID = response.gameID;
+                            // newIP = response.playerIP;
+                            //
+                            // cout << "Receiving Player: GameID = " << newGameID << "\tIP = " << newIP << "\n";
 
-                            cout << "Receiving Player: GameID = " << newGameID << "\tIP = " << newIP << "\n";
-                            cout << "ACK sent to manager.\n";
 
                             // Creating Player
                             // Player tempPlayer(response.playerIP, response.playerPort);
                             // tempPlayerrintPlayer();
-
+                            usleep(2000);
+                            cout << "ACK sent to manager.\n";
                             // Sending ACK back to manager:
-                            outputMessage.commandCode = CALLERACK;
-                            n = write(sockfd, &outputMessage, sizeof(message));
+
+                            n = write(sockfd, &callerACK, sizeof(message));
                             if (n < 0)
                                 DieWithError("ERROR writing to socket");
 
