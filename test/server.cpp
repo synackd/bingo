@@ -52,7 +52,7 @@ void EchoString(int sockfd)
               response.playerPort = playersList[i].Port;
               playersLeft --;
 
-			  printf("Sending Player: GameID=%d\t IP=%c\t Port=%d\n", response.gameID, response.playerIP, response.playerPort);
+			  printf("Sending Player: GameID=%d\t IP=%s\t Port=%d\n", response.gameID, response.playerIP, response.playerPort);
               // response.gamePlayer->PrintPlayer();
               write(sockfd, &response, sizeof(startGameResponse));
 			  if (n < 0)
@@ -91,8 +91,8 @@ int main(int argc, char **argv)
     int numberOfRegPlayers = 5;
 
     for (int i = 0; i < numberOfRegPlayers; i++){
-        string IP = "IP" + std::to_string(i);
-        Player tempPlayer(IP, i);
+        string playerIP = "IP" + std::to_string(i);
+        Player tempPlayer(playerIP, i);
 		playersList.push_back(tempPlayer);
     }
 
