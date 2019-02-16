@@ -86,7 +86,7 @@ void str_cli(FILE *fp, int sockfd)
                             DieWithError("ERROR reading from socket");
                         else{
                             //newGameID = response.gameID;
-                            newIP = response.playerIP;
+                            // newIP = response.playerIP;
                             //
                             // cout << "Receiving Player: GameID = " << newGameID << "\tIP = " << newIP << "\n";
 
