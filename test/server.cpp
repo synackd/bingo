@@ -42,9 +42,10 @@ void EchoString(int sockfd)
           // Sending k players from list --> RANDOM PENDING!!!!!
           int gameID = 1; // RANDOM PENDING!!
           int playersLeft = receivedK;
+		  startGameResponse response;
 
           for (int i = 0; i < inputMessage.parameters; i++){
-              startGameResponse response;
+
               // Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
               response.gameID = gameID;
 			  response.playersLeft = playersLeft;
