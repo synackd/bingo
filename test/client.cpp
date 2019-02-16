@@ -75,10 +75,11 @@ void str_cli(FILE *fp, int sockfd)
                     int newGameID;
                     message callerACK;
                     callerACK.commandCode = CALLERACK;
+                    startGameResponse response;
 
                     for (int i = 0; i < kInt; i++){
                         // startGameResponse response;
-                        startGameResponse response;
+
                         cout << "receiving player ...\n";
                         n = read(sockfd, &response, sizeof(startGameResponse));
                         if (n < 0)
@@ -94,13 +95,12 @@ void str_cli(FILE *fp, int sockfd)
                             // Player tempPlayer(response.playerIP, response.playerPort);
                             // tempPlayerrintPlayer();
                             usleep(2000);
-                            cout << "ACK sent to manager.\n";
-                            // Sending ACK back to manager:
 
+                            // Sending ACK back to manager:
                             n = write(sockfd, &callerACK, sizeof(message));
                             if (n < 0)
                                 DieWithError("ERROR writing to socket");
-
+                            cout << "ACK sent to manager.\n";
 
                         }
                     }
