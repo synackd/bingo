@@ -52,7 +52,7 @@ void EchoString(int sockfd)
               response.playerPort = playersList[i].Port;
               playersLeft --;
 
-			  cout << "Sending Player: GameID = " << response.GameID << "\tIP = " << response.playerIP << "\tPort = " << response.playerPort << "\n";
+			  cout << "Sending Player: GameID = " << response.gameID << "\tIP = " << response.playerIP << "\tPort = " << response.playerPort << "\n";
               // response.gamePlayer->PrintPlayer();
               write(sockfd, &response, sizeof(startGameResponse));
 			  if (n < 0)
