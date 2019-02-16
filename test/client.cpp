@@ -83,7 +83,7 @@ void str_cli(FILE *fp, int sockfd)
                             DieWithError("ERROR reading from socket");
                         else{
 
-                            cout << "Receiving Player: GameID = " << response.gameID << "\tIP = " << response.playerIP << "\tPort = " << response.playerPort << "\n";
+                            cout << "Receiving Player: GameID = " << response->gameID << "\tIP = " << response->playerIP << "\tPort = " << response->playerPort << "\n";
                             cout << "ACK sent to manager.\n";
 
                             // Creating Player
