@@ -69,9 +69,17 @@ int main(int argc, char **argv)
 
     ssize_t size = 0;
 
-    // Create a general struct.
-    any_cmd_t general = { .command = DEREGISTER };     // For sending
-    any_cmd_t *rec    = (any_cmd_t*) malloc(sizeof(any_cmd_t)); // Receiving
+    // Create a general data payload.
+    msg_t general = {
+        DEREGISTER,
+        {
+            .mgr_rsp_register = {
+                0,
+                1234
+            }
+        }
+    };     // For sending
+    msg_t *rec    = (msg_t*) malloc(sizeof(msg_t)); // Receiving
 
     // Create socket and start it.
     ServerSocket *sock = new ServerSocket(port);

@@ -71,9 +71,19 @@ int main(int argc, char **argv)
 
     ssize_t size = 0;
 
-    // Create general struct.
-    any_cmd_t general = { .command = REGISTER };    // For sending
-    any_cmd_t *rec    = (any_cmd_t*) malloc(sizeof(any_cmd_t)); // Receiving
+    // Create general payload.
+    msg_t general = {
+        REGISTER,
+        {
+            .mgr_cmd_register = {
+                "Player",
+                "1.1.1.1",
+                "4000"
+            }
+        }
+    };
+
+    msg_t *rec    = (msg_t*) malloc(sizeof(msg_t)); // Receiving
 
     // Create socket and start it.
     ClientSocket *sock = new ClientSocket(argv[1], port);
@@ -81,16 +91,12 @@ int main(int argc, char **argv)
 
     // Send struct through socket and read response.
     size = sock->send(&general, sizeof(general));
-    cprintf(stdout, BOLD, "[CLI] ");
-    fprintf(stdout, "Sent %d bytes over socket.\n", size);
-    cprintf(stdout, BOLD, "[CLI] ");
-    fprintf(stdout, "Listening for response...\n");
+    info("Sent %d bytes over socket.", size);
+    info("Listening for response...");
 
     size = sock->receive((void**) &rec, sizeof(*rec));
-    cprintf(stdout, BOLD, "[CLI] ");
-    fprintf(stdout, "Received %d bytes over socket.\n", size);
-    cprintf(stdout, BOLD, "[CLI] ");
-    fprintf(stdout, "Command: %d\n", rec->command);
+    info("Received %d bytes over socket.", size);
+    info("Command: %d", rec->command);
 
     // Clean up.
     sock->stop();

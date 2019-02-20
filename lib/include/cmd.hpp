@@ -46,7 +46,6 @@
  * 'register' command.
  */
 typedef struct {
-    int command;        /**< The command code for the manager */
     char name[BUFMAX];  /**< The name of a player to register/deregister */
     char ip[BUFMAX];    /**< The default IP address of the player */
     char port[BUFMAX];  /**< The default port of the player */
@@ -76,7 +75,7 @@ typedef struct {
         /* Register command/response */
         mgr_cmd_register_t mgr_cmd_register;    /**< Register player command data */
         mgr_rsp_register_t mgr_rsp_register;    /**< Register player response data */
-    };
+    } data;
 } msg_t;
 
 #endif
