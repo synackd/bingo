@@ -50,7 +50,7 @@ void error(const char *fmt, ...)
  */
 int main(int argc, char **argv)
 {
-    BingoBoard testBoard = BingoBoard();
+    Board testBoard = Board();
 
     testBoard.PrintBoard();
 
@@ -60,8 +60,8 @@ int main(int argc, char **argv)
     while (!gameover){
         value = rand() % 10;
         info("Calling %d", value);
-        testBoard.CheckNumber(value);
-        gameover = testBoard.CheckWin();
+        testBoard.markNumber(value);
+        gameover = testBoard.checkWin();
     }
 
     info("GAMEOVER");
