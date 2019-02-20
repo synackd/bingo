@@ -40,52 +40,93 @@ void error(const char *fmt, ...)
     fprintf(stderr, "\n");
 }
 
+void EchoString(ServerSocket *sock)
+{
+    ssize_t n;
+    char    line[ECHOMAX];
+    int inputCode;
+    int receivedK;
+
+    message *inputMessage = (message*) malloc(sizeof(message));
+
+    for ( ; ; ) {
+	    if ( (n = sock->receive((void**) &inputMessage, sizeof(message))) == 0 )
+   	    	return; /* connection closed by other end */
+
+        inputCode = inputMessage->commandCode;
+
+        if (inputCode == STARTGAME){
+          info("Start Game command received!");
+          info("Sending %i players to caller.", inputMessage->parameters);
+
+          // Sending k players from list --> RANDOM PENDING!!!!!
+          int gameID = 1; // RANDOM PENDING!!
+		  int numberOfPlayersToSend = inputMessage->parameters;
+          int playersLeft = receivedK;
+		  startGameResponse *response = (startGameResponse*) malloc(sizeof(startGameResponse));
+
+          for (int i = 0; i < numberOfPlayersToSend; i++){
+
+              // Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
+              response->gameID = gameID;
+			  response->playersLeft = playersLeft;
+              response->playerIP = playersList[i].playerIP;
+              response->playerPort = playersList[i].Port;
+              playersLeft --;
+
+			  cout << "Sending Player: GameID = " << response->gameID << "\tIP = " << response->playerIP << "\tPort = " << response->playerPort << "\n";
+              // response.gamePlayer->PrintPlayer();
+              sock->send((void**) &response, sizeof(startgameResponse));
+			  if (n < 0)
+			  	error("Could not write to socket!");
+
+              // waiting for ACK:
+			  n = sock->receive((void**) &inputMessage, sizeof(message));
+			  if (n < 0)
+				  error("Could not read from socket!");
+			  else{
+				  if (inputMessage->commandCode == CALLERACK)
+				  	info("Caller ACK received.");
+			  }
+          }
+	  } // end of STARTGAME command processing
+
+    }// end of for loop
+
+}// end of EchoString
+
 /**
  * Main runtime of manager application.
  */
 int main(int argc, char **argv)
 {
-    // Arg checking.
-    if (argc != 2) {
-        cprintf(stdout, BOLD, "Usage: ");
-        fprintf(stdout, "%s <port>\n", argv[0]);
-        exit(FAILURE);
+    // TEMPORAL LIST OF PLAYERS FOR TESTING: //////////////////////
+
+    // LIST OF REGISTERED PLAYERS:
+    int numberOfRegPlayers = 5;
+
+    for (int i = 0; i < numberOfRegPlayers; i++){
+        string playerIP = "IP" + std::to_string(i);
+        PlayerData tempPlayer(playerIP, i);
+		playersList.push_back(tempPlayer);
     }
 
-    // Try to convert port.
-    unsigned short port;
-    errno = 0;
-    long int tmp = strtol(argv[1], NULL, 10);
-    if (errno != 0) {
-        error("Invalid port number!");
-        exit(FAILURE);
-    }
-    if (0 <= tmp && tmp <= 65535) {
-        port = (unsigned short) tmp;
-    } else {
-        error("Port must be between 0 and 65535!");
-        exit(FAILURE);
+    //////////////////////////////////////////////////////////////
+
+
+    if (argc != 2)         /* Test for correct number of parameters */
+    {
+        fprintf(stderr,"Usage: %s <TDP SERVER PORT>\n", argv[0]);
+        exit(1);
     }
 
-    ssize_t size = 0;
+    echoServPort = atoi(argv[1]);  /* First arg:  local port */
 
-    // Create a general struct.
-    any_cmd_t general = { .command = DEREGISTER };     // For sending
-    any_cmd_t *rec    = (any_cmd_t*) malloc(sizeof(any_cmd_t)); // Receiving
-
-    // Create socket and start it.
-    ServerSocket *sock = new ServerSocket(port);
+    /* Create socket for sending/receiving datagrams */
+    ClientSocket *sock = new ServerSocket(echoServPort);
     sock->start();
-
-    // Receive data from client and send response.
-    size = sock->receive((void**) &rec, sizeof(*rec));
-    info("Received %d bytes over socket.", size);
-    info("Command: %d", rec->command);
-
-    size = sock->send(&general, sizeof(general));
-    info("Sent %d bytes over socket.", size);
-
-    return 0;
+	EchoString(sock);
+	sock->stop();
 }
 
 /*
