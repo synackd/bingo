@@ -50,6 +50,8 @@ void CallBingo(int sockfd)
 			if (playerResponse.commandCode == PLAYERACK)
 				cout << "Player ACK received.\n";
 
+			if (playerResponse.commandCode == GAMEOVER)
+				gameOVer = true;
 		}
 
 		usleep(3000);

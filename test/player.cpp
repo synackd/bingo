@@ -29,7 +29,7 @@ void ListenBingo(int sockfd)
 
     message inputMessage;
 	message callerACK;
-	callerACK.commandCode = CALLERACK;
+	callerACK.commandCode = PLAYERACK;
 
     for ( ; ; ) {
 	    if ( (n = read(sockfd, &inputMessage, sizeof(message))) == 0 )
