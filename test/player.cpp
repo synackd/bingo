@@ -48,6 +48,8 @@ void ListenBingo(int sockfd)
 			// updating command code if player wins:
 			if (gameOver){
 				callerACK.commandCode = GAMEOVER;
+
+				gameBoard.PrintBoard();
 			}
 
 			n = write(sockfd, &callerACK, sizeof(message));

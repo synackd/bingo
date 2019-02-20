@@ -84,7 +84,8 @@ public:
         }
     }
 
-    bool CheckNumber(int calledValue){
+    bool CheckNumber(int
+    ){
         for (int row = 0; row < 3; row++){
             for (int column = 0; column < 3; column++){
                 if (values[row][column].value == calledValue){

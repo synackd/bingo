@@ -57,6 +57,8 @@ void CallBingo(int sockfd)
 		usleep(3000);
 	} // end of while loop
 
+	cout << "Game Over! \n";
+
 }// end of EchoString
 
 
