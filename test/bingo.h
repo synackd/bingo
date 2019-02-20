@@ -18,7 +18,10 @@
 
 using namespace std;
 
-class Player{
+// CLASSES: /////////////////////////////////////////
+
+// Used in Caller role to keep track of players in each game:
+class PlayerData{
 public:
     string playerIP;
     int Port;
@@ -52,7 +55,7 @@ public:
 
 };
 
-
+// Used to represent the Bing Board cell:
 class BingoPair{
 public:
 
@@ -71,6 +74,7 @@ public:
 
 };
 
+// Represents the Bingoboard and contains methods:
 class BingoBoard{
 public:
 
@@ -150,6 +154,125 @@ public:
 
 };
 
+
+class Caller{
+public:
+    // Calls numbers to players:
+    void CallBingo(int sockfd){
+        ssize_t n;
+        int inputCode;
+    	bool gameOver = false;
+    	int value;
+
+        message callMessage; 	// message for sending
+    	message playerResponse;		// message to receive ACK from player
+
+    	while (!gameOver){
+    		// Populating callMessage:
+    		callMessage.commandCode = BINGOCALL;
+    		value = rand() % 10;
+    		callMessage.parameters = value;
+
+    		// Sending 'Start game K' command:
+    		cout << "calling " << value << "\n";
+    		n = write(sockfd, &callMessage, sizeof(message));
+    		if (n < 0)
+    			DieWithError("ERROR writing to socket");
+
+    		n = read(sockfd, &playerResponse, sizeof(startGameResponse));
+    		if (n < 0)
+    			DieWithError("ERROR reading from socket");
+    		else{
+
+    			if (playerResponse.commandCode == PLAYERACK)
+    				cout << "Player ACK received.\n";
+
+    			if (playerResponse.commandCode == GAMEOVER)
+    				gameOVer = true;
+    		}
+
+    	} // end of while loop
+
+    	cout << "Game Over! \n";
+    }
+
+    // Request players to manager:
+    void StartGame(){
+
+    }
+
+};
+
+
+class Manager{
+public:
+    // Sends K players to Caller that requested them:
+    void SendKPlayers(){
+
+    }
+
+    // Registers players who want to be considered to play Bingo:
+    void RegisterPlayer(){
+
+    }
+
+};
+
+
+class Player{
+public:
+
+    // Player listens for Numbers called by Caller:
+    void ListenBingo(){
+        ssize_t n;
+        int inputCode;
+        int calledNumber;
+    	bool gameOver = false;
+
+        message inputMessage;
+    	message callerACK;
+    	callerACK.commandCode = PLAYERACK;
+
+        for ( ; ; ) {
+    	    if ( (n = read(sockfd, &inputMessage, sizeof(message))) == 0 )
+       	    	return; /* connection closed by other end */
+
+            inputCode = inputMessage.commandCode;
+
+            if (inputCode == BINGOCALL){
+                printf("Bingo Call received!\n");
+    			calledNumber = inputMessage.parameters;
+                cout << "Number: " << calledNumber << "\n";
+
+    			gameBoard.CheckNumber(calledNumber);
+    	        gameOver = gameBoard.CheckWin();
+
+    			// updating command code if player wins:
+    			if (gameOver){
+    				callerACK.commandCode = GAMEOVER;
+
+    				gameBoard.PrintBoard();
+    			}
+
+    			n = write(sockfd, &callerACK, sizeof(message));
+    			if (n < 0)
+    				DieWithError("ERROR writing to socket");
+    			cout << "ACK/GAMEOVER sent to caller.\n";
+
+            }
+
+        }// end of for loop
+    }
+
+    // Registers to Manager for future games:
+    void RegisterToManager(){
+
+    }
+}
+
+
+
+// STRUCTS FOR MESSAGES ////////////////////////////////////
 // Used for CALLERACK, STARTGAME, NUMBERCALL,...
 struct message{
     int commandCode;

@@ -90,7 +90,8 @@ void str_cli(FILE *fp, int sockfd)
                             //
                             // cout << "Receiving Player: GameID = " << newGameID << "\tIP = " << newIP << "\n";
                             // Creating Player
-                            // Player tempPlayer(response.playerIP, response.playerPort);
+                            Player tempPlayer = new Player(response.playerIP, response.playerPort);
+                            cout << tempPlayer.playerIP << "\n";
                             // tempPlayerrintPlayer();
                             // usleep(2000);
 

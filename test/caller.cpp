@@ -12,7 +12,7 @@
 
 using namespace std;
 
-vector<Player> playersList;
+vector<PlayerData> playersList;
 
 void DieWithError(const char *errorMessage) /* External error handling function */
 {

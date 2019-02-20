@@ -12,7 +12,7 @@
 
 using namespace std;
 
-vector<Player> playersList;
+vector<PlayerData> playersList;
 
 void DieWithError(const char *errorMessage) /* External error handling function */
 {
@@ -94,7 +94,7 @@ int main(int argc, char **argv)
 
     for (int i = 0; i < numberOfRegPlayers; i++){
         string playerIP = "IP" + std::to_string(i);
-        Player tempPlayer(playerIP, i);
+        PlayerData tempPlayer(playerIP, i);
 		playersList.push_back(tempPlayer);
     }
 
