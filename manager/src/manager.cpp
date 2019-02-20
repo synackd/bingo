@@ -87,3 +87,32 @@ int main(int argc, char **argv)
 
     return 0;
 }
+
+/*
+ * Class Implementations
+ */
+
+/***********
+ * Manager *
+ ***********/
+
+/**
+ * Create a new manager
+ */
+Manager::Manager()
+{
+}
+
+/**
+ * Send k players to caller that requested them
+ */
+void Manager::sendKPlayers()
+{
+}
+
+/**
+ * Register players who want to be considered to play Bingo
+ */
+void Manager::registerPlayer()
+{
+}
