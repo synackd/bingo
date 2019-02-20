@@ -8,6 +8,7 @@
 #ifndef _BINGO_HPP_
 #define _BINGO_HPP_
 
-// Definitions go here.
+void info(const char *fmt, ...);
+void error(const char *fmt, ...);
 
 #endif

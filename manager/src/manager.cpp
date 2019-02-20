@@ -6,10 +6,39 @@
  */
 
 #include <stdio.h>
+#include <stdarg.h>
 #include "colors.hpp"
 #include "manager.hpp"
 #include "cmd.hpp"
 #include "server.hpp"
+
+/**
+ * Log an info message to stdout
+ * from the manager.
+ */
+void info(const char *fmt, ...)
+{
+    va_list vaList;
+    cprintf(stdout, BOLD, "[MGR] ");
+    va_start(vaList, fmt);
+    fprintf(stdout, fmt, vaList);
+    va_end(vaList);
+    fprintf(stdout, "\n");
+}
+
+/**
+ * Log an error message to stderr
+ * from the manager.
+ */
+void error(const char *fmt, ...)
+{
+    va_list vaList;
+    cprintf(stderr, BOLD, "[MGR][ERR] ");
+    va_start(vaList, fmt);
+    fprintf(stderr, fmt, vaList);
+    va_end(vaList);
+    fprintf(stderr, "\n");
+}
 
 /**
  * Main runtime of manager application.
@@ -28,15 +57,13 @@ int main(int argc, char **argv)
     errno = 0;
     long int tmp = strtol(argv[1], NULL, 10);
     if (errno != 0) {
-        cprintf(stderr, BOLD, "Error: ");
-        fprintf(stderr, "Invalid port number.\n");
+        error("Invalid port number!");
         exit(FAILURE);
     }
     if (0 <= tmp && tmp <= 65535) {
         port = (unsigned short) tmp;
     } else {
-        cprintf(stderr, BOLD, "Error: ");
-        fprintf(stderr, "Port must be between 0 and 65535.\n");
+        error("Port must be between 0 and 65535!");
         exit(FAILURE);
     }
 
@@ -52,14 +79,11 @@ int main(int argc, char **argv)
 
     // Receive data from client and send response.
     size = sock->receive((void**) &rec, sizeof(*rec));
-    cprintf(stdout, BOLD, "[SRV] ");
-    fprintf(stdout, "Received %d bytes over socket.\n", size);
-    cprintf(stdout, BOLD, "[SRV] ");
-    fprintf(stdout, "Command: %d\n", rec->command);
+    info("Received %d bytes over socket.", size);
+    info("Command: %d", rec->command);
 
     size = sock->send(&general, sizeof(general));
-    cprintf(stdout, BOLD, "[SRV] ");
-    fprintf(stdout, "Sent %d bytes over socket.\n", size);
+    info("Sent %d bytes over socket.", size);
 
     return 0;
 }
