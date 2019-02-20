@@ -45,14 +45,11 @@ void error(const char *fmt, ...)
     fprintf(stderr, "\n");
 }
 
-/**
- * Main runtime of bingo application
- */
-int main(int argc, char **argv)
+void caller()
 {
     Board testBoard = Board();
 
-    testBoard.PrintBoard();
+    testBoard.printBoard();
 
     int value;
     bool gameover = false;
@@ -65,5 +62,58 @@ int main(int argc, char **argv)
     }
 
     info("GAMEOVER");
-    testBoard.PrintBoard();
+    testBoard.printBoard();
+}
+
+void player(int port)
+{
+	ssize_t n;
+    int inputCode;
+    int calledNumber;
+	bool gameOver = false;
+
+    Board testBoard = Board();
+    message *inputMessage = (message*) malloc(sizeof(message));
+	message *callerACK = (message*) malloc(sizeof(message));
+	callerACK->commandCode = PLAYERACK;
+    ServerSocket sock = new ServerSocket(port);
+    sock.start();
+
+    for ( ; ; ) {
+	    if ( (n = sock->receive((void**) &inputMessage, sizeof(message))) == 0 )
+   	    	return; /* connection closed by other end */
+
+        inputCode = inputMessage->commandCode;
+
+        if (inputCode == BINGOCALL){
+            info("Bingo Call received!");
+			calledNumber = inputMessage->parameters;
+            info("Number: %d", calledNumber);
+
+			gameBoard.CheckNumber(calledNumber);
+	        gameOver = gameBoard.checkWin();
+
+			// updating command code if player wins:
+			if (gameOver){
+				callerACK->commandCode = GAMEOVER;
+
+				gameBoard.printBoard();
+			}
+
+			n = sock->send((void**) &callerACK, sizeof(message));
+			if (n < 0) {
+                // TODO: Implement return code here
+				error("Could not write to socket!");
+                return;
+            }
+			info("ACK/GAMEOVER sent to caller.");
+        }
+    }// end of for loop
+}
+
+/**
+ * Main runtime of bingo application
+ */
+int main(int argc, char **argv)
+{
 }
