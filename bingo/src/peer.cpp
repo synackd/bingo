@@ -181,6 +181,7 @@ Caller::Caller()
 /**
  * Calls numbers to players
  */
+// TODO: Make this object oriented with ServerSocket...
 void Caller::call(int sockfd)
 {
     ssize_t n;
@@ -286,6 +287,7 @@ int Player::getPort()
 /**
  * Player listens for Numbers called by Caller
  */
+// TODO: Make this object oriented using ClientSocket...
 void Player::listenBingo()
 {
     ssize_t n;
