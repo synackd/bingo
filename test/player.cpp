@@ -12,7 +12,7 @@
 
 using namespace std;
 
-vector<Player> playersList;
+BingoBoard gameBoard = BingoBoard();
 
 void DieWithError(const char *errorMessage) /* External error handling function */
 {
@@ -20,14 +20,16 @@ void DieWithError(const char *errorMessage) /* External error handling function 
 	exit(1);
 }
 
-void EchoString(int sockfd)
+void ListenBingo(int sockfd)
 {
-    ssize_t n;
-    char    line[ECHOMAX];
+	ssize_t n;
     int inputCode;
-    int receivedK;
+    int calledNumber;
+	bool gameOver = false;
 
     message inputMessage;
+	message callerACK;
+	callerACK.commandCode = CALLERACK;
 
     for ( ; ; ) {
 	    if ( (n = read(sockfd, &inputMessage, sizeof(message))) == 0 )
@@ -35,42 +37,25 @@ void EchoString(int sockfd)
 
         inputCode = inputMessage.commandCode;
 
-        if (inputCode == STARTGAME){
-          printf("Start Game command received!\n");
-          printf("Sending %i players to caller.\n", inputMessage.parameters);
+        if (inputCode == BINGOCALL){
+            printf("Bingo Call received!\n");
+			calledNumber = inputMessage.parameters;
+            cout << "Number: " << calledNumber << "\n";
 
-          // Sending k players from list --> RANDOM PENDING!!!!!
-          int gameID = 1; // RANDOM PENDING!!
-		  int numberOfPlayersToSend = inputMessage.parameters;
-          int playersLeft = receivedK;
-		  startGameResponse response;
+			gameBoard.CheckNumber(calledNumber);
+	        gameOver = gameBoard.CheckWin();
 
-          for (int i = 0; i < numberOfPlayersToSend; i++){
+			// updating command code if player wins:
+			if (gameOver){
+				callerACK.commandCode = GAMEOVER;
+			}
 
-              // Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
-              response.gameID = gameID;
-			  response.playersLeft = playersLeft;
-              response.playerIP = playersList[i].playerIP;
-              response.playerPort = playersList[i].Port;
-              playersLeft --;
+			n = write(sockfd, &callerACK, sizeof(message));
+			if (n < 0)
+				DieWithError("ERROR writing to socket");
+			cout << "ACK/GAMEOVER sent to caller.\n";
 
-			  cout << "Sending Player: GameID = " << response.gameID << "\tIP = " << response.playerIP << "\tPort = " << response.playerPort << "\n";
-              // response.gamePlayer->PrintPlayer();
-              write(sockfd, &response, sizeof(startGameResponse));
-			  if (n < 0)
-			  	DieWithError("ERROR writing to socket");
-
-              // waiting for ACK:
-			  n = read(sockfd, &inputMessage, sizeof(message));
-			  if (n < 0)
-				  DieWithError("ERROR reading from socket");
-			  else{
-				  if (inputMessage.commandCode == CALLERACK)
-				  	printf("Caller ACK received.\n");
-			  }
-
-          }
-	  } // end of STARTGAME command processing
+        }
 
     }// end of for loop
 
@@ -86,20 +71,6 @@ int main(int argc, char **argv)
     char echoBuffer[ECHOMAX];        /* Buffer for echo string */
     unsigned short echoServPort;     /* Server port */
     int recvMsgSize;                 /* Size of received message */
-
-    // TEMPORAL LIST OF PLAYERS FOR TESTING: //////////////////////
-
-    // LIST OF REGISTERED PLAYERS:
-    int numberOfRegPlayers = 5;
-
-    for (int i = 0; i < numberOfRegPlayers; i++){
-        string playerIP = "IP" + std::to_string(i);
-        Player tempPlayer(playerIP, i);
-		playersList.push_back(tempPlayer);
-    }
-
-    //////////////////////////////////////////////////////////////
-
 
     if (argc != 2)         /* Test for correct number of parameters */
     {
@@ -126,11 +97,11 @@ int main(int argc, char **argv)
 	if (listen(sock, BACKLOG) < 0 )
 		DieWithError("server: listen() failed");
 
-	printf("Manager listening at port %s\n", argv[1]);
+	printf("Player listening at port %s\n", argv[1]);
 
 	cliAddrLen = sizeof(echoClntAddr);
 	connfd = accept( sock, (struct sockaddr *) &echoClntAddr, &cliAddrLen );
 
-	EchoString(connfd);
+	ListenBingo(connfd);
 	close(connfd);
 }

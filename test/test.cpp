@@ -11,20 +11,24 @@
 #include "bingo.h"
 using namespace std;
 
-
-
 int main(int argc, char **argv)
 {
-    int numberOfRegPlayers = 5;
+    BingoBoard testBoard = BingoBoard();
 
-    vector<Player> playersList;
+    testBoard.PrintBoard();
 
-    for (int i = 0; i < numberOfRegPlayers; i++){
-        string playerIP = "IP" + std::to_string(i);
-        Player tempPlayer(playerIP, i);
-        playersList.push_back(tempPlayer);
+    int value;
+    bool gameover = false;
+
+    while (!gameover){
+        value = rand() % 10;
+        cout << "calling " << value << "\n";
+        testBoard.CheckNumber(value);
+        gameover = testBoard.CheckWin();
     }
 
-    cout << playersList[0].playerIP;
+    cout << "GAMEOVER\n";
+    testBoard.PrintBoard();
+
 
 }
