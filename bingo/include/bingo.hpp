@@ -8,12 +8,6 @@
 #ifndef _BINGO_HPP_
 #define _BINGO_HPP_
 
-#define STARTGAME 10
-#define CALLERACK 1
-#define BINGOCALL 2
-#define PLAYERACK 3
-#define GAMEOVER 4
-
 /*
  * Functions
  */

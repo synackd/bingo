@@ -9,25 +9,6 @@
 using namespace std;
 
 /*
- * Structures for messages
- */
-
-/**
- * Used for CALLERACK, STARTGAME, NUMBERCALL,...
- */
-typedef struct message {
-    int commandCode;
-    int parameters;
-} message;
-
-typedef struct startGameResponse {
-    int gameID;
-    int playersLeft;
-    string playerIP;
-    int playerPort;
-} startGameResponse;
-
-/*
  * Class Prototypes
  */
 
@@ -45,23 +26,6 @@ class Player {
         int getPort(void);
         void listenBingo(void);
         void registerToManager(void);
-};
-
-/**
- * Used in Caller role to keep track of players in each game
- */
-class PlayerData {
-    private:
-        string name;
-        string ip;
-        int port;
-
-    public:
-        PlayerData(string inputName, string inputIP, int inputPort);
-        string to_string(void);
-        string getName(void);
-        string getIP(void);
-        int getPort(void);
 };
 
 /**

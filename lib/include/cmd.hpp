@@ -69,5 +69,25 @@ typedef struct {
     int game_uid;       /**< The queried unique game identifier */
 } mgr_rsp_register_t;
 
+/*
+ * Test Structures
+ */
+
+/**
+ * Used for CALLERACK, STARTGAME, NUMBERCALL,...
+ */
+typedef struct message {
+    int commandCode;
+    int parameters;
+} message;
+
+typedef struct startGameResponse {
+    int gameID;
+    int playersLeft;
+    string playerIP;
+    int playerPort;
+} startGameResponse;
+
+
 
 #endif

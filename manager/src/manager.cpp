@@ -9,6 +9,7 @@
 #include <stdarg.h>
 #include "colors.hpp"
 #include "manager.hpp"
+#include "player.hpp"
 #include "cmd.hpp"
 #include "server.hpp"
 
@@ -43,7 +44,7 @@ void error(const char *fmt, ...)
 void EchoString(ServerSocket *sock)
 {
     ssize_t n;
-    char    line[ECHOMAX];
+    char    line[BUFMAX];
     int inputCode;
     int receivedK;
 
@@ -66,7 +67,6 @@ void EchoString(ServerSocket *sock)
 		  startGameResponse *response = (startGameResponse*) malloc(sizeof(startGameResponse));
 
           for (int i = 0; i < numberOfPlayersToSend; i++){
-
               // Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
               response->gameID = gameID;
 			  response->playersLeft = playersLeft;
@@ -74,7 +74,7 @@ void EchoString(ServerSocket *sock)
               response->playerPort = playersList[i].Port;
               playersLeft --;
 
-			  cout << "Sending Player: GameID = " << response->gameID << "\tIP = " << response->playerIP << "\tPort = " << response->playerPort << "\n";
+			  info("Sending Player: GameID = %d\tIP = %s\tPort = %d", response->gameID, response->playerIP, response->playerPort);
               // response.gamePlayer->PrintPlayer();
               sock->send((void**) &response, sizeof(startgameResponse));
 			  if (n < 0)
@@ -120,10 +120,10 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    echoServPort = atoi(argv[1]);  /* First arg:  local port */
+    int echoServPort = atoi(argv[1]);  /* First arg:  local port */
 
     /* Create socket for sending/receiving datagrams */
-    ClientSocket *sock = new ServerSocket(echoServPort);
+    ServerSocket *sock = new ServerSocket(echoServPort);
     sock->start();
 	EchoString(sock);
 	sock->stop();
