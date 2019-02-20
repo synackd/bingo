@@ -8,6 +8,9 @@
 #ifndef _MANAGER_H_
 #define _MANAGER_H_
 
-// Definitions go here.
+#include "colors.hpp"
+
+void info(const char *fmt, ...);
+void error(const char *fmt, ...);
 
 #endif
