@@ -40,14 +40,6 @@
 //***********************
 //* Payload Definitions *
 //***********************
-/**
- * @brief A generic struct for the recipient to read and
- * determine what type of structure to use based on the
- * command code.
- */
-typedef struct {
-    int command;
-} any_cmd_t;
 
 /**
  * @brief The payload to the manager for the
@@ -69,5 +61,22 @@ typedef struct {
     int game_uid;       /**< The queried unique game identifier */
 } mgr_rsp_register_t;
 
+/*****************************
+ * GENERIC PAYLOAD STRUCTURE *
+ *****************************/
+
+/**
+ * @brief A generic struct for the recipient to read and
+ * determine what type of structure to use based on the
+ * command code.
+ */
+typedef struct {
+    int command;
+    union {
+        /* Register command/response */
+        mgr_cmd_register_t mgr_cmd_register;    /**< Register player command data */
+        mgr_rsp_register_t mgr_rsp_register;    /**< Register player response data */
+    };
+} msg_t;
 
 #endif
