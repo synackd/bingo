@@ -159,23 +159,11 @@ int main(int argc, char **argv)
     /****************
      * REGISTRATION *
      ****************/
-    /*int choice = 0;
-
-    printMenu();
-    getChoice();*/
-
     char *p_name, *p_ip;
     unsigned int p_port;
     getPeerInfo(&p_name, &p_ip, &p_port);
 
-    printMenu();
-    int choice = getChoice();
-    printf("Choice is: %d\n", choice);
-
-    /******************************
-     * COMMUNICATION WITH MANAGER *
-     ******************************/
-    /*// Create socket for communication with manager
+    // Create socket for communication with manager
     bingo_sock = new ClientSocket(argv[1], port);
 
     // Establish connection with manager
@@ -183,7 +171,7 @@ int main(int argc, char **argv)
     bingo_sock->start();
 
     // Create player
-    Player *newPlayer = new Player("Newbie", argv[1], port);
+    Player *newPlayer = new Player(p_name, p_ip, p_port);
 
     // Attempt to register player with manager
     newPlayer->registerToManager(bingo_sock);
@@ -191,7 +179,15 @@ int main(int argc, char **argv)
     // Close connection with manager
     info("Closing connection with manager...");
     bingo_sock->stop();
-    delete bingo_sock;*/
+    delete bingo_sock;
+    bingo_sock = NULL;
+
+    /********
+     * MENU *
+     ********/
+    /*int choice = 0;
+    printMenu();
+    choice = getChoice();*/
 
     return SUCCESS;
 }
