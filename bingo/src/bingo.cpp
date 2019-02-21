@@ -123,7 +123,7 @@ void playerRole(ServerSocket *sock)
                gameBoard.printBoard();
            }
 
-           n = sock->send((void**) &callerACK, sizeof(message));
+           n = sock->send(&callerACK, sizeof(message));
            cout << "Sending" << n << " bytes over socket.\n";
            cout << "ACK/GAMEOVER sent to caller.\n";
 
