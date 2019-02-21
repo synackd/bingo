@@ -106,8 +106,8 @@ void playerRole(ServerSocket *sock)
    callerACK.commandCode = PLAYERACK;
 
    for ( ; ; ) {
-       if ( (n = sock->receive((void*) &inputMessage, sizeof(message))) == 0 )
-           return; /* connection closed by other end */
+       n = sock->receive((void*) &inputMessage, sizeof(message));
+       cout << "Receiving" << n << " bytes over socket. CommandCode" << inputMessage.commandCode << "\n";
 
        inputCode = inputMessage.commandCode;
 
@@ -139,7 +139,20 @@ void playerRole(ServerSocket *sock)
  */
 int main(int argc, char **argv)
 {
-    cout << "ArgCount = " << argc <<"\n";
+    // Try to convert port.
+    unsigned short port;
+    errno = 0;
+    long int tmp = strtol(argv[3], NULL, 10);
+    if (errno != 0) {
+        error("Invalid port number!");
+        exit(FAILURE);
+    }
+    if (0 <= tmp && tmp <= 65535) {
+        port = (unsigned short) tmp;
+    } else {
+        error("Port must be between 0 and 65535!");
+        exit(FAILURE);
+    }
 
     if (argc != 4 && argc != 3)
 		DieWithError( "Parameter Error: usage: bingo caller <player-IPaddress> <player-Port> \n or bingo player <player-Port> " );
@@ -148,14 +161,14 @@ int main(int argc, char **argv)
     if (strcmp(argv[1],"caller") == 0) {
         cout << "Caller Role Started:\n";
         ClientSocket *cSock;
-    	cSock = new ClientSocket(argv[2], atoi(argv[3]));
+    	cSock = new ClientSocket(argv[2], port);
     	cSock->start();
         callerRole(cSock);
         cout << "out of caller method ............................................\n";
     }else if(strcmp(argv[1],"player") == 0){
         cout << "Player Role Started:\n";
         ServerSocket *pSock;
-    	pSock = new ServerSocket(atoi(argv[2]));
+    	pSock = new ServerSocket(port);
     	pSock->start();
         playerRole(pSock);
         cout << "out of player method ............................................\n";

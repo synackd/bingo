@@ -24,7 +24,7 @@ class ServerSocket: public Socket
         int start(void);
         int stop(void);
         ssize_t send(void* data, size_t size);
-        ssize_t receive(void** data, size_t size);
+        ssize_t receive(void* data, size_t size);
 };
 
 #endif
