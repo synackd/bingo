@@ -160,14 +160,27 @@ short ConvertPort(char *inputPort){
  */
 int main(int argc, char **argv)
 {
-    unsigned short port;
 
     if (argc != 3)
 		DieWithError( "Parameter Error: usage: bingo caller <manager-IPaddress> <manager-Port> \n or bingo player <player-Port> " );
 
-    port = ConvertPort(argv[3]);
+    // Try to convert port.
+    unsigned short port;
+    errno = 0;
+    long int tmp = strtol(argv[2], NULL, 10);
+    if (errno != 0) {
+        error("Invalid port number!");
+        exit(FAILURE);
+    }
+    if (0 <= tmp && tmp <= 65535) {
+        port = (unsigned short) tmp;
+    } else {
+        error("Port must be between 0 and 65535!");
+        exit(FAILURE);
+    }
+
     ClientSocket *cSock;
-	cSock = new ClientSocket(argv[2], port);
+	cSock = new ClientSocket(argv[1], port);
 	cSock->start();
 
     // Starting Game:
