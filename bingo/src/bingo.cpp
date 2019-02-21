@@ -36,9 +36,17 @@ void printMenu()
     // Header
     cprintf(stdout, BOLD, "\n Choices:\n");
 
-    // Register
+    // Exit
+    cprintf(stdout, BOLD, "  0) ");
+    fprintf(stdout, "Exit\n");
+
+    // Start Game K
     cprintf(stdout, BOLD, "  1) ");
-    fprintf(stdout, "Register\n");
+    fprintf(stdout, "Start Game\n");
+
+    // Deregister
+    cprintf(stdout, BOLD, "  2) ");
+    fprintf(stdout, "Deregister\n");
 
     fprintf(stdout, "\n");
 }
@@ -49,7 +57,7 @@ void printMenu()
 int getChoice()
 {
     char *choice_str;
-    long int tmp = 0;
+    long int tmp = -1;
     int choice;
 
     // Get user input
@@ -59,7 +67,7 @@ int getChoice()
     // Convert choice
     errno = 0;
     tmp = strtol(choice_str, NULL, 10);
-    while (errno != 0 || tmp == 0) {
+    while (errno != 0 || tmp == -1) {
         cprintf(stdout, BOLD, "Invalid choice!\n");
         cprintf(stdout, BOLD, "Your choice: ");
         choice_str = read_line();
@@ -185,9 +193,31 @@ int main(int argc, char **argv)
     /********
      * MENU *
      ********/
-    /*int choice = 0;
-    printMenu();
-    choice = getChoice();*/
+    int choice = -1;
+
+    // Forever get user's choice
+    for ( ; ; ) {
+        // Get user's choice
+        printMenu();
+        choice = getChoice();
+
+        // Decide what to do
+        switch (choice) {
+            case 0:
+                cprintf(stdout, BOLD, "Exit\n");
+                exit(SUCCESS);
+                break;  // <-- Here for aesthetic purposes :)
+            case 1:
+                cprintf(stdout, BOLD, "Start Game\n");
+                break;
+            case 2:
+                cprintf(stdout, BOLD, "Deregister\n");
+                break;
+            default:
+                cprintf(stdout, BOLD, "No such choice on menu.\n");
+                break;
+        }
+    }
 
     return SUCCESS;
 }
