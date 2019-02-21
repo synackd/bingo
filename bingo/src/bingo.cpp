@@ -69,7 +69,7 @@ void callerRole(ClientSocket *sock)
 		callMessage.parameters = value;
 
         // Calling number:
-		cout << "Calling " << value;
+		cout << "Calling " << value << "\n";
 		n = sock->send((void*) &callMessage, sizeof(message));
         // cout << " Sending " << n << " bytes over socket.\n";
 
