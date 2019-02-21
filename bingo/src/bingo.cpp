@@ -81,8 +81,12 @@ void callerRole(ClientSocket *sock)
 			if (playerResponse.commandCode == PLAYERACK)
 				cout << "Player ACK received.\n";
 
-			if (playerResponse.commandCode == GAMEOVER)
-				gameOver = true;
+			if (playerResponse.commandCode == GAMEOVER){
+                gameOver = true;
+                cout << "GAMEOVER!\n";
+            }
+
+
 		}
     }
 
@@ -123,12 +127,15 @@ void playerRole(ServerSocket *sock)
 			if (gameOver){
 				callerACK->commandCode = GAMEOVER;
 				gameBoard.printBoard();
+                n = sock->send((void**) &callerACK, sizeof(message));
+                cout << "GAMEOVER sent to caller.\n";
+                return;
 			}
 
 			n = sock->send((void**) &callerACK, sizeof(message));
 			if (n < 0)
 				DieWithError("ERROR writing to socket");
-			cout << "ACK/GAMEOVER sent to caller.\n";
+			cout << "ACK sent to caller.\n";
 
         }
 
