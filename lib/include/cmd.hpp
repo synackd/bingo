@@ -75,7 +75,7 @@ typedef struct {
         /* Register command/response */
         mgr_cmd_register_t mgr_cmd_register;    /**< Register player command data */
         mgr_rsp_register_t mgr_rsp_register;    /**< Register player response data */
-    } data;
+    };
 } msg_t;
 
 #endif

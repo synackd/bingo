@@ -92,7 +92,7 @@ int ClientSocket::stop(void)
  * @param size The number of bytes so receive.
  * @return The size of the data read.
  */
-ssize_t ClientSocket::receive(void** data, size_t size)
+ssize_t ClientSocket::receive(void* data, size_t size)
 {
     /* Make sure there's a socket */
     if (this->sockfd == 0) {
@@ -102,7 +102,7 @@ ssize_t ClientSocket::receive(void** data, size_t size)
     }
 
     /* Don't write to a nonexistent or NULL pointer */
-    if (data == NULL || *data == NULL) {
+    if (data == NULL) {
         cprintf(stderr, BOLD, "[SRC][ERR] ");
         fprintf(stderr, "Received data is NULL!\n");
         return -1;
@@ -110,7 +110,7 @@ ssize_t ClientSocket::receive(void** data, size_t size)
 
     /* Read data, store in 'data', and return # bytes read */
     errno = 0;
-    ssize_t bytes = read(this->sockfd, *data, size);
+    ssize_t bytes = read(this->sockfd, data, size);
     if (bytes < 0) {
         cprintf(stderr, BOLD, "[CLI][ERR] ");
         fprintf(stderr, "read() failed: %s\n", strerror(errno));

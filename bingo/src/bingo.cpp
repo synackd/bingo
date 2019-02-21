@@ -72,35 +72,34 @@ int main(int argc, char **argv)
     ssize_t size = 0;
 
     // Create general payload.
-    msg_t general = {
-        REGISTER,
-        {
-            .mgr_cmd_register = {
-                "Player",
-                "1.1.1.1",
-                "4000"
-            }
-        }
-    };
+    info("%d", sizeof(msg_t));
+    info("%d", sizeof(mgr_cmd_register_t));
+    msg_t general;
+    general.command = REGISTER;
+    strncpy(general.mgr_cmd_register.name, "Player", BUFMAX);
+    strncpy(general.mgr_cmd_register.ip, "1.1.1.1", BUFMAX);
+    strncpy(general.mgr_cmd_register.port, "4000", BUFMAX);
 
-    msg_t *rec    = (msg_t*) malloc(sizeof(msg_t)); // Receiving
+    info("Command: %d", general.command);
+    info("Name: %s", general.mgr_cmd_register.name);
+
+    msg_t rec; // Receiving
 
     // Create socket and start it.
     ClientSocket *sock = new ClientSocket(argv[1], port);
     sock->start();
 
     // Send struct through socket and read response.
-    size = sock->send(&general, sizeof(general));
+    size = sock->send(&general, sizeof(msg_t));
     info("Sent %d bytes over socket.", size);
     info("Listening for response...");
 
-    size = sock->receive((void**) &rec, sizeof(*rec));
+    size = sock->receive((void*) &rec, sizeof(msg_t));
     info("Received %d bytes over socket.", size);
-    info("Command: %d", rec->command);
+    info("Command: %d", rec.mgr_rsp_register.ret_code);
 
     // Clean up.
     sock->stop();
-    free(rec);
     delete sock;
 
     return 0;

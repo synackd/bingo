@@ -70,27 +70,23 @@ int main(int argc, char **argv)
     ssize_t size = 0;
 
     // Create a general data payload.
-    msg_t general = {
-        DEREGISTER,
-        {
-            .mgr_rsp_register = {
-                0,
-                1234
-            }
-        }
-    };     // For sending
-    msg_t *rec    = (msg_t*) malloc(sizeof(msg_t)); // Receiving
+    msg_t general;
+    general.command = DEREGISTER;
+    general.mgr_rsp_register.ret_code = 0;
+    general.mgr_rsp_register.game_uid = 1234;
+
+    msg_t rec; // Receiving
 
     // Create socket and start it.
     ServerSocket *sock = new ServerSocket(port);
     sock->start();
 
     // Receive data from client and send response.
-    size = sock->receive((void**) &rec, sizeof(*rec));
+    size = sock->receive((void*) &rec, sizeof(msg_t));
     info("Received %d bytes over socket.", size);
-    info("Command: %d", rec->command);
+    info("Name: %s", rec.mgr_cmd_register.name);
 
-    size = sock->send(&general, sizeof(general));
+    size = sock->send(&general, sizeof(msg_t));
     info("Sent %d bytes over socket.", size);
 
     return 0;
