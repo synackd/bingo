@@ -64,8 +64,8 @@ void callerRole(ClientSocket *sock)
     message callMessage; 	// message for sending
 	message playerResponse;		// message to receive ACK from player
 
-    // while (!gameOver){
-    for (int i=0; i<20; i++){
+    while (!gameOver){
+    // for (int i=0; i<20; i++){
         callMessage.commandCode = BINGOCALL;
 		value = rand() % 10;
 		callMessage.parameters = value;
