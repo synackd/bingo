@@ -119,7 +119,7 @@ void playerRole(ServerSocket *sock)
            cout << "Number Called: " << calledNumber << "\n";
 
            gameBoard.markNumber(calledNumber);
-           gameBoard.printBoard();
+           // gameBoard.printBoard();
            gameOver = gameBoard.checkWin();
 
            // updating command code if player wins:
