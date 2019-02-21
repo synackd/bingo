@@ -71,20 +71,16 @@ void callerRole(ClientSocket *sock)
 		// Sending 'Start game K' command:
 		cout << "calling " << value << "\n";
 		n = sock->send((void**) &callMessage, sizeof(message));
-		if (n < 0)
-			DieWithError("ERROR writing to socket");
+        cout << "Sending" << n << " bytes over socket.";
 
 		n = sock->receive((void**) &playerResponse, sizeof(message));
-		if (n < 0)
-			DieWithError("ERROR reading from socket");
-		else{
+        cout << "Receiving" << n << " bytes over socket.";
 
-			if (playerResponse.commandCode == PLAYERACK)
-				cout << "Player ACK received.\n";
+		if (playerResponse.commandCode == PLAYERACK)
+			cout << "Player ACK received.\n";
+		if (playerResponse.commandCode == GAMEOVER)
+			gameOver = true;
 
-			if (playerResponse.commandCode == GAMEOVER)
-				gameOver = true;
-		}
     }
 
     info("GAMEOVER");
@@ -128,8 +124,7 @@ void playerRole(ServerSocket *sock)
            }
 
            n = sock->send((void**) &callerACK, sizeof(message));
-           if (n < 0)
-               DieWithError("ERROR writing to socket");
+           cout << "Sending" << n << " bytes over socket.";
            cout << "ACK/GAMEOVER sent to caller.\n";
 
        }
