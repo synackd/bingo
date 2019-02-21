@@ -8,6 +8,8 @@
 #define _CMD_HPP_
 
 #include "constants.hpp"
+#include <string>
+using namespace std;
 
 //****************
 //* Return Codes *
@@ -28,6 +30,10 @@
 #define QUERY_GAMES     4   /**< Query current games from the manager */
 #define START_GAME      5   /**< Tell the manager to set up a new game */
 #define END             6   /**< Tell the manager to end an ongoing game */
+#define CALLERACK       7
+#define BINGOCALL       8
+#define PLAYERACK       9
+#define GAMEOVER        10
 
 /*
  * "Meta" codes defined by project

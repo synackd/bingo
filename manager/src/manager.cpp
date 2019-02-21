@@ -9,8 +9,10 @@
 #include <stdarg.h>
 #include "colors.hpp"
 #include "manager.hpp"
+#include "player.hpp"
 #include "cmd.hpp"
 #include "server.hpp"
+#include <vector>
 
 /**
  * Log an info message to stdout
@@ -45,52 +47,33 @@ void error(const char *fmt, ...)
  */
 int main(int argc, char **argv)
 {
-    // Arg checking.
-    if (argc != 2) {
-        cprintf(stdout, BOLD, "Usage: ");
-        fprintf(stdout, "%s <port>\n", argv[0]);
-        exit(FAILURE);
-    }
+}
 
-    // Try to convert port.
-    unsigned short port;
-    errno = 0;
-    long int tmp = strtol(argv[1], NULL, 10);
-    if (errno != 0) {
-        error("Invalid port number!");
-        exit(FAILURE);
-    }
-    if (0 <= tmp && tmp <= 65535) {
-        port = (unsigned short) tmp;
-    } else {
-        error("Port must be between 0 and 65535!");
-        exit(FAILURE);
-    }
+/*
+ * Class Implementations
+ */
 
-    ssize_t size = 0;
+/***********
+ * Manager *
+ ***********/
 
-    msg_t rec; // Receiving
+/**
+ * Create a new manager
+ */
+Manager::Manager()
+{
+}
 
-    // Create socket and start it.
-    ServerSocket *sock = new ServerSocket(port);
-    sock->start();
+/**
+ * Send k players to caller that requested them
+ */
+void Manager::sendKPlayers()
+{
+}
 
-    // Receive data from client and send response.
-    size = sock->receive((void*) &rec, sizeof(msg_t));
-    info("Received %d bytes over socket.", size);
-
-    if (rec.command == REGISTER) {
-        // Create a general data payload.
-        msg_t general;
-        general.command = DEREGISTER;
-        general.mgr_rsp_register.ret_code = 0;
-        general.mgr_rsp_register.game_uid = 1234;
-
-        info("Name: %s", rec.mgr_cmd_register.name);
-
-        size = sock->send(&general, sizeof(msg_t));
-        info("Sent %d bytes over socket.", size);
-    }
-
-    return 0;
+/**
+ * Register players who want to be considered to play Bingo
+ */
+void Manager::registerPlayer()
+{
 }

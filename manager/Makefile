@@ -6,7 +6,7 @@ libdir := ../lib
 lib    := global
 
 CC       := g++
-CPPFLAGS += $(addprefix -I ,$(inc)) -g
+CPPFLAGS += $(addprefix -I ,$(inc)) -g -std=c++11
 LDFLAGS  := $(addprefix -L ,$(libdir)) $(addprefix -l ,$(lib))
 vpath %.hpp $(inc)
 
