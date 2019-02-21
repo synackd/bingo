@@ -94,20 +94,20 @@ void callerRole(ClientSocket *sock)
 void playerRole(ServerSocket *sock)
 {
     ssize_t n;
-   int inputCode;
-   int calledNumber;
-   bool gameOver = false;
+    int inputCode;
+    int calledNumber;
+    bool gameOver = false;
 
-   Board gameBoard = Board();
-   gameBoard.printBoard();
+    Board gameBoard = Board();
+    gameBoard.printBoard();
 
-   message inputMessage;
-   // message *inputMessage = (message*) malloc(sizeof(message)); // Receiving
-   // message *callerACK = (message*) malloc(sizeof(message)); // Receiving
-   message callerACK;
-   callerACK.commandCode = PLAYERACK;
+    message inputMessage;
+    // message *inputMessage = (message*) malloc(sizeof(message)); // Receiving
+    // message *callerACK = (message*) malloc(sizeof(message)); // Receiving
+    message callerACK;
+    callerACK.commandCode = PLAYERACK;
 
-   for ( ; ; ) {
+    while (!gameOver){
        n = sock->receive((void*) &inputMessage, sizeof(message));
        cout << "Receiving " << n << " bytes over socket. CommandCode " << inputMessage.commandCode << "\n";
 
@@ -126,6 +126,7 @@ void playerRole(ServerSocket *sock)
            if (gameOver){
                callerACK.commandCode = GAMEOVER;
                gameBoard.printBoard();
+               gameOver = true;
            }
 
            n = sock->send((void*) &callerACK, sizeof(message));
@@ -133,7 +134,7 @@ void playerRole(ServerSocket *sock)
 
        }
 
-   }// end of for loop
+   }// end of while
 }
 
 short ConvertPort(char *inputPort){
