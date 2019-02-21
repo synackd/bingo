@@ -134,11 +134,7 @@ void playerRole(ServerSocket *sock)
    }// end of for loop
 }
 
-/**
- * Main runtime of bingo application
- */
-int main(int argc, char **argv)
-{
+short ConvertPort(char *inputPort){
     // Try to convert port.
     unsigned short port;
     errno = 0;
@@ -154,12 +150,25 @@ int main(int argc, char **argv)
         exit(FAILURE);
     }
 
+    return port;
+}
+
+/**
+ * Main runtime of bingo application
+ */
+int main(int argc, char **argv)
+{
+    unsigned short port;
+
     if (argc != 4 && argc != 3)
 		DieWithError( "Parameter Error: usage: bingo caller <player-IPaddress> <player-Port> \n or bingo player <player-Port> " );
 
     // Checking role type;
     if (strcmp(argv[1],"caller") == 0) {
         cout << "Caller Role Started:\n";
+
+        port = ConvertPort(argv[3]);
+
         ClientSocket *cSock;
     	cSock = new ClientSocket(argv[2], port);
     	cSock->start();
@@ -167,6 +176,9 @@ int main(int argc, char **argv)
         cout << "out of caller method ............................................\n";
     }else if(strcmp(argv[1],"player") == 0){
         cout << "Player Role Started:\n";
+
+        port = ConvertPort(argv[1]);
+
         ServerSocket *pSock;
     	pSock = new ServerSocket(port);
     	pSock->start();
