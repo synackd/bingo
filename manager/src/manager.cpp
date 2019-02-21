@@ -89,9 +89,7 @@ int main(int argc, char **argv)
     int status;
     ssize_t size = 0;
     msg_t data;
-    for ( ; ; ) {
-        // Read data from socket
-        size = mgr_sock->receive((void*) &data, sizeof(msg_t));
+    while ((size = mgr_sock->receive((void*) &data, sizeof(msg_t))) != 0) {
         info("Received %d bytes from socket.", size);
 
         // Determine what to do
@@ -104,7 +102,7 @@ int main(int argc, char **argv)
             // Form response
             msg_t mgr_rsp;
             if (status == SUCCESS) {
-                info("Registration succeeded! Game UID: %d", status);
+                info("Registration succeeded!");
                 mgr_rsp.mgr_rsp_register.ret_code = SUCCESS;
             } else {
                 error("Registration failed!");
