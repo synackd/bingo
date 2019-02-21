@@ -66,7 +66,11 @@ int main(int argc, char **argv)
         info("Received %d bytes from socket.", size);
 
         /*
-         * Determine what to do
+         * Determine what to do based on command
+         *
+         * NOTE: Responses have the "command" field in msg_t set with
+         * the return code of the request. Return codes are 0 or less,
+         * distinguishing them from commands.
          */
         switch (data.command) {
             // Register command
@@ -80,9 +84,11 @@ int main(int argc, char **argv)
                 msg_t mgr_rsp;
                 if (status == SUCCESS) {
                     info("Registration succeeded!");
+                    mgr_rsp.command = SUCCESS;
                     mgr_rsp.mgr_rsp_register.ret_code = SUCCESS;
                 } else {
                     error("Registration failed!");
+                    mgr_rsp.command = FAILURE;
                     mgr_rsp.mgr_rsp_register.ret_code = FAILURE;
                 }
 
