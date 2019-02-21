@@ -3,6 +3,8 @@
 #include "colors.hpp"
 #include "log.hpp"
 
+using namespace std;
+
 /**
  * Log an info message to stdout
  * from the manager.
