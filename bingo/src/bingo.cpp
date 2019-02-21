@@ -139,17 +139,17 @@ void playerRole(ServerSocket *sock)
 int main(int argc, char **argv)
 {
 
-    if (argc != 4)
-		DieWithError( "Parameter Error: usage: bingo <host-IPaddress> <host-Port> <host-Role>" );
+    if (argc != 4 || argc != 2)
+		DieWithError( "Parameter Error: usage: bingo caller <player-IPaddress> <player-Port> \n or bingo player <player-Port> " );
 
     // Checking role type;
-    if (strcmp(argv[3],"caller") == 0) {
+    if (strcmp(argv[1],"caller") == 0) {
         cout << "Caller Role Started:\n";
         ClientSocket *cSock;
-    	cSock = new ClientSocket(argv[1], atoi(argv[2]));
+    	cSock = new ClientSocket(argv[2], atoi(argv[3]));
     	cSock->start();
         callerRole(cSock);
-    }else if(strcmp(argv[3],"player") == 0){
+    }else if(strcmp(argv[1],"player") == 0){
         cout << "Player Role Started:\n";
         ServerSocket *pSock;
     	pSock = new ServerSocket(atoi(argv[2]));
