@@ -72,10 +72,10 @@ void callerRole(ClientSocket *sock)
 
 		// Sending 'Start game K' command:
 		cout << "calling " << value << "\n";
-		n = sock->send(&callMessage, sizeof(message));
+		n = sock->send(&callMessage, sizeof(*message));
         cout << "Sending" << n << " bytes over socket.\n";
 
-		n = sock->receive((void**) &playerResponse, sizeof(message));
+		n = sock->receive((void**) &playerResponse, sizeof(*message));
         cout << "Receiving" << n << " bytes over socket. CommandCode" << playerResponse->commandCode << "\n";
 
 		if (playerResponse->commandCode == PLAYERACK)
@@ -106,7 +106,7 @@ void playerRole(ServerSocket *sock)
    callerACK->commandCode = PLAYERACK;
 
    for ( ; ; ) {
-       if ( (n = sock->receive((void**) &inputMessage, sizeof(message))) == 0 )
+       if ( (n = sock->receive((void**) &inputMessage, sizeof(*message))) == 0 )
            return; /* connection closed by other end */
 
        inputCode = inputMessage->commandCode;
@@ -125,7 +125,7 @@ void playerRole(ServerSocket *sock)
                gameBoard.printBoard();
            }
 
-           n = sock->send(&callerACK, sizeof(message));
+           n = sock->send(&callerACK, sizeof(*message));
            cout << "Sending" << n << " bytes over socket.\n";
            cout << "ACK/GAMEOVER sent to caller.\n";
 
