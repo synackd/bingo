@@ -74,7 +74,7 @@ void callerRole(ClientSocket *sock)
         cout << "Sending" << n << " bytes over socket.\n";
 
 		n = sock->receive((void**) &playerResponse, sizeof(message));
-        cout << "Receiving" << n << " bytes over socket. CommandCode" << playerResponse.CommandCode << "\n";
+        cout << "Receiving" << n << " bytes over socket. CommandCode" << playerResponse.commandCode << "\n";
 
 		if (playerResponse.commandCode == PLAYERACK)
 			cout << "Player ACK received.\n";
