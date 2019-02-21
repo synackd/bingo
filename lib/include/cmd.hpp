@@ -76,7 +76,7 @@ typedef struct message {
 
 // Bingo Call command
 typedef struct clr_cmd_bingocall_t{
-    int calledNumber;
+    int bingoNumber;
 }clr_cmd_bingocall_t;
 
 // Player response to Bingo Call
