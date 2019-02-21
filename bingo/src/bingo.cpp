@@ -159,12 +159,14 @@ int main(int argc, char **argv)
     	cSock = new ClientSocket(argv[2], atoi(argv[3]));
     	cSock->start();
         callerRole(cSock);
+        cout << "out of caller method ............................................\n";
     }else if(strcmp(argv[1],"player") == 0){
         cout << "Player Role Started:\n";
         ServerSocket *pSock;
     	pSock = new ServerSocket(atoi(argv[2]));
     	pSock->start();
         playerRole(pSock);
+        cout << "out of player method ............................................\n";
     }else{
         cout << "Invalid Role value. Valid parameters are ./client -IPaddress -Port -Role\n";
         exit(0);
