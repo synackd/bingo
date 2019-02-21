@@ -84,11 +84,7 @@ void callerRole(ClientSocket *sock)
             info("GAMEOVER");
             gameOver = true;
         }
-
     }
-
-
-
 }
 
 void playerRole(ServerSocket *sock)

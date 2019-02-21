@@ -66,13 +66,6 @@ typedef struct {
     int ret_code;       /**< Return code by the previously sent command */
 } mgr_rsp_register_t;
 
-/**
- * Used for CALLERACK, STARTGAME, NUMBERCALL,...
- */
-typedef struct message {
-    int commandCode;
-    int parameters;
-} message;
 
 // Bingo Call command
 typedef struct clr_cmd_bingocall_t{
