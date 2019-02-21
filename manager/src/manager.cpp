@@ -43,6 +43,11 @@ void error(const char *fmt, ...)
     fprintf(stderr, "\n");
 }
 
+void startGame(ServerSocket *socket){
+
+}
+
+
 /**
  * Main runtime of manager application.
  */
@@ -114,11 +119,16 @@ int main(int argc, char **argv)
             // Send response
             size = mgr_sock->send((void*) &mgr_rsp, sizeof(msg_t));
             info("Sent response of %d bytes.", size);
+        }else if (data.command == START_GAME) {
+            info("Command received was START_GAME.");
+
         }else{
             error("Unknown command received.");
         }
     }
 }
+
+
 
 /*
  * Class Implementations

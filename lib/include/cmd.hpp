@@ -77,9 +77,9 @@ typedef struct ply_rsp_bingocall_t{
     int ret_code;
 }ply_rsp_bingocall_t;
 
-typedef struct mgr_cmd_startgame_t{
+typedef struct clr_cmd_startgame_t{
     int k;
-}mgr_cmd_startgame_t;
+}clr_cmd_startgame_t;
 
 typedef struct mgr_rsp_startgame_t {
     int gameID;
@@ -104,8 +104,9 @@ typedef struct {
         /* Register command/response */
         mgr_cmd_register_t mgr_cmd_register;    /**< Register player command data */
         mgr_rsp_register_t mgr_rsp_register;    /**< Register player response data */
-        clr_cmd_bingocall_t clr_cmd_bingocals;   /**< Bingo Call command data */
+        clr_cmd_bingocall_t clr_cmd_bingocals;  /**< Bingo Call command data */
         ply_rsp_bingocall_t ply_rsp_bingocall;  /**< Player response to Bingo Call data */
+        clr_cmd_startgame_t clr_cmd_startgame;  /**< Caller Start Command data */
     };
 } msg_t;
 

@@ -162,28 +162,44 @@ int main(int argc, char **argv)
 {
     unsigned short port;
 
-    if (argc != 4 && argc != 3)
-		DieWithError( "Parameter Error: usage: bingo caller <player-IPaddress> <player-Port> \n or bingo player <player-Port> " );
+    if (argc != 4)
+		DieWithError( "Parameter Error: usage: bingo caller <manager-IPaddress> <manager-Port> \n or bingo player <player-Port> " );
 
-    // Checking role type;
-    if (strcmp(argv[1],"caller") == 0) {
-        cout << "Caller Role Started:\n";
-        port = ConvertPort(argv[3]);
-        ClientSocket *cSock;
-    	cSock = new ClientSocket(argv[2], port);
-    	cSock->start();
-        callerRole(cSock);
-    }else if(strcmp(argv[1],"player") == 0){
-        cout << "Player Role Started:\n";
-        port = ConvertPort(argv[2]);
-        ServerSocket *pSock;
-    	pSock = new ServerSocket(port);
-    	pSock->start();
-        playerRole(pSock);
-    }else{
-        cout << "Invalid Role value. Valid parameters are ./client -IPaddress -Port -Role\n";
-        exit(0);
-    }
+    port = ConvertPort(argv[3]);
+    ClientSocket *cSock;
+	cSock = new ClientSocket(argv[2], port);
+	cSock->start();
+
+    // Starting Game:
+    // Populating message body:
+    msg_t startGameCmd;
+    ssize_t n;
+    startGameCmd.command = START_GAME;
+    startGameCmd.clr_cmd_startgame.k = 3;
+
+    // Sending 'Start game K' command:
+    cout << "Sending START_GAME 3.\n";
+    n = cSock->send((void*) &startGameCmd, sizeof(msg_t));
+
+    // // Checking role type;
+    // if (strcmp(argv[1],"caller") == 0) {
+    //     cout << "Caller Role Started:\n";
+    //     port = ConvertPort(argv[3]);
+    //     ClientSocket *cSock;
+    // 	cSock = new ClientSocket(argv[2], port);
+    // 	cSock->start();
+    //     callerRole(cSock);
+    // }else if(strcmp(argv[1],"player") == 0){
+    //     cout << "Player Role Started:\n";
+    //     port = ConvertPort(argv[2]);
+    //     ServerSocket *pSock;
+    // 	pSock = new ServerSocket(port);
+    // 	pSock->start();
+    //     playerRole(pSock);
+    // }else{
+    //     cout << "Invalid Role value. Valid parameters are ./client -IPaddress -Port -Role\n";
+    //     exit(0);
+    // }
 
 	exit(0);
 }
