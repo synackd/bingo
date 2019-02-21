@@ -177,7 +177,7 @@ int main(int argc, char **argv)
     }else if(strcmp(argv[1],"player") == 0){
         cout << "Player Role Started:\n";
 
-        port = ConvertPort(argv[1]);
+        port = ConvertPort(argv[2]);
 
         ServerSocket *pSock;
     	pSock = new ServerSocket(port);
