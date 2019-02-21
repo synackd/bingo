@@ -71,7 +71,7 @@ void callerRole(ClientSocket *sock)
 
 		// Sending 'Start game K' command:
 		cout << "calling " << value << "\n";
-		n = sock->send((void**) &callMessage, sizeof(message));
+		n = sock->send(&callMessage, sizeof(message));
 		if (n < 0)
 			DieWithError("ERROR writing to socket");
 
@@ -128,7 +128,7 @@ void playerRole(ServerSocket *sock)
 				gameBoard.printBoard();
 			}
 
-			n = sock->send((void**) &callerACK, sizeof(message));
+			n = sock->send(&callerACK, sizeof(message));
 			if (n < 0)
 				DieWithError("ERROR writing to socket");
 			cout << "ACK sent to caller.\n";
