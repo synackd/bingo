@@ -69,7 +69,7 @@ int main(int argc, char **argv)
         if (data.command == REGISTER) {
             // Register the player
             info("Command received was REGISTER.");
-            info("Attempting to register player \"%s\"...", data.mgr_cmd_register.name);
+            info("Attempting to register player \"%s\" with IP \"%s\" and port %d...", data.mgr_cmd_register.name, data.mgr_cmd_register.ip, data.mgr_cmd_register.port);
             status = mgr->registerPlayer(data.mgr_cmd_register.name, data.mgr_cmd_register.ip, data.mgr_cmd_register.port);
 
             // Form response
