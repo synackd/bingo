@@ -162,7 +162,7 @@ int main(int argc, char **argv)
 {
     unsigned short port;
 
-    if (argc != 4)
+    if (argc != 3)
 		DieWithError( "Parameter Error: usage: bingo caller <manager-IPaddress> <manager-Port> \n or bingo player <player-Port> " );
 
     port = ConvertPort(argv[3]);
