@@ -18,6 +18,14 @@ class PlayerData {
         string getName(void);
         string getIP(void);
         int getPort(void);
+
+        void setIP(string newIP){
+            ip = newIP;
+        }
+
+        void setPort(int newPort){
+            port = newPort;
+        }
 };
 
 #endif

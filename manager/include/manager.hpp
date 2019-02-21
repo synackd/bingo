@@ -12,12 +12,8 @@
 #include <string>
 #include <vector>
 #include "colors.hpp"
-
-#define STARTGAME 10
-#define CALLERACK 1
-#define BINGOCALL 2
-#define PLAYERACK 3
-#define GAMEOVER 4
+#include "player.hpp"
+#include "cmd.hpp"
 
 using namespace std;
 
@@ -33,6 +29,10 @@ void error(const char *fmt, ...);
 
 class Manager{
     public:
+        int numberOfRegPlayers;
+        vector<PlayerData> registeredPlayers;
+
+
         // TODO: These methods need implementation
         Manager(void);
         void sendKPlayers(void);

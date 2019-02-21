@@ -1,4 +1,5 @@
 #include "peer.hpp"
+#include "cmd.hpp"
 
 using namespace std;
 
@@ -184,46 +185,7 @@ Caller::Caller()
 // TODO: Make this object oriented with ServerSocket...
 void Caller::call(int sockfd)
 {
-    ssize_t n;
-    int inputCode;
-    bool gameOver = false;
-    int value;
 
-    message callMessage; 	// message for sending
-    message playerResponse;		// message to receive ACK from player
-
-    while (!gameOver){
-        // Populating callMessage:
-        callMessage.commandCode = BINGOCALL;
-        value = rand() % 10;
-        callMessage.parameters = value;
-
-        // Sending 'Start game K' command:
-        info("Calling %d", value);
-        n = write(sockfd, &callMessage, sizeof(message));
-        if (n < 0) {
-            error("Could not write to socket!");
-            // TODO: Implement return code here
-            return;
-        }
-
-        n = read(sockfd, &playerResponse, sizeof(startGameResponse));
-        if (n < 0) {
-            error("Could not read from socket!");
-            // TODO: Implement return code here
-            return;
-        } else {
-
-            if (playerResponse.commandCode == PLAYERACK)
-                info("Player ACK received.");
-
-            if (playerResponse.commandCode == GAMEOVER)
-                gameOver = true;
-        }
-
-    } // end of while loop
-
-    info("Game Over!");
 }
 
 /**
@@ -290,44 +252,7 @@ int Player::getPort()
 // TODO: Make this object oriented using ClientSocket...
 void Player::listenBingo()
 {
-    ssize_t n;
-    int inputCode;
-    int calledNumber;
-    bool gameOver = false;
 
-    message inputMessage;
-    message callerACK;
-    callerACK.commandCode = PLAYERACK;
-
-    for ( ; ; ) {
-        if ( (n = read(sockfd, &inputMessage, sizeof(message))) == 0 )
-            return; /* connection closed by other end */
-
-        inputCode = inputMessage.commandCode;
-
-        if (inputCode == BINGOCALL){
-            info("Bingo Call received!");
-            calledNumber = inputMessage.parameters;
-            info("Number: ", calledNumber);
-
-            gameBoard.CheckNumber(calledNumber);
-            gameOver = gameBoard.CheckWin();
-
-            // updating command code if player wins:
-            if (gameOver){
-                callerACK.commandCode = GAMEOVER;
-                gameBoard.PrintBoard();
-            }
-
-            n = write(sockfd, &callerACK, sizeof(message));
-            if (n < 0) {
-                error("Could not write to socket!");
-                // TODO: Implement return code here
-                return;
-            }
-            info("ACK/GAMEOVER sent to caller.");
-        }
-    }// end of for loop
 }
 
 /**

@@ -12,6 +12,10 @@
 #include "player.hpp"
 #include "cmd.hpp"
 #include "server.hpp"
+#include <vector>
+
+
+vector<PlayerData> playersList;
 
 /**
  * Log an info message to stdout
@@ -56,7 +60,7 @@ void EchoString(ServerSocket *sock)
 
         inputCode = inputMessage->commandCode;
 
-        if (inputCode == STARTGAME){
+        if (inputCode == START_GAME){
           info("Start Game command received!");
           info("Sending %i players to caller.", inputMessage->parameters);
 
@@ -70,13 +74,13 @@ void EchoString(ServerSocket *sock)
               // Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
               response->gameID = gameID;
 			  response->playersLeft = playersLeft;
-              response->playerIP = playersList[i].playerIP;
-              response->playerPort = playersList[i].Port;
+              response->playerIP = playersList[i].getIP();
+              response->playerPort = playersList[i].getPort();
               playersLeft --;
 
 			  info("Sending Player: GameID = %d\tIP = %s\tPort = %d", response->gameID, response->playerIP, response->playerPort);
               // response.gamePlayer->PrintPlayer();
-              sock->send((void**) &response, sizeof(startgameResponse));
+              sock->send((void**) &response, sizeof(startGameResponse));
 			  if (n < 0)
 			  	error("Could not write to socket!");
 
@@ -107,7 +111,8 @@ int main(int argc, char **argv)
 
     for (int i = 0; i < numberOfRegPlayers; i++){
         string playerIP = "IP" + std::to_string(i);
-        PlayerData tempPlayer(playerIP, i);
+        string playerName = "Player" + std::to_string(i);
+        PlayerData tempPlayer(playerName, playerIP, i);
 		playersList.push_back(tempPlayer);
     }
 
