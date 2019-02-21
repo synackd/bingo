@@ -54,7 +54,7 @@ using namespace std;
 typedef struct {
     char name[BUFMAX];  /**< The name of a player to register/deregister */
     char ip[BUFMAX];    /**< The default IP address of the player */
-    char port[BUFMAX];  /**< The default port of the player */
+    unsigned int port;  /**< The default port of the player */
 } mgr_cmd_register_t;
 
 /**
@@ -63,7 +63,6 @@ typedef struct {
  */
 typedef struct {
     int ret_code;       /**< Return code by the previously sent command */
-    int game_uid;       /**< The queried unique game identifier */
 } mgr_rsp_register_t;
 
 /*****************************

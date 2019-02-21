@@ -18,11 +18,6 @@
 using namespace std;
 
 /*
- * Data
- */
-vector<PlayerData> playersList;
-
-/*
  * Function Prototypes
  */
 void info(const char *fmt, ...);
@@ -41,7 +36,7 @@ class Manager{
         // TODO: These methods need implementation
         Manager(void);
         void sendKPlayers(void);
-        void registerPlayer(void);
+        int registerPlayer(string name, string ip, unsigned int port);
 };
 
 #endif

@@ -93,7 +93,11 @@ int main(int argc, char **argv)
     info("Establishing connection with manager...");
     bingo_sock->start();
 
-    // Stuff happens here...
+    // Create player
+    Player *newPlayer = new Player("Newbie", argv[1], port);
+
+    // Attempt to register player with manager
+    newPlayer->registerToManager(bingo_sock);
 
     // Close connection with manager
     info("Closing connection with manager...");

@@ -257,5 +257,33 @@ void Player::listenBingo()
 /**
  * Registers to Manager for future games
  */
-void Player::registerToManager(){
+void Player::registerToManager(ClientSocket *sock)
+{
+    ssize_t size = 0;
+
+    // Create register packet
+    msg_t reg_cmd;
+    reg_cmd.command = REGISTER;
+    strncpy(reg_cmd.mgr_cmd_register.name, this->name.c_str(), BUFMAX);
+    strncpy(reg_cmd.mgr_cmd_register.ip, this->ip.c_str(), BUFMAX);
+    reg_cmd.mgr_cmd_register.port = this->port;
+
+    // Send packet to manager
+    info("Attempting to register player \"%s\"...", this->name.c_str());
+    size = sock->send((void*) &reg_cmd, sizeof(msg_t));
+    info("Sent %d bytes to manager.", size);
+
+    // Listen for manager's response
+    msg_t reg_rsp;
+    size = sock->receive((void*) &reg_rsp, sizeof(msg_t));
+    info("Received %d bytes from manager.", size);
+
+    // Examine return code
+    if (reg_rsp.mgr_rsp_register.ret_code == SUCCESS) {
+        info("Registration success!");
+    } else if (reg_rsp.mgr_rsp_register.ret_code == FAILURE) {
+        error("Registration failed!");
+    } else {
+        error("Manager returned unknown value.");
+    }
 }
