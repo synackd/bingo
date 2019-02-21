@@ -23,7 +23,7 @@ void info(const char *fmt, ...)
     va_list vaList;
     cprintf(stdout, BOLD, "[PLR] ");
     va_start(vaList, fmt);
-    fprintf(stdout, fmt, vaList);
+    vfprintf(stdout, fmt, vaList);
     va_end(vaList);
     fprintf(stdout, "\n");
 }
@@ -37,7 +37,7 @@ void error(const char *fmt, ...)
     va_list vaList;
     cprintf(stderr, BOLD, "[PLR][ERR] ");
     va_start(vaList, fmt);
-    fprintf(stderr, fmt, vaList);
+    vfprintf(stderr, fmt, vaList);
     va_end(vaList);
     fprintf(stderr, "\n");
 }
