@@ -19,6 +19,11 @@
 
 using namespace std;
 
+/*
+ * Data
+ */
+ClientSocket *bingo_sock;   /**< Socket for communicating with the manager */
+
 /**
  * Log an info message to stdout
  * from the manager.
@@ -31,12 +36,6 @@ void info(const char *fmt, ...)
     vfprintf(stdout, fmt, vaList);
     va_end(vaList);
     fprintf(stdout, "\n");
-}
-
-void DieWithError(const char *errorMessage) /* External error handling function */
-{
-    perror(errorMessage);
-    exit(1);
 }
 
 /**
@@ -58,4 +57,48 @@ void error(const char *fmt, ...)
  */
 int main(int argc, char **argv)
 {
+    /****************
+     * HOUSEKEEPING *
+     ****************/
+
+    // Arg checking.
+    if (argc != 3) {
+        cprintf(stdout, BOLD, "Usage: ");
+        fprintf(stdout, "%s <server_ip> <port>\n", argv[0]);
+        exit(FAILURE);
+    }
+
+    // Try to convert port.
+    unsigned short port;
+    errno = 0;
+    long int tmp = strtol(argv[2], NULL, 10);
+    if (errno != 0) {
+        error("Invalid port number.");
+        exit(FAILURE);
+    }
+    if (0 <= tmp && tmp <= 65535) {
+        port = (unsigned short) tmp;
+    } else {
+        error("Port must be between 0 and 65535.");
+        exit(FAILURE);
+    }
+
+    /******************************
+     * COMMUNICATION WITH MANAGER *
+     ******************************/
+    // Create socket for communication with manager
+    bingo_sock = new ClientSocket(argv[1], port);
+
+    // Establish connection with manager
+    info("Establishing connection with manager...");
+    bingo_sock->start();
+
+    // Stuff happens here...
+
+    // Close connection with manager
+    info("Closing connection with manager...");
+    bingo_sock->stop();
+    delete bingo_sock;
+
+    return SUCCESS;
 }

@@ -8,6 +8,10 @@
 #ifndef _BINGO_HPP_
 #define _BINGO_HPP_
 
+#include "client.hpp"
+
+using namespace std;
+
 /*
  * Functions
  */

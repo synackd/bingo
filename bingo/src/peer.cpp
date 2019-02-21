@@ -185,7 +185,6 @@ Caller::Caller()
 // TODO: Make this object oriented with ServerSocket...
 void Caller::call(int sockfd)
 {
-
 }
 
 /**
@@ -202,7 +201,7 @@ void Caller::startGame()
 /**
  * Store player's information
  */
-Player::Player(string inputName, string inputIP, int inputPort)
+Player::Player(string inputName, string inputIP, unsigned int inputPort)
 {
     this->name = inputName;
     this->ip = inputIP;
@@ -242,7 +241,7 @@ string Player::getIP()
 /**
  * Getter for player's port
  */
-int Player::getPort()
+unsigned int Player::getPort()
 {
     return this->port;
 }

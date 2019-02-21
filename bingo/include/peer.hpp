@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "client.hpp"
 #include "bingo.hpp"
 
 using namespace std;
@@ -16,14 +17,15 @@ class Player {
     private:
         string name;
         string ip;
-        int port;
+        unsigned int port;
+        ClientSocket *sock;
 
     public:
-        Player(string inputName, string inputIP, int inputPort);
+        Player(string inputName, string inputIP, unsigned int inputPort);
         string to_string(void);
         string getName(void);
         string getIP(void);
-        int getPort(void);
+        unsigned int getPort(void);
         void listenBingo(void);
         void registerToManager(void);
 };
