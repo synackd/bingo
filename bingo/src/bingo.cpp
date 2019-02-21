@@ -59,19 +59,17 @@ void callerRole(ClientSocket *sock)
     int value;
     bool gameOver = false;
 
-    message *callMessage = (message*) malloc(sizeof(message)); // Receiving
-    message *playerResponse = (message*) malloc(sizeof(message)); // Receiving
-    // message callMessage; 	// message for sending
-	// message playerResponse;		// message to receive ACK from player
+    message callMessage; 	// message for sending
+	message playerResponse;		// message to receive ACK from player
 
     while (!gameOver){
-        callMessage->commandCode = BINGOCALL;
+        callMessage.commandCode = BINGOCALL;
 		value = rand() % 10;
-		callMessage->parameters = value;
+		callMessage.parameters = value;
 
 		// Sending 'Start game K' command:
 		cout << "calling " << value << "\n";
-		n = sock->send(&callMessage, sizeof(message));
+		n = sock->send((void**) &callMessage, sizeof(message));
 		if (n < 0)
 			DieWithError("ERROR writing to socket");
 
@@ -79,63 +77,63 @@ void callerRole(ClientSocket *sock)
 		if (n < 0)
 			DieWithError("ERROR reading from socket");
 		else{
-			if (playerResponse->commandCode == PLAYERACK)
-				cout << "Player ACK received.\n";
-			if (playerResponse->commandCode == GAMEOVER){
-                gameOver = true;
-                cout << "GAMEOVER!\n";
-            }
-		}
 
+			if (playerResponse.commandCode == PLAYERACK)
+				cout << "Player ACK received.\n";
+
+			if (playerResponse.commandCode == GAMEOVER)
+				gameOver = true;
+		}
     }
 
     info("GAMEOVER");
+
 }
 
 void playerRole(ServerSocket *sock)
 {
     ssize_t n;
-    int inputCode;
-    int calledNumber;
-	bool gameOver = false;
+   int inputCode;
+   int calledNumber;
+   bool gameOver = false;
 
-    Board gameBoard = Board();
-    gameBoard.printBoard();
+   Board gameBoard = Board();
+   gameBoard.printBoard();
 
-    // message inputMessage;
-    message *inputMessage = (message*) malloc(sizeof(message)); // Receiving
-    message *callerACK = (message*) malloc(sizeof(message)); // Receiving
-	// message callerACK;
-	callerACK->commandCode = PLAYERACK;
+   // message inputMessage;
+   message *inputMessage = (message*) malloc(sizeof(message)); // Receiving
+   message *callerACK = (message*) malloc(sizeof(message)); // Receiving
+   // message callerACK;
+   callerACK->commandCode = PLAYERACK;
 
-    for ( ; ; ) {
-	    if ( (n = sock->receive((void**) &inputMessage, sizeof(message))) == 0 )
-   	    	return; /* connection closed by other end */
+   for ( ; ; ) {
+       if ( (n = sock->receive((void**) &inputMessage, sizeof(message))) == 0 )
+           return; /* connection closed by other end */
 
-        inputCode = inputMessage->commandCode;
+       inputCode = inputMessage->commandCode;
 
-        if (inputCode == BINGOCALL){
-            printf("Bingo Call received!\n");
-			calledNumber = inputMessage->parameters;
-            cout << "Number: " << calledNumber << "\n";
+       if (inputCode == BINGOCALL){
+           printf("Bingo Call received!\n");
+           calledNumber = inputMessage->parameters;
+           cout << "Number: " << calledNumber << "\n";
 
-			gameBoard.markNumber(calledNumber);
-	        gameOver = gameBoard.checkWin();
+           gameBoard.markNumber(calledNumber);
+           gameOver = gameBoard.checkWin();
 
-			// updating command code if player wins:
-			if (gameOver){
-				callerACK->commandCode = GAMEOVER;
-				gameBoard.printBoard();
-			}
+           // updating command code if player wins:
+           if (gameOver){
+               callerACK->commandCode = GAMEOVER;
+               gameBoard.printBoard();
+           }
 
-			n = sock->send(&callerACK, sizeof(message));
-			if (n < 0)
-				DieWithError("ERROR writing to socket");
-			cout << "ACK sent to caller.\n";
+           n = sock->send((void**) &callerACK, sizeof(message));
+           if (n < 0)
+               DieWithError("ERROR writing to socket");
+           cout << "ACK/GAMEOVER sent to caller.\n";
 
-        }
+       }
 
-    }// end of for loop
+   }// end of for loop
 }
 
 /**
