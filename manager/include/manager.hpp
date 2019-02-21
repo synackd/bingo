@@ -36,7 +36,7 @@ class Manager{
         // TODO: These methods need implementation
         Manager(void);
         void sendKPlayers(void);
-        void registerPlayer(void);
+        int registerPlayer(string name, string ip, unsigned int port);
 };
 
 #endif

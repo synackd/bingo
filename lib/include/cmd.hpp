@@ -43,27 +43,19 @@ using namespace std;
 
 // Player-Caller codes
 
+
 //***********************
 //* Payload Definitions *
 //***********************
-/**
- * @brief A generic struct for the recipient to read and
- * determine what type of structure to use based on the
- * command code.
- */
-typedef struct {
-    int command;
-} any_cmd_t;
 
 /**
  * @brief The payload to the manager for the
  * 'register' command.
  */
 typedef struct {
-    int command;        /**< The command code for the manager */
     char name[BUFMAX];  /**< The name of a player to register/deregister */
     char ip[BUFMAX];    /**< The default IP address of the player */
-    char port[BUFMAX];  /**< The default port of the player */
+    unsigned int port;  /**< The default port of the player */
 } mgr_cmd_register_t;
 
 /**
@@ -72,12 +64,7 @@ typedef struct {
  */
 typedef struct {
     int ret_code;       /**< Return code by the previously sent command */
-    int game_uid;       /**< The queried unique game identifier */
 } mgr_rsp_register_t;
-
-/*
- * Test Structures
- */
 
 /**
  * Used for CALLERACK, STARTGAME, NUMBERCALL,...
@@ -87,11 +74,51 @@ typedef struct message {
     int parameters;
 } message;
 
-typedef struct startGameResponse {
+// Bingo Call command
+typedef struct clr_cmd_bingocall_t{
+    int calledNumber;
+}clr_cmd_bingocall_t;
+
+// Player response to Bingo Call
+typedef struct ply_rsp_bingocall_t{
+    int ret_code;
+}ply_rsp_bingocall_t;
+
+typedef struct mgr_cmd_startgame_t{
+    int k;
+}mgr_cmd_startgame_t;
+
+typedef struct mgr_rsp_startgame_t {
     int gameID;
     int playersLeft;
     std::string playerIP;
     int playerPort;
-} startGameResponse;
+} mgr_rsp_startgame_t;
+
+
+/*****************************
+ * GENERIC PAYLOAD STRUCTURE *
+ *****************************/
+
+/**
+ * @brief A generic struct for the recipient to read and
+ * determine what type of structure to use based on the
+ * command code.
+ */
+typedef struct {
+    int command;
+    union {
+        /* Register command/response */
+        mgr_cmd_register_t mgr_cmd_register;    /**< Register player command data */
+        mgr_rsp_register_t mgr_rsp_register;    /**< Register player response data */
+        clr_cmd_bingocall_t clr_cmd_bingocals;   /**< Bingo Call command data */
+        ply_rsp_bingocall_t ply_rsp_bingocall;  /**< Player response to Bingo Call data */
+    };
+} msg_t;
+
+/*
+ * Test Structures
+ */
+
 
 #endif
