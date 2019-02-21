@@ -65,28 +65,36 @@ int main(int argc, char **argv)
     while ((size = mgr_sock->receive((void*) &data, sizeof(msg_t))) != 0) {
         info("Received %d bytes from socket.", size);
 
-        // Determine what to do
-        if (data.command == REGISTER) {
-            // Register the player
-            info("Command received was REGISTER.");
-            info("Attempting to register player \"%s\" with IP \"%s\" and port %d...", data.mgr_cmd_register.name, data.mgr_cmd_register.ip, data.mgr_cmd_register.port);
-            status = mgr->registerPlayer(data.mgr_cmd_register.name, data.mgr_cmd_register.ip, data.mgr_cmd_register.port);
+        /*
+         * Determine what to do
+         */
+        switch (data.command) {
+            // Register command
+            case REGISTER:
+                // Register the player
+                info("Command received was REGISTER.");
+                info("Attempting to register player \"%s\" with IP \"%s\" and port %d...", data.mgr_cmd_register.name, data.mgr_cmd_register.ip, data.mgr_cmd_register.port);
+                status = mgr->registerPlayer(data.mgr_cmd_register.name, data.mgr_cmd_register.ip, data.mgr_cmd_register.port);
 
-            // Form response
-            msg_t mgr_rsp;
-            if (status == SUCCESS) {
-                info("Registration succeeded!");
-                mgr_rsp.mgr_rsp_register.ret_code = SUCCESS;
-            } else {
-                error("Registration failed!");
-                mgr_rsp.mgr_rsp_register.ret_code = FAILURE;
-            }
+                // Form response
+                msg_t mgr_rsp;
+                if (status == SUCCESS) {
+                    info("Registration succeeded!");
+                    mgr_rsp.mgr_rsp_register.ret_code = SUCCESS;
+                } else {
+                    error("Registration failed!");
+                    mgr_rsp.mgr_rsp_register.ret_code = FAILURE;
+                }
 
-            // Send response
-            size = mgr_sock->send((void*) &mgr_rsp, sizeof(msg_t));
-            info("Sent response of %d bytes.", size);
-        } else {
-            error("Unknown command received.");
+                // Send response
+                size = mgr_sock->send((void*) &mgr_rsp, sizeof(msg_t));
+                info("Sent response of %d bytes.", size);
+
+                break;
+            // Anything else
+            default:
+                error("Unknown command received.");
+                break;
         }
     }
 }
