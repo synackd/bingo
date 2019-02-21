@@ -138,7 +138,7 @@ short ConvertPort(char *inputPort){
     // Try to convert port.
     unsigned short port;
     errno = 0;
-    long int tmp = strtol(argv[3], NULL, 10);
+    long int tmp = strtol(inputPort, NULL, 10);
     if (errno != 0) {
         error("Invalid port number!");
         exit(FAILURE);
