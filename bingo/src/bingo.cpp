@@ -71,21 +71,23 @@ void callerRole(ClientSocket *sock)
 		callMessage.parameters = value;
 
 		// Sending 'Start game K' command:
-		cout << "calling " << value << "\n";
+		cout << "Calling " << value << "\n";
 		n = sock->send((void*) &callMessage, sizeof(message));
-        cout << "Sending" << n << " bytes over socket.\n";
+        cout << "Sending " << n << " bytes over socket.\n";
 
 		n = sock->receive((void*) &playerResponse, sizeof(message));
-        cout << "Receiving" << n << " bytes over socket. CommandCode" << playerResponse.commandCode << "\n";
+        cout << "Receiving " << n << " bytes over socket. CommandCode " << playerResponse.commandCode << "\n";
 
 		if (playerResponse.commandCode == PLAYERACK)
 			cout << "Player ACK received.\n";
-		if (playerResponse.commandCode == GAMEOVER)
-			gameOver = true;
+		if (playerResponse.commandCode == GAMEOVER){
+            info("GAMEOVER");
+            gameOver = true;
+        }
 
     }
 
-    info("GAMEOVER");
+
 
 }
 
@@ -107,16 +109,17 @@ void playerRole(ServerSocket *sock)
 
    for ( ; ; ) {
        n = sock->receive((void*) &inputMessage, sizeof(message));
-       cout << "Receiving" << n << " bytes over socket. CommandCode" << inputMessage.commandCode << "\n";
+       cout << "Receiving" << n << " bytes over socket. CommandCode " << inputMessage.commandCode << "\n";
 
        inputCode = inputMessage.commandCode;
 
        if (inputCode == BINGOCALL){
-           printf("Bingo Call received!\n");
+
            calledNumber = inputMessage.parameters;
-           cout << "Number: " << calledNumber << "\n";
+           cout << "Number Called: " << calledNumber << "\n";
 
            gameBoard.markNumber(calledNumber);
+           gameBoard.printBoard();
            gameOver = gameBoard.checkWin();
 
            // updating command code if player wins:
@@ -126,8 +129,7 @@ void playerRole(ServerSocket *sock)
            }
 
            n = sock->send((void*) &callerACK, sizeof(message));
-           cout << "Sending" << n << " bytes over socket.\n";
-           cout << "ACK/GAMEOVER sent to caller.\n";
+           cout << "Sending ACK/GAMEOVER " << n << " bytes over socket.\n";
 
        }
 
