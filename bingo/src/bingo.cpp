@@ -72,16 +72,11 @@ int main(int argc, char **argv)
     ssize_t size = 0;
 
     // Create general payload.
-    info("%d", sizeof(msg_t));
-    info("%d", sizeof(mgr_cmd_register_t));
     msg_t general;
     general.command = REGISTER;
     strncpy(general.mgr_cmd_register.name, "Player", BUFMAX);
     strncpy(general.mgr_cmd_register.ip, "1.1.1.1", BUFMAX);
     strncpy(general.mgr_cmd_register.port, "4000", BUFMAX);
-
-    info("Command: %d", general.command);
-    info("Name: %s", general.mgr_cmd_register.name);
 
     msg_t rec; // Receiving
 
@@ -96,7 +91,8 @@ int main(int argc, char **argv)
 
     size = sock->receive((void*) &rec, sizeof(msg_t));
     info("Received %d bytes over socket.", size);
-    info("Command: %d", rec.mgr_rsp_register.ret_code);
+    info("Command Return: %d", rec.mgr_rsp_register.ret_code);
+    info("Game ID: %d", rec.mgr_rsp_register.game_uid);
 
     // Clean up.
     sock->stop();
