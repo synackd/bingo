@@ -59,15 +59,15 @@ void callerRole(ClientSocket *sock)
     int value;
     bool gameOver = false;
 
-    // message *callMessage = (message*) malloc(sizeof(message)); // Receiving
-    // message *playerResponse = (message*) malloc(sizeof(message)); // Receiving
-    message callMessage; 	// message for sending
-	message playerResponse;		// message to receive ACK from player
+    message *callMessage = (message*) malloc(sizeof(message)); // Receiving
+    message *playerResponse = (message*) malloc(sizeof(message)); // Receiving
+    // message callMessage; 	// message for sending
+	// message playerResponse;		// message to receive ACK from player
 
     while (!gameOver){
-        callMessage.commandCode = BINGOCALL;
+        callMessage->commandCode = BINGOCALL;
 		value = rand() % 10;
-		callMessage.parameters = value;
+		callMessage->parameters = value;
 
 		// Sending 'Start game K' command:
 		cout << "calling " << value << "\n";
@@ -79,9 +79,9 @@ void callerRole(ClientSocket *sock)
 		if (n < 0)
 			DieWithError("ERROR reading from socket");
 		else{
-			if (playerResponse.commandCode == PLAYERACK)
+			if (playerResponse->commandCode == PLAYERACK)
 				cout << "Player ACK received.\n";
-			if (playerResponse.commandCode == GAMEOVER){
+			if (playerResponse->commandCode == GAMEOVER){
                 gameOver = true;
                 cout << "GAMEOVER!\n";
             }
