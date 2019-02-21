@@ -65,15 +65,15 @@ void callerRole(ClientSocket *sock)
 	message playerResponse;		// message to receive ACK from player
 
     // while (!gameOver){
-    for (int i=0; i<10; i++){
+    for (int i=0; i<20; i++){
         callMessage.commandCode = BINGOCALL;
 		value = rand() % 10;
 		callMessage.parameters = value;
 
 		// Sending 'Start game K' command:
-		cout << "Calling " << value << "\n";
+		cout << "Calling " << value;
 		n = sock->send((void*) &callMessage, sizeof(message));
-        cout << "Sending " << n << " bytes over socket.\n";
+        cout << " Sending " << n << " bytes over socket.\n";
 
 		n = sock->receive((void*) &playerResponse, sizeof(message));
         cout << "Receiving " << n << " bytes over socket. CommandCode " << playerResponse.commandCode << "\n";
@@ -109,7 +109,7 @@ void playerRole(ServerSocket *sock)
 
    for ( ; ; ) {
        n = sock->receive((void*) &inputMessage, sizeof(message));
-       cout << "Receiving" << n << " bytes over socket. CommandCode " << inputMessage.commandCode << "\n";
+       cout << "Receiving " << n << " bytes over socket. CommandCode " << inputMessage.commandCode << "\n";
 
        inputCode = inputMessage.commandCode;
 
