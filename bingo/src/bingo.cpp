@@ -99,19 +99,21 @@ void playerRole(ServerSocket *sock)
     Board gameBoard = Board();
     gameBoard.printBoard();
 
-    message inputMessage;
-	message callerACK;
-	callerACK.commandCode = PLAYERACK;
+    // message inputMessage;
+    message *inputMessage = (message*) malloc(sizeof(message)); // Receiving
+    message *callerACK = (message*) malloc(sizeof(message)); // Receiving
+	// message callerACK;
+	callerACK->commandCode = PLAYERACK;
 
     for ( ; ; ) {
 	    if ( (n = sock->receive((void**) &inputMessage, sizeof(message))) == 0 )
    	    	return; /* connection closed by other end */
 
-        inputCode = inputMessage.commandCode;
+        inputCode = inputMessage->commandCode;
 
         if (inputCode == BINGOCALL){
             printf("Bingo Call received!\n");
-			calledNumber = inputMessage.parameters;
+			calledNumber = inputMessage->parameters;
             cout << "Number: " << calledNumber << "\n";
 
 			gameBoard.markNumber(calledNumber);
@@ -119,7 +121,7 @@ void playerRole(ServerSocket *sock)
 
 			// updating command code if player wins:
 			if (gameOver){
-				callerACK.commandCode = GAMEOVER;
+				callerACK->commandCode = GAMEOVER;
 				gameBoard.printBoard();
 			}
 
