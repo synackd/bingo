@@ -59,6 +59,8 @@ void callerRole(ClientSocket *sock)
     int value;
     bool gameOver = false;
 
+    // message *callMessage = (message*) malloc(sizeof(message)); // Receiving
+    // message *playerResponse = (message*) malloc(sizeof(message)); // Receiving
     message callMessage; 	// message for sending
 	message playerResponse;		// message to receive ACK from player
 
@@ -77,17 +79,14 @@ void callerRole(ClientSocket *sock)
 		if (n < 0)
 			DieWithError("ERROR reading from socket");
 		else{
-
 			if (playerResponse.commandCode == PLAYERACK)
 				cout << "Player ACK received.\n";
-
 			if (playerResponse.commandCode == GAMEOVER){
                 gameOver = true;
                 cout << "GAMEOVER!\n";
             }
-
-
 		}
+
     }
 
     info("GAMEOVER");
@@ -127,9 +126,6 @@ void playerRole(ServerSocket *sock)
 			if (gameOver){
 				callerACK->commandCode = GAMEOVER;
 				gameBoard.printBoard();
-                n = sock->send((void**) &callerACK, sizeof(message));
-                cout << "GAMEOVER sent to caller.\n";
-                return;
 			}
 
 			n = sock->send((void**) &callerACK, sizeof(message));
