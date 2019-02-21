@@ -15,6 +15,7 @@
 #include "cmd.hpp"
 #include "client.hpp"
 #include "server.hpp"
+#include "player.hpp"
 #include "peer.hpp"
 
 using namespace std;
@@ -164,6 +165,20 @@ int main(int argc, char **argv)
     if (argc != 3)
 		DieWithError( "Parameter Error: usage: bingo caller <manager-IPaddress> <manager-Port> \n or bingo player <player-Port> " );
 
+
+    // TEMPORAL LIST OF PLAYERS FOR TESTING: //////////////////////
+
+    // LIST OF REGISTERED PLAYERS:
+    int numberOfRegPlayers = 5;
+    vector<PlayerData> playersList;
+
+    for (int i = 0; i < numberOfRegPlayers; i++){
+        string playerIP = "IP" + std::to_string(i);
+
+        PlayerData tempPlayer("testName", playerIP, i);
+		playersList.push_back(tempPlayer);
+    }
+
     // Try to convert port.
     unsigned short port;
     errno = 0;
@@ -193,6 +208,29 @@ int main(int argc, char **argv)
     // Sending 'Start game K' command:
     cout << "Sending START_GAME 3.\n";
     n = cSock->send((void*) &startGameCmd, sizeof(msg_t));
+
+    // Receiving K Players:
+    string newIP;
+    int newGameID;
+    msg_t callerACK;
+    callerACK.command = CALLERACK;
+    msg_t mgrResponse;
+
+    for (int i = 0; i < 3; i++){
+        // startGameResponse response;
+        cout << "receiving player ...\n";
+        n = cSock->receive((void*) &mgrResponse, sizeof(msg_t));
+
+        cout << "Receiving Player: GameID = " << mgrResponse.mgr_rsp_startgame.gameID << "\tIP = " <<  mgrResponse.mgr_rsp_startgame.playerIP << "\n";
+
+        // Sending ACK back to manager:
+        n = cSock->send((void*) &callerACK, sizeof(msg_t));
+        cout << "ACK sent to manager.\n";
+
+
+    }
+
+
 
     // // Checking role type;
     // if (strcmp(argv[1],"caller") == 0) {

@@ -15,6 +15,7 @@
 #include "server.hpp"
 
 
+
 /**
  * Log an info message to stdout
  * from the manager.
@@ -80,6 +81,18 @@ int main(int argc, char **argv)
         exit(FAILURE);
     }
 
+    // TEMPORAL LIST OF PLAYERS FOR TESTING: //////////////////////
+
+    // LIST OF REGISTERED PLAYERS:
+    vector<PlayerData> playersList;
+    int numberOfRegPlayers = 5;
+
+    for (int i = 0; i < numberOfRegPlayers; i++){
+        string playerIP = "IP" + std::to_string(i);
+        PlayerData tempPlayer("name", playerIP, i);
+        playersList.push_back(tempPlayer);
+    }
+
     /******************************
      * COMMUNICATING WITH CALLERS *
      ******************************/
@@ -120,13 +133,35 @@ int main(int argc, char **argv)
             size = mgr_sock->send((void*) &mgr_rsp, sizeof(msg_t));
             info("Sent response of %d bytes.", size);
         }else if (data.command == START_GAME) {
-            info("Command received was START_GAME.");
 
-        }else{
-            error("Unknown command received.");
-        }
-    }
-}
+            info("Command received was START_GAME.");
+            int numberOfPlayersToSend = data.clr_cmd_startgame.k;
+            msg_t response;
+            // response.command =
+
+            for (int i = 0; i < numberOfPlayersToSend; i++){
+                // Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
+                response.mgr_rsp_startgame.gameID = 1;
+                strcpy(response.mgr_rsp_startgame.playerIP, playersList[i].getIP().c_str());
+                response.mgr_rsp_startgame.playerPort = playersList[i].getPort();
+
+                cout << "Sending Player: GameID = " << response.mgr_rsp_startgame.gameID << "\tIP = " << response.mgr_rsp_startgame.playerIP << "\tPort = " << response.mgr_rsp_startgame.playerPort << "\n";
+                // response.gamePlayer->PrintPlayer();
+                size = mgr_sock->send((void*) &response, sizeof(msg_t));
+
+                // waiting for ACK:
+                size = mgr_sock->receive((void*) &data, sizeof(msg_t));
+                if (data.command == CALLERACK)
+                  	printf("Caller ACK received.\n");
+
+
+            }
+	  } // end of STARTGAME command processing
+
+
+  } // end of while
+
+} // end of main()
 
 
 

@@ -81,10 +81,10 @@ typedef struct clr_cmd_startgame_t{
     int k;
 }clr_cmd_startgame_t;
 
-typedef struct mgr_rsp_startgame_t {
+typedef struct {
     int gameID;
     int playersLeft;
-    std::string playerIP;
+    char playerIP[BUFMAX];
     int playerPort;
 } mgr_rsp_startgame_t;
 
@@ -107,6 +107,7 @@ typedef struct {
         clr_cmd_bingocall_t clr_cmd_bingocals;  /**< Bingo Call command data */
         ply_rsp_bingocall_t ply_rsp_bingocall;  /**< Player response to Bingo Call data */
         clr_cmd_startgame_t clr_cmd_startgame;  /**< Caller Start Command data */
+        mgr_rsp_startgame_t mgr_rsp_startgame;  /**< Manager REsponse to StartGame command */
     };
 } msg_t;
 
