@@ -18,12 +18,6 @@
 using namespace std;
 
 /*
- * Function Prototypes
- */
-void info(const char *fmt, ...);
-void error(const char *fmt, ...);
-
-/*
  * Class Prototypes
  */
 
