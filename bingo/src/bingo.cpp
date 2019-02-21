@@ -138,8 +138,9 @@ void playerRole(ServerSocket *sock)
  */
 int main(int argc, char **argv)
 {
+    cout << "ArgCount = " << argc <<"\n";
 
-    if (argc != 4 && argc != 2)
+    if (argc != 4 && argc != 3)
 		DieWithError( "Parameter Error: usage: bingo caller <player-IPaddress> <player-Port> \n or bingo player <player-Port> " );
 
     // Checking role type;
