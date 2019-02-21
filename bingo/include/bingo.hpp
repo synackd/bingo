@@ -15,8 +15,6 @@ using namespace std;
 /*
  * Functions
  */
-void info(const char *fmt, ...);
-void error(const char *fmt, ...);
 void getPeerInfo(char **name_ptr, char **ip_ptr, unsigned int *port_ptr);
 void printMenu(void);
 int getChoice(void);

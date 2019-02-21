@@ -1,3 +1,4 @@
+#include "log.hpp"
 #include "peer.hpp"
 #include "cmd.hpp"
 
