@@ -127,6 +127,9 @@ void playerRole(ServerSocket *sock)
                callerACK.commandCode = GAMEOVER;
                gameBoard.printBoard();
                gameOver = true;
+               n = sock->send((void*) &callerACK, sizeof(message));
+               cout << "Sending GAMEOVER " << n << " bytes over socket.\n";
+               return;
            }
 
            n = sock->send((void*) &callerACK, sizeof(message));
@@ -169,24 +172,18 @@ int main(int argc, char **argv)
     // Checking role type;
     if (strcmp(argv[1],"caller") == 0) {
         cout << "Caller Role Started:\n";
-
         port = ConvertPort(argv[3]);
-
         ClientSocket *cSock;
     	cSock = new ClientSocket(argv[2], port);
     	cSock->start();
         callerRole(cSock);
-        cout << "out of caller method ............................................\n";
     }else if(strcmp(argv[1],"player") == 0){
         cout << "Player Role Started:\n";
-
         port = ConvertPort(argv[2]);
-
         ServerSocket *pSock;
     	pSock = new ServerSocket(port);
     	pSock->start();
         playerRole(pSock);
-        cout << "out of player method ............................................\n";
     }else{
         cout << "Invalid Role value. Valid parameters are ./client -IPaddress -Port -Role\n";
         exit(0);
