@@ -102,7 +102,11 @@ void playerRole(ServerSocket *sock)
     // message inputMessage;
     message *inputMessage = (message*) malloc(sizeof(message)); // Receiving
     message *callerACK = (message*) malloc(sizeof(message)); // Receiving
+<<<<<<< HEAD
 	// message callerACK;
+=======
+	message callerACK;
+>>>>>>> a78e49e8266459a77920b0919011a1706521bbf0
 	callerACK->commandCode = PLAYERACK;
 
     for ( ; ; ) {
