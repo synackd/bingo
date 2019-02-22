@@ -345,7 +345,6 @@ int main(int argc, char **argv)
                 info("Establishing connection with manager...");
                 bingo_sock->start();
 
-                info("Attempting to deregister player \"%s\"...", me->getName().c_str());
                 status = me->deregist(bingo_sock);
 
                 info("Closing connection to manager...");
