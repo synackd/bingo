@@ -159,7 +159,7 @@ int main(int argc, char **argv)
     // Verify IP address.
     int status;
     struct sockaddr_in addr;
-    status = inet_pton(AF_INET, *ip_ptr, &addr.sin_addr);
+    status = inet_pton(AF_INET, argv[1], &addr.sin_addr);
     if (status != 1) {
         error("Invalid IP address!");
         exit(FAILURE);
