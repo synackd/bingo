@@ -8,6 +8,15 @@
 #ifndef _BINGO_HPP_
 #define _BINGO_HPP_
 
-// Definitions go here.
+#include "client.hpp"
+
+using namespace std;
+
+/*
+ * Functions
+ */
+void getPeerInfo(char **name_ptr, char **ip_ptr, unsigned int *port_ptr);
+void printMenu(void);
+int getChoice(void);
 
 #endif

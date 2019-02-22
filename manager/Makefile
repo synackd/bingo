@@ -6,7 +6,7 @@ libdir := ../lib
 lib    := global
 
 CC       := g++
-CPPFLAGS += $(addprefix -I ,$(inc))
+CPPFLAGS += $(addprefix -I ,$(inc)) -g -std=c++11
 LDFLAGS  := $(addprefix -L ,$(libdir)) $(addprefix -l ,$(lib))
 vpath %.hpp $(inc)
 
@@ -25,6 +25,9 @@ build:
 build/%.cpp.o: src/%.cpp build
 	@echo ' [CC]   $@'
 	@$(CC) $(CPPFLAGS) -c -o $@ $<
+
+# Build logging before everything else
+build/manager.cpp.o: build/log.cpp.o
 
 # Clean up
 .PHONY: clean
