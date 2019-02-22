@@ -82,21 +82,17 @@ int main(int argc, char **argv)
         exit(FAILURE);
     }
 
-    // TEMPORAL LIST OF PLAYERS FOR TESTING: //////////////////////
-
-    // LIST OF REGISTERED PLAYERS:
-
-    int numberOfRegPlayers = 5;
-
-    for (int i = 0; i < numberOfRegPlayers; i++){
-        string playerIP = "IP" + std::to_string(i);
-        PlayerData tempPlayer("name", playerIP, i);
-        playersList.push_back(tempPlayer);
-    }
-
-    /******************************
-     * COMMUNICATING WITH CALLERS *
-     ******************************/
+    // // TEMPORAL LIST OF PLAYERS FOR TESTING: //////////////////////
+    //
+    // // LIST OF REGISTERED PLAYERS:
+    //
+    // int numberOfRegPlayers = 5;
+    //
+    // for (int i = 0; i < numberOfRegPlayers; i++){
+    //     string playerIP = "IP" + std::to_string(i);
+    //     PlayerData tempPlayer("name", playerIP, i);
+    //     playersList.push_back(tempPlayer);
+    // }
 
     // Create new manager object
     Manager *mgr = new Manager();
@@ -109,36 +105,65 @@ int main(int argc, char **argv)
     // do based on data
     int status;
     ssize_t size = 0;
+    int requestedK;
     msg_t data;
-    while ((size = mgr_sock->receive((void*) &data, sizeof(msg_t))) != 0) {
-        info("Received %d bytes from socket.", size);
+    for ( ; ; ) {
+        if ((size = mgr_sock->receive((void*) &data, sizeof(msg_t))) != 0) {
+            info("Received %d bytes from socket.", size);
 
-        // Determine what to do
-        if (data.command == REGISTER) {
-            // Register the player
-            info("Command received was REGISTER.");
-            info("Attempting to register player \"%s\"...", data.mgr_cmd_register.name);
-            status = mgr->registerPlayer(data.mgr_cmd_register.name, data.mgr_cmd_register.ip, data.mgr_cmd_register.port);
+            /*
+             * Determine what to do based on command
+             *
+             * NOTE: Responses have the "command" field in msg_t set with
+             * the return code of the request. Return codes are 0 or less,
+             * distinguishing them from commands.
+             */
+            switch (data.command) {
+                // Register command
+                case REGISTER:
+                    // Register the player
+                    info("Command received was REGISTER.");
+                    info("Attempting to register player \"%s\" with IP \"%s\" and port %d...", data.mgr_cmd_register.name, data.mgr_cmd_register.ip, data.mgr_cmd_register.port);
+                    status = mgr->registerPlayer(data.mgr_cmd_register.name, data.mgr_cmd_register.ip, data.mgr_cmd_register.port);
 
-            // Form response
-            msg_t mgr_rsp;
-            if (status == SUCCESS) {
-                info("Registration succeeded!");
-                mgr_rsp.mgr_rsp_register.ret_code = SUCCESS;
-            } else {
-                error("Registration failed!");
-                mgr_rsp.mgr_rsp_register.ret_code = FAILURE;
+                    // Form response
+                    msg_t mgr_rsp;
+                    if (status == SUCCESS) {
+                        info("Registration succeeded!");
+                        mgr_rsp.command = SUCCESS;
+                        mgr_rsp.mgr_rsp_register.ret_code = SUCCESS;
+                    } else {
+                        error("Registration failed!");
+                        mgr_rsp.command = FAILURE;
+                        mgr_rsp.mgr_rsp_register.ret_code = FAILURE;
+                    }
+
+                    // Send response
+                    size = mgr_sock->send((void*) &mgr_rsp, sizeof(msg_t));
+                    info("Sent response of %d bytes.", size);
+
+                    break;
+                case START_GAME:
+                    cout << "Registered Players Count = " << mgr->numberOfRegPlayers << "\n";
+                    requestedK = data.clr_cmd_startgame.k;
+
+                    if (requestedK <= mgr->numberOfRegPlayers){
+                        mgr->sendKPlayers(mgr_sock, data);
+                    }else{
+                        cout << "There are not enough registered players.\n";
+                    }
+
+                    break;
+                // Anything else
+                default:
+                    error("Unknown command received.");
+                    break;
             }
-
-            // Send response
-            size = mgr_sock->send((void*) &mgr_rsp, sizeof(msg_t));
-            info("Sent response of %d bytes.", size);
-        }else if (data.command == START_GAME) {
-
-            mgr->sendKPlayers(mgr_sock, data);
-
-	  } // end of STARTGAME command processing
-
+        } else {
+            // Restart socket
+            mgr_sock->stop();
+            mgr_sock->start();
+        }
 
   } // end of while
 
@@ -159,6 +184,7 @@ int main(int argc, char **argv)
  */
 Manager::Manager()
 {
+    numberOfRegPlayers = 0;
 }
 
 /**
@@ -203,6 +229,6 @@ int Manager::registerPlayer(string name, string ip, unsigned int port)
     // If not, add player
     PlayerData newPlayer(name, ip, port);
     registeredPlayers.push_back(newPlayer);
-
+    numberOfRegPlayers ++;
     return SUCCESS;
 }
