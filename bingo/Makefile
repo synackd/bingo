@@ -28,7 +28,7 @@ build/%.cpp.o: src/%.cpp build
 	@$(CC) $(CPPFLAGS) -c -o $@ $<
 
 # Build logging before everything else
-build/bingo.cpp.o: build/log.cpp.o
+build/bingo.cpp.o: build/log.cpp.o build/peer.cpp.o
 build/peer.cpp.o:  build/log.cpp.o
 
 # Clean up
