@@ -39,7 +39,7 @@ class Bingo{
         Bingo(void);
         void CallBingo(ClientSocket *sock);
         void PlayBingo(ServerSocket *sock);
-        void StartGame(ClientSocket *sock, int K);
+        void StartGame(ClientSocket *sock, int inputK);
 };
 
 #endif

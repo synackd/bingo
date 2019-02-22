@@ -216,16 +216,16 @@ void PlayBingo(ServerSocket *sock)
 /**
  * Sends START_GAME_K command to Manager and stores players:
  */
-void StartGame(ClientSocket *sock, int K){
+void StartGame(ClientSocket *sock, int inputK){
     // Starting Game:
     // Populating message body:
     msg_t startGameCmd;
     ssize_t n;
     startGameCmd.command = START_GAME;
-    startGameCmd.clr_cmd_startgame.k = K;
+    startGameCmd.clr_cmd_startgame.k = inputK;
 
     // Sending 'Start game K' command:
-    cout << "Sending START_GAME " << K << ".\n";
+    cout << "Sending START_GAME " << inputK << ".\n";
     n = sock->send((void*) &startGameCmd, sizeof(msg_t));
 
     // Receiving K Players:
@@ -235,7 +235,7 @@ void StartGame(ClientSocket *sock, int K){
     callerACK.command = CALLERACK;
     msg_t mgrResponse;
 
-    for (int i = 0; i < K; i++){
+    for (int i = 0; i < inputK; i++){
         // startGameResponse response;
         cout << "receiving player ...\n";
         n = sock->receive((void*) &mgrResponse, sizeof(msg_t));
