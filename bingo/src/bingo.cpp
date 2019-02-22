@@ -205,15 +205,65 @@ int main(int argc, char **argv)
 
     Bingo *bng = new Bingo();
 
-    ClientSocket *cSock;
-	cSock = new ClientSocket(argv[1], port);
-	cSock->start();
+    /****************
+     * REGISTRATION *
+     ****************/
+    char *p_name, *p_ip;
+    unsigned int p_port;
+    getPeerInfo(&p_name, &p_ip, &p_port);
 
-    int inputK = 3;
-    bng->StartGame(cSock, inputK);
+    // Create socket for communication with manager
+    ClientSocket *bingo_sock = new ClientSocket(argv[1], port);
 
-	exit(0);
-}
+    // Establish connection with manager
+    info("Establishing connection with manager...");
+    bingo_sock->start();
+
+    // Create player
+    Player *newPlayer = new Player(p_name, p_ip, p_port);
+
+    // Attempt to register player with manager
+    newPlayer->registerToManager(bingo_sock);
+
+    // Close connection with manager
+    info("Closing connection with manager...");
+    bingo_sock->stop();
+    delete bingo_sock;
+    bingo_sock = NULL;
+
+    /********
+     * MENU *
+     ********/
+    int choice = -1;
+    int kValue = 3;
+
+    // Forever get user's choice
+    for ( ; ; ) {
+        // Get user's choice
+        printMenu();
+        choice = getChoice();
+
+        // Decide what to do
+        switch (choice) {
+            case 0:
+                cprintf(stdout, BOLD, "Exit\n");
+                exit(SUCCESS);
+                break;  // <-- Here for aesthetic purposes :)
+            case 1:
+                cprintf(stdout, BOLD, "Start Game\n");
+                bng->StartGame(bingo_sock, kValue);
+                break;
+            case 2:
+                cprintf(stdout, BOLD, "Deregister\n");
+                break;
+            default:
+                cprintf(stdout, BOLD, "No such choice on menu.\n");
+                break;
+        }
+    }
+
+    return SUCCESS;
+}// end of main()
 
 /*
  * Class Implementations

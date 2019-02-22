@@ -1,3 +1,4 @@
+#include "log.hpp"
 #include "peer.hpp"
 #include "cmd.hpp"
 
@@ -185,7 +186,6 @@ Caller::Caller()
 // TODO: Make this object oriented with ServerSocket...
 void Caller::call(int sockfd)
 {
-
 }
 
 /**
@@ -202,7 +202,7 @@ void Caller::startGame()
 /**
  * Store player's information
  */
-Player::Player(string inputName, string inputIP, int inputPort)
+Player::Player(string inputName, string inputIP, unsigned int inputPort)
 {
     this->name = inputName;
     this->ip = inputIP;
@@ -242,7 +242,7 @@ string Player::getIP()
 /**
  * Getter for player's port
  */
-int Player::getPort()
+unsigned int Player::getPort()
 {
     return this->port;
 }
@@ -258,5 +258,33 @@ void Player::listenBingo()
 /**
  * Registers to Manager for future games
  */
-void Player::registerToManager(){
+void Player::registerToManager(ClientSocket *sock)
+{
+    ssize_t size = 0;
+
+    // Create register packet
+    msg_t reg_cmd;
+    reg_cmd.command = REGISTER;
+    strncpy(reg_cmd.mgr_cmd_register.name, this->name.c_str(), BUFMAX);
+    strncpy(reg_cmd.mgr_cmd_register.ip, this->ip.c_str(), BUFMAX);
+    reg_cmd.mgr_cmd_register.port = this->port;
+
+    // Send packet to manager
+    info("Attempting to register player \"%s\"...", this->name.c_str());
+    size = sock->send((void*) &reg_cmd, sizeof(msg_t));
+    info("Sent %d bytes to manager.", size);
+
+    // Listen for manager's response
+    msg_t reg_rsp;
+    size = sock->receive((void*) &reg_rsp, sizeof(msg_t));
+    info("Received %d bytes from manager.", size);
+
+    // Examine return code
+    if (reg_rsp.mgr_rsp_register.ret_code == SUCCESS) {
+        info("Registration success!");
+    } else if (reg_rsp.mgr_rsp_register.ret_code == FAILURE) {
+        error("Registration failed!");
+    } else {
+        error("Manager returned unknown value.");
+    }
 }
