@@ -252,6 +252,8 @@ int main(int argc, char **argv)
             case 1:
                 cprintf(stdout, BOLD, "Start Game\n");
                 // bingo_sock->start(); // Reopening socket to manager
+                cout << "Enter number of Players: \n";
+                kValue = getChoice();
                 bng->StartGame(bingo_sock, kValue);
                 break;
             case 2:

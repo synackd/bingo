@@ -195,13 +195,13 @@ Manager::Manager()
  */
 void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
 {
-    info("Command received was START_GAME.");
+    info("START_GAME command received.");
     // cout << "Getting K ...\n";
     int numberOfPlayersToSend = data.clr_cmd_startgame.k;
     msg_t response;
     // ssize_t size = 0;
     // response.command =
-
+    cout << "Sending " << numberOfPlayersToSend << " players to caller...\n";
     for (int i = 0; i < numberOfPlayersToSend; i++){
         // cout << "Populating response gameID...\n";
         // Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
