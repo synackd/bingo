@@ -13,8 +13,10 @@
 #include "colors.hpp"
 #include "bingo.hpp"
 #include "cmd.hpp"
+#include "constants.hpp"
 #include "client.hpp"
 #include "server.hpp"
+#include "input.hpp"
 #include "player.hpp"
 #include "peer.hpp"
 
@@ -72,6 +74,109 @@ short ConvertPort(char *inputPort){
 
     return port;
 }
+
+void printMenu()
+{
+    // Header
+    cprintf(stdout, BOLD, "\n Choices:\n");
+
+    // Exit
+    cprintf(stdout, BOLD, "  0) ");
+    fprintf(stdout, "Exit\n");
+
+    // Start Game K
+    cprintf(stdout, BOLD, "  1) ");
+    fprintf(stdout, "Start Game\n");
+
+    // Deregister
+    cprintf(stdout, BOLD, "  2) ");
+    fprintf(stdout, "Deregister\n");
+
+    fprintf(stdout, "\n");
+}
+
+/**
+ * Get user's choice after printing menu options
+ */
+int getChoice()
+{
+    char *choice_str;
+    long int tmp = -1;
+    int choice;
+
+    // Get user input
+    cprintf(stdout, BOLD, "Your choice: ");
+    choice_str = read_line();
+
+    // Convert choice
+    errno = 0;
+    tmp = strtol(choice_str, NULL, 10);
+    while (errno != 0 || tmp == -1) {
+        cprintf(stdout, BOLD, "Invalid choice!\n");
+        cprintf(stdout, BOLD, "Your choice: ");
+        choice_str = read_line();
+        errno = 0;
+        tmp = strtol(choice_str, NULL, 10);
+    }
+    choice = (int) tmp;
+
+    return choice;
+}
+
+/**
+ * Menu system for registering this peer with the
+ * manager.
+ */
+void getPeerInfo(char **name_ptr, char **ip_ptr, unsigned int *port_ptr)
+{
+    // Necessary pointer housekeeping
+    if (!name_ptr || !ip_ptr || !port_ptr) {
+        error("Cannot write to NULL!");
+        exit(FAILURE);
+    }
+
+    char *prt;
+    int status;
+    struct sockaddr_in addr;
+
+    cprintf(stdout, BOLD, " +-------------------+\n");
+    cprintf(stdout, BOLD, " | Welcome to Bingo! |\n");
+    cprintf(stdout, BOLD, " +-------------------+\n\n");
+    cprintf(stdout, BOLD, "Please register.\n");
+
+    // Name
+    cprintf(stdout, BOLD, "Name: ");
+    *name_ptr = read_line();
+
+    // IP Address
+    status = 0;
+    while (status != 1) {
+        cprintf(stdout, BOLD, "IP Address: ");
+        *ip_ptr = read_line();
+        status = inet_pton(AF_INET, *ip_ptr, &addr.sin_addr);
+        if (status != 1) {
+            cprintf(stdout, BOLD, "Invalid IP address!\n");
+        }
+    }
+
+    // Port
+    cprintf(stdout, BOLD, "Port: ");
+    prt = read_line();
+    errno = 0;
+    long int tmp = strtol(prt, NULL, 10);
+    while (errno != 0 || !(0 < tmp && tmp <= 65535)) {
+        if (errno != 0) {
+            errno = 0;
+        } else {
+            cprintf(stdout, BOLD, "Port must be between 1 and 65535.\n");
+        }
+        cprintf(stdout, BOLD, "Port: ");
+        prt = read_line();
+        tmp = strtol(prt, NULL, 10);
+    }
+    *port_ptr = (unsigned short) tmp;
+}
+
 
 /**
  * Main runtime of bingo application

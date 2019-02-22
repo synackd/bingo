@@ -14,7 +14,8 @@
 #include "cmd.hpp"
 #include "server.hpp"
 
-
+// GLOBAL LIST OF REGISTERED PLAYERS:
+vector<PlayerData> playersList;
 
 /**
  * Log an info message to stdout
@@ -84,7 +85,7 @@ int main(int argc, char **argv)
     // TEMPORAL LIST OF PLAYERS FOR TESTING: //////////////////////
 
     // LIST OF REGISTERED PLAYERS:
-    vector<PlayerData> playersList;
+
     int numberOfRegPlayers = 5;
 
     for (int i = 0; i < numberOfRegPlayers; i++){
@@ -134,28 +135,8 @@ int main(int argc, char **argv)
             info("Sent response of %d bytes.", size);
         }else if (data.command == START_GAME) {
 
-            info("Command received was START_GAME.");
-            int numberOfPlayersToSend = data.clr_cmd_startgame.k;
-            msg_t response;
-            // response.command =
+            mgr->sendKPlayers(mgr_sock, data);
 
-            for (int i = 0; i < numberOfPlayersToSend; i++){
-                // Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
-                response.mgr_rsp_startgame.gameID = 1;
-                strcpy(response.mgr_rsp_startgame.playerIP, playersList[i].getIP().c_str());
-                response.mgr_rsp_startgame.playerPort = playersList[i].getPort();
-
-                cout << "Sending Player: GameID = " << response.mgr_rsp_startgame.gameID << "\tIP = " << response.mgr_rsp_startgame.playerIP << "\tPort = " << response.mgr_rsp_startgame.playerPort << "\n";
-                // response.gamePlayer->PrintPlayer();
-                size = mgr_sock->send((void*) &response, sizeof(msg_t));
-
-                // waiting for ACK:
-                size = mgr_sock->receive((void*) &data, sizeof(msg_t));
-                if (data.command == CALLERACK)
-                  	printf("Caller ACK received.\n");
-
-
-            }
 	  } // end of STARTGAME command processing
 
 
@@ -183,8 +164,29 @@ Manager::Manager()
 /**
  * Send k players to caller that requested them
  */
-void Manager::sendKPlayers()
+void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
 {
+    info("Command received was START_GAME.");
+    int numberOfPlayersToSend = data.clr_cmd_startgame.k;
+    msg_t response;
+    // ssize_t size = 0;
+    // response.command =
+
+    for (int i = 0; i < numberOfPlayersToSend; i++){
+        // Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
+        response.mgr_rsp_startgame.gameID = 1;
+        strcpy(response.mgr_rsp_startgame.playerIP, playersList[i].getIP().c_str());
+        response.mgr_rsp_startgame.playerPort = playersList[i].getPort();
+
+        cout << "Sending Player: GameID = " << response.mgr_rsp_startgame.gameID << "\tIP = " << response.mgr_rsp_startgame.playerIP << "\tPort = " << response.mgr_rsp_startgame.playerPort << "\n";
+        // response.gamePlayer->PrintPlayer();
+        sock->send((void*) &response, sizeof(msg_t));
+
+        // waiting for ACK:
+        sock->receive((void*) &data, sizeof(msg_t));
+        if (data.command == CALLERACK)
+            printf("Caller ACK received.\n");
+    }
 }
 
 /**
