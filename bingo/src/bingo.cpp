@@ -251,6 +251,11 @@ int main(int argc, char **argv)
                 break;  // <-- Here for aesthetic purposes :)
             case 1:
                 cprintf(stdout, BOLD, "Start Game\n");
+                // Create socket for communication with manager
+                ClientSocket *bingo_sock = new ClientSocket(argv[1], port);
+                // Establish connection with manager
+                info("Establishing connection with manager...");
+                bingo_sock->start();
                 bng->StartGame(bingo_sock, kValue);
                 break;
             case 2:
