@@ -279,13 +279,13 @@ int main(int argc, char **argv)
 
         // Decide what to do
         switch (choice) {
-            // Exit game
+            // Exit program
             case 0:
                 cprintf(stdout, BOLD, "Exit\n");
                 exit(SUCCESS);
                 break;  // <-- Here for aesthetic purposes :)
 
-            // Start a game
+            // Start a game with k players
             case 1:
                 // Check if player is registered
                 if (!me->isRegistered()) {
