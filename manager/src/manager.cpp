@@ -151,6 +151,9 @@ int main(int argc, char **argv)
                         mgr->sendKPlayers(mgr_sock, data);
                     }else{
                         cout << "There are not enough registered players.\n";
+                        msg_t startGameFail;
+                        startGameFail.command = FAILURE;
+                        mgr_sock->send((void*) &startGameFail, sizeof(msg_t));
                     }
 
                     break;

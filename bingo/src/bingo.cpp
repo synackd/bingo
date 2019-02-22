@@ -396,6 +396,10 @@ void Bingo::StartGame(ClientSocket *sock, int inputK){
         // startGameResponse response;
         cout << "receiving player ...\n";
         n = sock->receive((void*) &mgrResponse, sizeof(msg_t));
+        if (mgrResponse.command == FAILURE){
+            cout << "Not enough registered players.\n";
+            return;            
+        }
 
         cout << "Receiving Player: GameID = " << mgrResponse.mgr_rsp_startgame.gameID << "\tIP = " <<  mgrResponse.mgr_rsp_startgame.playerIP << "\n";
 
