@@ -226,31 +226,7 @@ int main(int argc, char **argv)
         // Sending ACK back to manager:
         n = cSock->send((void*) &callerACK, sizeof(msg_t));
         cout << "ACK sent to manager.\n";
-
-
     }
-
-
-
-    // // Checking role type;
-    // if (strcmp(argv[1],"caller") == 0) {
-    //     cout << "Caller Role Started:\n";
-    //     port = ConvertPort(argv[3]);
-    //     ClientSocket *cSock;
-    // 	cSock = new ClientSocket(argv[2], port);
-    // 	cSock->start();
-    //     callerRole(cSock);
-    // }else if(strcmp(argv[1],"player") == 0){
-    //     cout << "Player Role Started:\n";
-    //     port = ConvertPort(argv[2]);
-    //     ServerSocket *pSock;
-    // 	pSock = new ServerSocket(port);
-    // 	pSock->start();
-    //     playerRole(pSock);
-    // }else{
-    //     cout << "Invalid Role value. Valid parameters are ./client -IPaddress -Port -Role\n";
-    //     exit(0);
-    // }
 
 	exit(0);
 }
