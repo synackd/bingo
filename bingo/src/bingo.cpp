@@ -27,6 +27,13 @@ using namespace std;
  */
 ClientSocket *bingo_sock;   /**< Socket for communicating with the manager */
 
+char mgr_ip[BUFMAX];        /**< Holds the manager's IP address */
+unsigned int mgr_port;      /**< Holds the manager's port */
+vector<Player> *players;    /**< List of in-game players */
+Game *myGame;               /**< This peer's game */
+Player *me;                 /**< Holds this peer's player data */
+
+
 /**
  * Menu system for allowing the peer to decide
  * what to do (e.g. be a caller, deregister, etc.
@@ -160,7 +167,6 @@ int main(int argc, char **argv)
     strncpy(mgr_ip, argv[1], BUFMAX);   // Store for later
 
     // Try to convert port.
-    unsigned short port;
     errno = 0;
     long int tmp = strtol(argv[2], NULL, 10);
     if (errno != 0) {
@@ -168,7 +174,7 @@ int main(int argc, char **argv)
         exit(FAILURE);
     }
     if (0 <= tmp && tmp <= 65535) {
-        port = (unsigned short) tmp;
+        mgr_port = (unsigned short) tmp;
     } else {
         error("Port must be between 0 and 65535.");
         exit(FAILURE);
@@ -182,17 +188,17 @@ int main(int argc, char **argv)
     getPeerInfo(&p_name, &p_ip, &p_port);
 
     // Create socket for communication with manager
-    bingo_sock = new ClientSocket(argv[1], port);
+    bingo_sock = new ClientSocket(mgr_ip, mgr_port);
 
     // Establish connection with manager
     info("Establishing connection with manager...");
     bingo_sock->start();
 
     // Create player
-    Player *newPlayer = new Player(p_name, p_ip, p_port);
+    me = new Player(p_name, p_ip, p_port);
 
     // Attempt to register player with manager
-    newPlayer->registerToManager(bingo_sock);
+    me->regist(bingo_sock);
 
     // Close connection with manager
     info("Closing connection with manager...");
