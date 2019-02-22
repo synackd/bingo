@@ -98,6 +98,31 @@ int main(int argc, char **argv)
                     info("Sent response of %d bytes.", size);
 
                     break;
+
+                case DEREGISTER:
+                    // Deregister the player
+                    info("Command received was DEREGISTER.");
+                    info("Attempting to deregister player \"%s\"...", data.mgr_cmd_deregister.name);
+                    status = mgr->deregisterPlayer(data.mgr_cmd_deregister.name);
+
+                    // Form response
+                    msg_t mgr_rsp;
+                    if (status == SUCCESS) {
+                        info("Deregistration succeeded!");
+                        mgr_rsp.command = SUCCESS;
+                        mgr_rsp.mgr_rsp_register.ret_code = SUCCESS;
+                    } else {
+                        error("Registration failed!");
+                        mgr_rsp.command = FAILURE;
+                        mgr_rsp.mgr_rsp_register.ret_code = FAILURE;
+                    }
+
+                    // Send response
+                    size = mgr_sock->send((void*) &mgr_rsp, sizeof(msg_t));
+                    info("Sent response of %d bytes.", size);
+
+                    break;
+
                 // Anything else
                 default:
                     error("Unknown command received.");
