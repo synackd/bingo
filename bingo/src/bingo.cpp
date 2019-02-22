@@ -255,6 +255,7 @@ int main(int argc, char **argv)
                 cout << "Enter number of Players: \n";
                 kValue = getChoice();
                 bng->StartGame(bingo_sock, kValue);
+                bng->CheckStatus();
                 break;
             case 2:
                 cprintf(stdout, BOLD, "Deregister\n");
@@ -416,5 +417,17 @@ void Bingo::StartGame(ClientSocket *sock, int inputK){
         // Sending ACK back to manager:
         n = sock->send((void*) &callerACK, sizeof(msg_t));
         cout << "ACK sent to manager.\n";
+    }
+
+    // Verifying gamingPlayers:
+
+
+}
+
+void Bingo::CheckStatus(){
+    cout << "Number of Gaming Players: " << numberOfGamingPlayers << ".\n";
+    cout << "Name: " << "\t" << "IP address:" << "\t" << "Port:" << "\n";
+    for (int i = 0; i < numberOfGamingPlayers; i ++){
+        cout << gamingPlayers[i].getName() << "\t" << gamingPlayers[i].getIP() << "\t" << gamingPlayers[i].getPort() << "\n";
     }
 }
