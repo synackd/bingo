@@ -104,7 +104,8 @@ int main(int argc, char **argv)
 	cSock = new ClientSocket(argv[1], port);
 	cSock->start();
 
-    bng->StartGame(cSock, 3);
+    int inputK = 3;
+    bng->StartGame(cSock, inputK);
 
 	exit(0);
 }
@@ -127,7 +128,7 @@ Bingo::Bingo()
 /**
  * Calls Numbers to Players until there is a Winner
  */
-void CallBingo(ClientSocket *sock)
+void Bingo::CallBingo(ClientSocket *sock)
 {
     ssize_t n;
     int value;
@@ -164,7 +165,7 @@ void CallBingo(ClientSocket *sock)
 /**
  * Listens to numbers until the game is over or player wins:
  */
-void PlayBingo(ServerSocket *sock)
+void Bingo::PlayBingo(ServerSocket *sock)
 {
     ssize_t n;
     int inputCode;
@@ -216,7 +217,7 @@ void PlayBingo(ServerSocket *sock)
 /**
  * Sends START_GAME_K command to Manager and stores players:
  */
-void StartGame(ClientSocket *sock, int inputK){
+void Bingo::StartGame(ClientSocket *sock, int inputK){
     // Starting Game:
     // Populating message body:
     msg_t startGameCmd;
