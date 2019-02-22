@@ -223,12 +223,32 @@ int main(int argc, char **argv)
                 cprintf(stdout, BOLD, "Exit\n");
                 exit(SUCCESS);
                 break;  // <-- Here for aesthetic purposes :)
+
             case 1:
                 cprintf(stdout, BOLD, "Start Game\n");
                 break;
+
             case 2:
-                cprintf(stdout, BOLD, "Deregister\n");
+                // Check if player is registered
+                if (!me) {
+                    cprintf(stdout, BOLD, "Player not registered.\n");
+                    break;
+                }
+
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+
+                info("Establishing connection with manager...");
+                bingo_sock->start();
+
+                info("Attempting to register player \"%s\"...", me->getName().c_str());
+                me->deregist(bingo_sock);
+
+                info("Closing connection to manager...");
+                bingo_sock->stop();
+                delete bingo_sock;
+                bingo_sock = NULL;
                 break;
+
             default:
                 cprintf(stdout, BOLD, "No such choice on menu.\n");
                 break;
