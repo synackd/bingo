@@ -149,6 +149,16 @@ int main(int argc, char **argv)
         exit(FAILURE);
     }
 
+    // Verify IP address.
+    int status;
+    struct sockaddr_in addr;
+    status = inet_pton(AF_INET, *ip_ptr, &addr.sin_addr);
+    if (status != 1) {
+        error("Invalid IP address!");
+        exit(FAILURE);
+    }
+    strncpy(mgr_ip, argv[1], BUFMAX);   // Store for later
+
     // Try to convert port.
     unsigned short port;
     errno = 0;
