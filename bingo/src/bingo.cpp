@@ -235,7 +235,7 @@ int main(int argc, char **argv)
      * MENU *
      ********/
     int choice = -1;
-    int kValue = 3;
+    int kValue = 1;
 
     // Forever get user's choice
     for ( ; ; ) {
@@ -398,7 +398,7 @@ void Bingo::StartGame(ClientSocket *sock, int inputK){
         n = sock->receive((void*) &mgrResponse, sizeof(msg_t));
         if (mgrResponse.command == FAILURE){
             cout << "Not enough registered players.\n";
-            return;            
+            return;
         }
 
         cout << "Receiving Player: GameID = " << mgrResponse.mgr_rsp_startgame.gameID << "\tIP = " <<  mgrResponse.mgr_rsp_startgame.playerIP << "\n";
