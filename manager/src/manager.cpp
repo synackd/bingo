@@ -204,11 +204,10 @@ void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
     cout << "Sending " << numberOfPlayersToSend << " players to caller...\n";
     for (int i = 0; i < numberOfPlayersToSend; i++){
         // cout << "Populating response gameID...\n";
-        // Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
+
         response.mgr_rsp_startgame.gameID = 1;
-        // cout << "Populating response playerIP...\n";
+        strcpy(response.mgr_rsp_startgame.playerName, registeredPlayers[i].getName().c_str());
         strcpy(response.mgr_rsp_startgame.playerIP, registeredPlayers[i].getIP().c_str());
-        // cout << "Populating response playerPort...\n";
         response.mgr_rsp_startgame.playerPort = registeredPlayers[i].getPort();
 
         cout << "Sending Player: GameID = " << response.mgr_rsp_startgame.gameID << "\tIP = " << response.mgr_rsp_startgame.playerIP << "\tPort = " << response.mgr_rsp_startgame.playerPort << "\n";

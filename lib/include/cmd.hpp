@@ -85,6 +85,7 @@ typedef struct {
     int gameID;
     int playersLeft;
     char playerIP[BUFMAX];
+    char playerName[BUFMAX];
     int playerPort;
 } mgr_rsp_startgame_t;
 

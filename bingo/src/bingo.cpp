@@ -388,8 +388,8 @@ void Bingo::StartGame(ClientSocket *sock, int inputK){
     n = sock->send((void*) &startGameCmd, sizeof(msg_t));
 
     // Receiving K Players:
-    string newIP;
-    int newGameID;
+    string newIP, newName;
+    int newGameID, newPort;
     msg_t callerACK;
     callerACK.command = CALLERACK;
     msg_t mgrResponse;
@@ -403,7 +403,15 @@ void Bingo::StartGame(ClientSocket *sock, int inputK){
             return;
         }
 
-        cout << "Receiving Player: GameID = " << mgrResponse.mgr_rsp_startgame.gameID << "\tIP = " <<  mgrResponse.mgr_rsp_startgame.playerIP << "\n";
+        newGameID = mgrResponse.mgr_rsp_startgame.gameID;
+        newIP = mgrResponse.mgr_rsp_startgame.playerIP;
+        newName = mgrResponse.mgr_rsp_startgame.playerName;
+        newPort = mgrResponse.mgr_rsp_startgame.playerPort;
+
+        cout << "Receiving Player " << newName << "\n";
+        PlayerData tempPlayer(newName, newIP, newPort);
+        gamingPlayers.push_back(tempPlayer);
+        numberOfGamingPlayers ++;
 
         // Sending ACK back to manager:
         n = sock->send((void*) &callerACK, sizeof(msg_t));

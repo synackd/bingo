@@ -18,6 +18,9 @@ class PlayerData {
         string getName(void);
         string getIP(void);
         int getPort(void);
+        void setName(string newName){
+            name = newName;
+        }
 
         void setIP(string newIP){
             ip = newIP;
