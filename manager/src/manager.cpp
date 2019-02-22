@@ -175,3 +175,21 @@ int Manager::registerPlayer(string name, string ip, unsigned int port)
 
     return SUCCESS;
 }
+
+/**
+ * Deregister a player
+ */
+int Manager::deregisterPlayer(string name)
+{
+    // Check if player is in list
+    for (int i = 0; i < registeredPlayers.size(); i++) {
+        if (registeredPlayers[i].getName() == name) {
+            // Player is in list, deregister
+            registeredPlayers.erase(i);
+            return SUCCESS;
+        }
+    }
+
+    // Otherwise, fail
+    return FAILURE;
+}

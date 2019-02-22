@@ -21,16 +21,15 @@ using namespace std;
  * Class Prototypes
  */
 
-class Manager{
+class Manager {
     public:
         int numberOfRegPlayers;
         vector<PlayerData> registeredPlayers;
 
-
-        // TODO: These methods need implementation
         Manager(void);
         void sendKPlayers(void);
         int registerPlayer(string name, string ip, unsigned int port);
+        int deregisterPlayer(string name);
 };
 
 #endif
