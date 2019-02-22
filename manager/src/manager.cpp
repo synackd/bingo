@@ -196,19 +196,19 @@ Manager::Manager()
 void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
 {
     info("Command received was START_GAME.");
-    cout << "Getting K ...\n";
+    // cout << "Getting K ...\n";
     int numberOfPlayersToSend = data.clr_cmd_startgame.k;
     msg_t response;
     // ssize_t size = 0;
     // response.command =
 
     for (int i = 0; i < numberOfPlayersToSend; i++){
-        cout << "Populating response gameID...\n";
+        // cout << "Populating response gameID...\n";
         // Player tempPlayer(playersList.at(i).IP, playersList.at(i).Port);
         response.mgr_rsp_startgame.gameID = 1;
-        cout << "Populating response playerIP...\n";
+        // cout << "Populating response playerIP...\n";
         strcpy(response.mgr_rsp_startgame.playerIP, registeredPlayers[i].getIP().c_str());
-        cout << "Populating response playerPort...\n";
+        // cout << "Populating response playerPort...\n";
         response.mgr_rsp_startgame.playerPort = registeredPlayers[i].getPort();
 
         cout << "Sending Player: GameID = " << response.mgr_rsp_startgame.gameID << "\tIP = " << response.mgr_rsp_startgame.playerIP << "\tPort = " << response.mgr_rsp_startgame.playerPort << "\n";
