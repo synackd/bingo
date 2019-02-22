@@ -13,6 +13,7 @@
 #include <vector>
 #include "colors.hpp"
 #include "player.hpp"
+#include "server.hpp"
 #include "cmd.hpp"
 
 using namespace std;
@@ -32,10 +33,9 @@ class Manager{
         int numberOfRegPlayers;
         vector<PlayerData> registeredPlayers;
 
-
         // TODO: These methods need implementation
         Manager(void);
-        void sendKPlayers(void);
+        void sendKPlayers(ServerSocket *sock, msg_t data);
         int registerPlayer(string name, string ip, unsigned int port);
 };
 
