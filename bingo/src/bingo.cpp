@@ -228,8 +228,8 @@ int main(int argc, char **argv)
     // Close connection with manager
     info("Closing connection with manager...");
     bingo_sock->stop();
-    delete bingo_sock;
-    bingo_sock = NULL;
+    // delete bingo_sock;
+    // bingo_sock = NULL;
 
     /********
      * MENU *
@@ -251,12 +251,8 @@ int main(int argc, char **argv)
                 break;  // <-- Here for aesthetic purposes :)
             case 1:
                 cprintf(stdout, BOLD, "Start Game\n");
-                // Create socket for communication with manager
-                ClientSocket *bingo_sock2 = new ClientSocket(argv[1], port);
-                // Establish connection with manager
-                info("Establishing connection with manager...");
-                bingo_sock2->start();
-                bng->StartGame(bingo_sock2, kValue);
+                bingo_sock->start(); // Reopening socket to manager
+                bng->StartGame(bingo_sock, kValue);
                 break;
             case 2:
                 cprintf(stdout, BOLD, "Deregister\n");
