@@ -54,7 +54,80 @@ void error(const char *fmt, ...)
     fprintf(stderr, "\n");
 }
 
-void callerRole(ClientSocket *sock)
+short ConvertPort(char *inputPort){
+    // Try to convert port.
+    unsigned short port;
+    errno = 0;
+    long int tmp = strtol(inputPort, NULL, 10);
+    if (errno != 0) {
+        error("Invalid port number!");
+        exit(FAILURE);
+    }
+    if (0 <= tmp && tmp <= 65535) {
+        port = (unsigned short) tmp;
+    } else {
+        error("Port must be between 0 and 65535!");
+        exit(FAILURE);
+    }
+
+    return port;
+}
+
+/**
+ * Main runtime of bingo application
+ */
+int main(int argc, char **argv)
+{
+
+    if (argc != 3)
+		DieWithError( "Parameter Error: usage: bingo caller <manager-IPaddress> <manager-Port> \n or bingo player <player-Port> " );
+
+
+    // Try to convert port.
+    unsigned short port;
+    errno = 0;
+    long int tmp = strtol(argv[2], NULL, 10);
+    if (errno != 0) {
+        error("Invalid port number!");
+        exit(FAILURE);
+    }
+    if (0 <= tmp && tmp <= 65535) {
+        port = (unsigned short) tmp;
+    } else {
+        error("Port must be between 0 and 65535!");
+        exit(FAILURE);
+    }
+
+    Bingo *bng = new Bingo();
+
+    ClientSocket *cSock;
+	cSock = new ClientSocket(argv[1], port);
+	cSock->start();
+
+    bng->StartGame(cSock, 3);
+
+	exit(0);
+}
+
+/*
+ * Class Implementations
+ */
+
+/***********
+ * Bingo *
+ ***********/
+
+/**
+ * Create a new Bingo
+ */
+Bingo::Bingo()
+{
+}
+
+/**
+ * Calls Numbers to Players until there is a Winner
+ */
+void CallBingo(ClientSocket *sock)
 {
     ssize_t n;
     int value;
@@ -88,7 +161,10 @@ void callerRole(ClientSocket *sock)
     }
 }
 
-void playerRole(ServerSocket *sock)
+/**
+ * Listens to numbers until the game is over or player wins:
+ */
+void PlayBingo(ServerSocket *sock)
 {
     ssize_t n;
     int inputCode;
@@ -137,77 +213,20 @@ void playerRole(ServerSocket *sock)
    }// end of while
 }
 
-short ConvertPort(char *inputPort){
-    // Try to convert port.
-    unsigned short port;
-    errno = 0;
-    long int tmp = strtol(inputPort, NULL, 10);
-    if (errno != 0) {
-        error("Invalid port number!");
-        exit(FAILURE);
-    }
-    if (0 <= tmp && tmp <= 65535) {
-        port = (unsigned short) tmp;
-    } else {
-        error("Port must be between 0 and 65535!");
-        exit(FAILURE);
-    }
-
-    return port;
-}
-
 /**
- * Main runtime of bingo application
+ * Sends START_GAME_K command to Manager and stores players:
  */
-int main(int argc, char **argv)
-{
-
-    if (argc != 3)
-		DieWithError( "Parameter Error: usage: bingo caller <manager-IPaddress> <manager-Port> \n or bingo player <player-Port> " );
-
-
-    // TEMPORAL LIST OF PLAYERS FOR TESTING: //////////////////////
-
-    // LIST OF REGISTERED PLAYERS:
-    int numberOfRegPlayers = 5;
-    vector<PlayerData> playersList;
-
-    for (int i = 0; i < numberOfRegPlayers; i++){
-        string playerIP = "IP" + std::to_string(i);
-
-        PlayerData tempPlayer("testName", playerIP, i);
-		playersList.push_back(tempPlayer);
-    }
-
-    // Try to convert port.
-    unsigned short port;
-    errno = 0;
-    long int tmp = strtol(argv[2], NULL, 10);
-    if (errno != 0) {
-        error("Invalid port number!");
-        exit(FAILURE);
-    }
-    if (0 <= tmp && tmp <= 65535) {
-        port = (unsigned short) tmp;
-    } else {
-        error("Port must be between 0 and 65535!");
-        exit(FAILURE);
-    }
-
-    ClientSocket *cSock;
-	cSock = new ClientSocket(argv[1], port);
-	cSock->start();
-
+void StartGame(ClientSocket *sock, int K){
     // Starting Game:
     // Populating message body:
     msg_t startGameCmd;
     ssize_t n;
     startGameCmd.command = START_GAME;
-    startGameCmd.clr_cmd_startgame.k = 3;
+    startGameCmd.clr_cmd_startgame.k = K;
 
     // Sending 'Start game K' command:
-    cout << "Sending START_GAME 3.\n";
-    n = cSock->send((void*) &startGameCmd, sizeof(msg_t));
+    cout << "Sending START_GAME " << K << ".\n";
+    n = sock->send((void*) &startGameCmd, sizeof(msg_t));
 
     // Receiving K Players:
     string newIP;
@@ -216,17 +235,15 @@ int main(int argc, char **argv)
     callerACK.command = CALLERACK;
     msg_t mgrResponse;
 
-    for (int i = 0; i < 3; i++){
+    for (int i = 0; i < K; i++){
         // startGameResponse response;
         cout << "receiving player ...\n";
-        n = cSock->receive((void*) &mgrResponse, sizeof(msg_t));
+        n = sock->receive((void*) &mgrResponse, sizeof(msg_t));
 
         cout << "Receiving Player: GameID = " << mgrResponse.mgr_rsp_startgame.gameID << "\tIP = " <<  mgrResponse.mgr_rsp_startgame.playerIP << "\n";
 
         // Sending ACK back to manager:
-        n = cSock->send((void*) &callerACK, sizeof(msg_t));
+        n = sock->send((void*) &callerACK, sizeof(msg_t));
         cout << "ACK sent to manager.\n";
     }
-
-	exit(0);
 }
