@@ -29,8 +29,8 @@ class Player {
         bool isRegistered(void);
         unsigned int getPort(void);
         void listenBingo(void);
-        void regist(ClientSocket *sock);
-        void deregist(ClientSocket *sock);
+        int regist(ClientSocket *sock);
+        int deregist(ClientSocket *sock);
 };
 
 /**

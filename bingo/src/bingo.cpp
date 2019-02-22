@@ -58,6 +58,10 @@ void printMenu()
     cprintf(stdout, BOLD, "  2) ");
     fprintf(stdout, "Deregister\n");
 
+    // Reregister
+    cprintf(stdout, BOLD, "  3) ");
+    fprintf(stdout, "Reregister\n");
+
     fprintf(stdout, "\n");
 }
 
@@ -342,9 +346,41 @@ int main(int argc, char **argv)
                 bingo_sock->start();
 
                 info("Attempting to deregister player \"%s\"...", me->getName().c_str());
-                me->deregist(bingo_sock);
+                status = me->deregist(bingo_sock);
 
                 info("Closing connection to manager...");
+                bingo_sock->stop();
+                delete bingo_sock;
+                bingo_sock = NULL;
+
+                if (status == SUCCESS) {
+                    info("Deleting player...");
+                    delete me;
+                    me = NULL;
+                }
+                break;
+
+            // Reregister a player
+            case 3:
+                // Check if player is already registered
+                if (me) {
+                    cprintf(stdout, BOLD, "Player already registered.\n");
+                    break;
+                }
+
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+
+                info("Establishing connection with manager...");
+                bingo_sock->start();
+
+                // Create player
+                me = new Player(p_name, p_ip, p_port);
+
+                // Attempt to register player with manager
+                me->regist(bingo_sock);
+
+                // Close connection with manager
+                info("Closing connection with manager...");
                 bingo_sock->stop();
                 delete bingo_sock;
                 bingo_sock = NULL;

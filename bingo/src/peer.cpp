@@ -262,7 +262,7 @@ void Player::listenBingo()
 /**
  * Registers to Manager for future games
  */
-void Player::regist(ClientSocket *sock)
+int Player::regist(ClientSocket *sock)
 {
     ssize_t size = 0;
 
@@ -287,17 +287,20 @@ void Player::regist(ClientSocket *sock)
     if (reg_rsp.mgr_rsp_register.ret_code == SUCCESS) {
         info("Registration success!");
         this->registered = true;
+        return SUCCESS;
     } else if (reg_rsp.mgr_rsp_register.ret_code == FAILURE) {
         error("Registration failed!");
+        return FAILURE;
     } else {
         error("Manager returned unknown value.");
+        return FAILURE;
     }
 }
 
 /**
  * Deregister player from manager
  */
-void Player::deregist(ClientSocket *sock)
+int Player::deregist(ClientSocket *sock)
 {
     ssize_t size = 0;
 
@@ -320,10 +323,13 @@ void Player::deregist(ClientSocket *sock)
     if (dereg_rsp.mgr_rsp_deregister.ret_code == SUCCESS) {
         info("Deregistration success!");
         this->registered = false;
+        return SUCCESS;
     } else if (dereg_rsp.mgr_rsp_deregister.ret_code == FAILURE) {
         error("Deregistration failed!");
+        return FAILURE;
     } else {
         error("Manager returned unknown value.");
+        return FAILURE;
     }
 }
 
