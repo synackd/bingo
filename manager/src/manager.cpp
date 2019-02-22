@@ -73,6 +73,7 @@ int main(int argc, char **argv)
              * the return code of the request. Return codes are 0 or less,
              * distinguishing them from commands.
              */
+            msg_t mgr_rsp;
             switch (data.command) {
                 // Register command
                 case REGISTER:
@@ -82,7 +83,6 @@ int main(int argc, char **argv)
                     status = mgr->registerPlayer(data.mgr_cmd_register.name, data.mgr_cmd_register.ip, data.mgr_cmd_register.port);
 
                     // Form response
-                    msg_t mgr_rsp;
                     if (status == SUCCESS) {
                         info("Registration succeeded!");
                         mgr_rsp.command = SUCCESS;
@@ -106,7 +106,6 @@ int main(int argc, char **argv)
                     status = mgr->deregisterPlayer(data.mgr_cmd_deregister.name);
 
                     // Form response
-                    msg_t mgr_rsp;
                     if (status == SUCCESS) {
                         info("Deregistration succeeded!");
                         mgr_rsp.command = SUCCESS;
@@ -185,7 +184,7 @@ int Manager::deregisterPlayer(string name)
     for (int i = 0; i < registeredPlayers.size(); i++) {
         if (registeredPlayers[i].getName() == name) {
             // Player is in list, deregister
-            registeredPlayers.erase(i);
+            registeredPlayers.erase(registeredPlayers.begin()+i);
             return SUCCESS;
         }
     }
