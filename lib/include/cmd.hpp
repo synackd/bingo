@@ -47,12 +47,16 @@ using namespace std;
 //* Payload Definitions *
 //***********************
 
+/*
+ * REGISTER
+ */
+
 /**
  * @brief The payload to the manager for the
  * 'register' command.
  */
 typedef struct {
-    char name[BUFMAX];  /**< The name of a player to register/deregister */
+    char name[BUFMAX];  /**< The name of a player to register */
     char ip[BUFMAX];    /**< The default IP address of the player */
     unsigned int port;  /**< The default port of the player */
 } mgr_cmd_register_t;
@@ -62,8 +66,28 @@ typedef struct {
  * 'register' command.
  */
 typedef struct {
-    int ret_code;       /**< Return code by the previously sent command */
+    int ret_code;   /**< Return code of the previously sent 'register command */
 } mgr_rsp_register_t;
+
+/*
+ * DEREGISTER
+ */
+
+/**
+ * @brief The payload to the manager for the
+ * 'deregister' command.
+ */
+typedef struct {
+    char name[BUFMAX];  /**< The name of the player to deregister */
+} mgr_cmd_deregister_t;
+
+/**
+ * @brief The response from the manager for the
+ * 'deregister' comand.
+ */
+typedef struct {
+    int ret_code;   /**< Return code of the sent 'deregister' command */
+} mgr_rsp_deregister_t;
 
 /*****************************
  * GENERIC PAYLOAD STRUCTURE *
@@ -80,6 +104,10 @@ typedef struct {
         /* Register command/response */
         mgr_cmd_register_t mgr_cmd_register;    /**< Register player command data */
         mgr_rsp_register_t mgr_rsp_register;    /**< Register player response data */
+
+        /* Deregister command/resoonse */
+        mgr_cmd_deregister_t mgr_cmd_deregister;    /**< Deregister player command data */
+        mgr_rsp_deregister_t mgr_rsp_deregister;    /**< Deregister player response data */
     };
 } msg_t;
 

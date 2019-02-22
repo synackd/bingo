@@ -73,6 +73,7 @@ int main(int argc, char **argv)
              * the return code of the request. Return codes are 0 or less,
              * distinguishing them from commands.
              */
+            msg_t mgr_rsp;
             switch (data.command) {
                 // Register command
                 case REGISTER:
@@ -82,7 +83,6 @@ int main(int argc, char **argv)
                     status = mgr->registerPlayer(data.mgr_cmd_register.name, data.mgr_cmd_register.ip, data.mgr_cmd_register.port);
 
                     // Form response
-                    msg_t mgr_rsp;
                     if (status == SUCCESS) {
                         info("Registration succeeded!");
                         mgr_rsp.command = SUCCESS;
@@ -98,6 +98,30 @@ int main(int argc, char **argv)
                     info("Sent response of %d bytes.", size);
 
                     break;
+
+                case DEREGISTER:
+                    // Deregister the player
+                    info("Command received was DEREGISTER.");
+                    info("Attempting to deregister player \"%s\"...", data.mgr_cmd_deregister.name);
+                    status = mgr->deregisterPlayer(data.mgr_cmd_deregister.name);
+
+                    // Form response
+                    if (status == SUCCESS) {
+                        info("Deregistration succeeded!");
+                        mgr_rsp.command = SUCCESS;
+                        mgr_rsp.mgr_rsp_register.ret_code = SUCCESS;
+                    } else {
+                        error("Registration failed!");
+                        mgr_rsp.command = FAILURE;
+                        mgr_rsp.mgr_rsp_register.ret_code = FAILURE;
+                    }
+
+                    // Send response
+                    size = mgr_sock->send((void*) &mgr_rsp, sizeof(msg_t));
+                    info("Sent response of %d bytes.", size);
+
+                    break;
+
                 // Anything else
                 default:
                     error("Unknown command received.");
@@ -149,4 +173,22 @@ int Manager::registerPlayer(string name, string ip, unsigned int port)
     registeredPlayers.push_back(newPlayer);
 
     return SUCCESS;
+}
+
+/**
+ * Deregister a player
+ */
+int Manager::deregisterPlayer(string name)
+{
+    // Check if player is in list
+    for (int i = 0; i < registeredPlayers.size(); i++) {
+        if (registeredPlayers[i].getName() == name) {
+            // Player is in list, deregister
+            registeredPlayers.erase(registeredPlayers.begin()+i);
+            return SUCCESS;
+        }
+    }
+
+    // Otherwise, fail
+    return FAILURE;
 }

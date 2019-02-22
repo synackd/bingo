@@ -27,7 +27,8 @@ class Player {
         string getIP(void);
         unsigned int getPort(void);
         void listenBingo(void);
-        void registerToManager(ClientSocket *sock);
+        void regist(ClientSocket *sock);
+        void deregist(ClientSocket *sock);
 };
 
 /**

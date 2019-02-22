@@ -288,3 +288,35 @@ void Player::registerToManager(ClientSocket *sock)
         error("Manager returned unknown value.");
     }
 }
+
+/**
+ * Deregister player from manager
+ */
+void Player::deregist(ClientSocket *sock)
+{
+    ssize_t size = 0;
+
+    // Create deregister packet
+    msg_t dereg_cmd;
+    dereg_cmd.command = DEREGISTER;
+    strncpy(dereg_cmd.mgr_cmd_deregister.name, this->name.c_str(), BUFMAX);
+
+    // Send packet to manager
+    info("Attempting to deregister player \"%s\"...", this->name.c_str());
+    size = sock->send((void*) &dereg_cmd, sizeof(msg_t));
+    info("Sent %d bytes to manager.", size);
+
+    // Listen for manager's response
+    msg_t dereg_rsp;
+    size = sock->receive((void*) &dereg_rsp, sizeof(msg_t));
+    info("Received %d bytes from manager.", size);
+
+    // Examine return code
+    if (dereg_rsp.mgr_rsp_deregister.ret_code == SUCCESS) {
+        info("Deregistration success!");
+    } else if (dereg_rsp.mgr_rsp_deregister.ret_code == FAILURE) {
+        error("Deregistration failed!");
+    } else {
+        error("Manager returned unknown value.");
+    }
+}
