@@ -424,15 +424,16 @@ int main(int argc, char **argv)
             // Listen for games
             case 5:
                 // After registration, creating socket for listening for new games:
-                info("listening on default port %u for starting games...", defaultPlayerPort);
+                cout << "listening on default port " << defaultPlayerPort << " for starting games...\n";
                 default_sock->start();
 
                 while (true){
-
-                    if (default_sock->receive((void*) &data, sizeof(msg_t)) != 0){
+                    
+                    if (default_sock->receive((void*) &data, sizeof(msg_t)) > 0){
                         switch (data.command) {
                             case PORT_HANDSHAKE:
-                                info("callerGamePort Received: %u", data.port_handshake.gamePort);
+                                cout << "callerGamePort Received: " << data.port_handshake.gamePort << "\n";
+                                // Sending default port back to caller:
                                 handshakeResponse.command = PORT_HANDSHAKE;
                                 handshakeResponse.port_handshake.gamePort = defaultPlayerPort;
                                 default_sock->send((void*) &handshakeResponse, sizeof(msg_t));
@@ -641,7 +642,7 @@ unsigned int Bingo::NegotiateGameplayPort(PlayerData player, unsigned int inputC
     callerMessage.port_handshake.gamePort = inputCallerGamePort;   // TEMPORAL!!!!!!
 
     // Sending callerGamePort to player:
-    info("Sending callerGamePort (%u) to player...", inputCallerGamePort);
+    cout << "Sending callerGamePort " << inputCallerGamePort << " to player...\n";
     n = playerSocket->send((void*) &callerMessage, sizeof(msg_t));
     info("Sent %d bytes from socket.", n);
 
