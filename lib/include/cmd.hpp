@@ -127,6 +127,20 @@ typedef struct {
     unsigned int playerPort;    /**< Player's default port */
 } mgr_rsp_startgame_t;
 
+/*
+ * QUERY PLAYERS
+ */
+
+/**
+ * Query Players response from manager
+ */
+typedef struct {
+    int players_left;       /**< Sentinel for peer to know how many responses are left */
+    char name[BUFMAX];      /**< Player's name */
+    char ip[BUFMAX];        /**< Player's default IP address */
+    unsigned int port;      /**< Player's default port */
+} mgr_rsp_queryplayers_t;
+
 /*****************************
  * GENERIC PAYLOAD STRUCTURE *
  *****************************/
@@ -153,7 +167,10 @@ typedef struct {
 
         /* Start game command/response */
         clr_cmd_startgame_t clr_cmd_startgame;  /**< Caller Start Command data */
-        mgr_rsp_startgame_t mgr_rsp_startgame;  /**< Manager REsponse to StartGame command */
+        mgr_rsp_startgame_t mgr_rsp_startgame;  /**< Manager Response to startGame command */
+
+        /* Query players response */
+        mgr_rsp_queryplayers_t mgr_rsp_queryplayers;    /**< Manager response to Query Players command */
     };
 } msg_t;
 

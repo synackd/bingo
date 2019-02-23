@@ -133,6 +133,12 @@ int main(int argc, char **argv)
 
                     break;
 
+                case QUERY_PLAYERS:
+                    info("Number of registered players: %d", mgr->numberOfRegPlayers);
+                    mgr->sendAllPlayers(mgr_sock);
+
+                    break;
+
                 // Anything else
                 default:
                     error("Unknown command received.");
@@ -191,6 +197,44 @@ void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
 }
 
 /**
+ * Send all registered players to caller requesting them
+ */
+int Manager::sendAllPlayers(ServerSocket *sock)
+{
+    int numberOfPlayersToSend = this->numberOfRegPlayers;
+    msg_t response;
+
+    info("QUERY_PLAYERS command received.");
+
+    // Check if there are any players
+    if (numberOfPlayersToSend == 0) {
+        info("There are no players!");
+
+        // Populate response
+        response.command = FAILURE;
+
+        // Send response
+        sock->send((void*) &response, sizeof(msg_t));
+    } else {
+        info("Sending %d players to caller...", numberOfPlayersToSend);
+        for (int i = numberOfPlayersToSend; i > 0; i--) {
+            // Populate response
+            response.command = SUCCESS;
+            response.mgr_rsp_queryplayers.players_left = i - 1;
+            strncpy(response.mgr_rsp_queryplayers.name, registeredPlayers[i-1].getName().c_str(), BUFMAX);
+            strncpy(response.mgr_rsp_queryplayers.ip, registeredPlayers[i-1].getIP().c_str(), BUFMAX);
+            response.mgr_rsp_queryplayers.port = registeredPlayers[i-1].getPort();
+
+            // Send response
+            info("Sending player \"%s\": IP: %s\tPort: %d", response.mgr_rsp_queryplayers.name, response.mgr_rsp_queryplayers.ip, response.mgr_rsp_queryplayers.port);
+            sock->send((void*) &response, sizeof(msg_t));
+        }
+    }
+
+    return numberOfPlayersToSend;
+}
+
+/**
  * Register players who want to be considered to play Bingo
  */
 int Manager::registerPlayer(string name, string ip, unsigned int port)
@@ -215,10 +259,11 @@ int Manager::registerPlayer(string name, string ip, unsigned int port)
 int Manager::deregisterPlayer(string name)
 {
     // Check if player is in list
-    for (int i = 0; i < registeredPlayers.size(); i++) {
-        if (registeredPlayers[i].getName() == name) {
+    for (int i = 0; i < this->registeredPlayers.size(); i++) {
+        if (this->registeredPlayers[i].getName() == name) {
             // Player is in list, deregister
-            registeredPlayers.erase(registeredPlayers.begin()+i);
+            this->registeredPlayers.erase(this->registeredPlayers.begin()+i);
+            this->numberOfRegPlayers--;
             return SUCCESS;
         }
     }

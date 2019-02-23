@@ -58,6 +58,14 @@ void printMenu()
     cprintf(stdout, BOLD, "  2) ");
     fprintf(stdout, "Deregister\n");
 
+    // Reregister
+    cprintf(stdout, BOLD, "  3) ");
+    fprintf(stdout, "Reregister\n");
+
+    // Query Players
+    cprintf(stdout, BOLD, "  4) ");
+    fprintf(stdout, "Query Players\n");
+
     fprintf(stdout, "\n");
 }
 
@@ -161,7 +169,7 @@ Bingo::Bingo()
 /**
  * Calls Numbers to Players until there is a Winner
  */
-void Bingo::CallBingo(ClientSocket *sock)
+void Bingo::callBingo(ClientSocket *sock)
 {
     ssize_t n;
     int value;
@@ -279,13 +287,13 @@ int main(int argc, char **argv)
 
         // Decide what to do
         switch (choice) {
-            // Exit game
+            // Exit program
             case 0:
                 cprintf(stdout, BOLD, "Exit\n");
                 exit(SUCCESS);
                 break;  // <-- Here for aesthetic purposes :)
 
-            // Start a game
+            // Start a game with k players
             case 1:
                 // Check if player is registered
                 if (!me->isRegistered()) {
@@ -317,8 +325,8 @@ int main(int argc, char **argv)
                 kValue = (int) tmp;
 
                 // Attempt to start game
-                bng->StartGame(bingo_sock, kValue);
-                bng->CheckStatus();
+                bng->startGame(bingo_sock, kValue);
+                bng->checkStatus();
 
                 // Close connection with manager
                 info("Closing connection with manager...");
@@ -341,13 +349,59 @@ int main(int argc, char **argv)
                 info("Establishing connection with manager...");
                 bingo_sock->start();
 
-                info("Attempting to deregister player \"%s\"...", me->getName().c_str());
-                me->deregist(bingo_sock);
+                status = me->deregist(bingo_sock);
 
                 info("Closing connection to manager...");
                 bingo_sock->stop();
                 delete bingo_sock;
                 bingo_sock = NULL;
+
+                break;
+
+            // Reregister a player
+            case 3:
+                // Check if player is already registered
+                if (me->isRegistered()) {
+                    cprintf(stdout, BOLD, "Player already registered.\n");
+                    break;
+                }
+
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+
+                info("Establishing connection with manager...");
+                bingo_sock->start();
+
+                // Create player
+                me = new Player(p_name, p_ip, p_port);
+
+                // Attempt to register player with manager
+                me->regist(bingo_sock);
+
+                // Close connection with manager
+                info("Closing connection with manager...");
+                bingo_sock->stop();
+                delete bingo_sock;
+                bingo_sock = NULL;
+                break;
+
+            // Query players
+            case 4:
+                cprintf(stdout, BOLD, "Query Players\n");
+
+                // Connect to manager
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+                info("Establishing connection with manager...");
+                bingo_sock->start();
+
+                // Attempt to query players
+                bng->queryPlayers(bingo_sock);
+
+                // Close connection with manager
+                info("Closing connection with manager...");
+                bingo_sock->stop();
+                delete bingo_sock;
+                bingo_sock = NULL;
+
                 break;
 
             // Any other choice
@@ -363,7 +417,7 @@ int main(int argc, char **argv)
 /**
  * Listens to numbers until the game is over or player wins:
  */
-void Bingo::PlayBingo(ServerSocket *sock)
+void Bingo::playBingo(ServerSocket *sock)
 {
     ssize_t n;
     int inputCode;
@@ -413,7 +467,7 @@ void Bingo::PlayBingo(ServerSocket *sock)
 /**
  * Sends START_GAME_K command to Manager and stores players:
  */
-void Bingo::StartGame(ClientSocket *sock, int inputK)
+void Bingo::startGame(ClientSocket *sock, int inputK)
 {
     // Starting Game:
     // Populating message body:
@@ -462,7 +516,62 @@ void Bingo::StartGame(ClientSocket *sock, int inputK)
 
 }
 
-void Bingo::CheckStatus(){
+/**
+ * Query all registered players from manager and print them
+ */
+void Bingo::queryPlayers(ClientSocket *sock)
+{
+    ssize_t status;
+
+    // Populate command body
+    msg_t query;
+    query.command = QUERY_PLAYERS;
+
+    // Initialize response
+    msg_t response;
+
+    // Send command
+    info("Sending QUERY_PLAYERS...");
+    status = sock->send((void*) &query, sizeof(msg_t));
+
+    // Look for response
+    status = sock->receive((void*) &response, sizeof(msg_t));
+
+    // Decide what to do
+    if (status > 0) {
+        // Failure
+        if (response.command == FAILURE) {
+            error("No registered players!");
+        } else if (response.command == SUCCESS) {
+            info("Receiving players from manager...");
+            info("NAME\t\tIP\t\tPort");
+
+            // Print first player sent
+            info("%s\t\t%s\t\t%d", response.mgr_rsp_queryplayers.name, response.mgr_rsp_queryplayers.ip, response.mgr_rsp_queryplayers.port);
+
+            // Keep track of how many players left to expect
+            int players_left = response.mgr_rsp_queryplayers.players_left;
+
+            // Receive the rest of the players
+            while (players_left > 0) {
+                // Receive next player
+                sock->receive((void*) &response, sizeof(msg_t));
+
+                // Print player
+                info("%s\t\t%s\t\t%d", response.mgr_rsp_queryplayers.name, response.mgr_rsp_queryplayers.ip, response.mgr_rsp_queryplayers.port);
+
+                // See how many players are left
+                players_left = response.mgr_rsp_queryplayers.players_left;
+            }
+        } else {
+            error("Manager returned unknown data.");
+        }
+    } else {
+        error("No data received from manager!");
+    }
+}
+
+void Bingo::checkStatus(){
     info("Number of Gaming Players: %d", numberOfGamingPlayers);
     info("Name:\tIP Address:\tPort:");
     for (int i = 0; i < numberOfGamingPlayers; i ++){
