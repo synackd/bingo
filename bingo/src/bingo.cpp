@@ -427,15 +427,15 @@ void Bingo::StartGame(ClientSocket *sock, int inputK)
     n = sock->send((void*) &startGameCmd, sizeof(msg_t));
 
     // Receiving K Players:
-    string newIP, newName;
+    char newIP[BUFMAX], newName[BUFMAX];
     int newGameID, newPort;
     msg_t callerACK;
     callerACK.command = CALLERACK;
     msg_t mgrResponse;
 
+    info("Looking for players...");
     for (int i = 0; i < inputK; i++){
         // startGameResponse response;
-        info("Looking for players...");
         n = sock->receive((void*) &mgrResponse, sizeof(msg_t));
         if (mgrResponse.command == FAILURE){
             error("Not enough registered players!");
@@ -443,14 +443,14 @@ void Bingo::StartGame(ClientSocket *sock, int inputK)
         }
 
         newGameID = mgrResponse.mgr_rsp_startgame.gameID;
-        newIP = mgrResponse.mgr_rsp_startgame.playerIP;
-        newName = mgrResponse.mgr_rsp_startgame.playerName;
+        strncpy(newIP, mgrResponse.mgr_rsp_startgame.playerIP, BUFMAX);
+        strncpy(newName, mgrResponse.mgr_rsp_startgame.playerName, BUFMAX);
         newPort = mgrResponse.mgr_rsp_startgame.playerPort;
 
         info("Receiving player %s...", newName);
         PlayerData tempPlayer(newName, newIP, newPort);
         gamingPlayers.push_back(tempPlayer);
-        numberOfGamingPlayers ++;
+        numberOfGamingPlayers++;
 
         // Sending ACK back to manager:
         n = sock->send((void*) &callerACK, sizeof(msg_t));
