@@ -259,10 +259,11 @@ int Manager::registerPlayer(string name, string ip, unsigned int port)
 int Manager::deregisterPlayer(string name)
 {
     // Check if player is in list
-    for (int i = 0; i < registeredPlayers.size(); i++) {
-        if (registeredPlayers[i].getName() == name) {
+    for (int i = 0; i < this->registeredPlayers.size(); i++) {
+        if (this->registeredPlayers[i].getName() == name) {
             // Player is in list, deregister
-            registeredPlayers.erase(registeredPlayers.begin()+i);
+            this->registeredPlayers.erase(this->registeredPlayers.begin()+i);
+            this->numberOfRegPlayers--;
             return SUCCESS;
         }
     }
