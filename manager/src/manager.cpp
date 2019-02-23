@@ -180,13 +180,13 @@ void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
         response.mgr_rsp_startgame.playerPort = registeredPlayers[i].getPort();
 
         // Send player data back to caller
-        info("Sending Player: GameID = %d\tIP = %s\tPort = %d", response.mgr_rsp_startgame.gameID, response.mgr_rsp_startgame.playerIP, response.mgr_rsp_startgame.playerPort);
+        info("Sending player \"%s\": GameID = %d\tIP = %s\tPort = %d", response.mgr_rsp_startgame.playerName, response.mgr_rsp_startgame.gameID, response.mgr_rsp_startgame.playerIP, response.mgr_rsp_startgame.playerPort);
         sock->send((void*) &response, sizeof(msg_t));
 
         // Waiting for ACK
         sock->receive((void*) &data, sizeof(msg_t));
         if (data.command == CALLERACK)
-            printf("Caller ACK received.\n");
+            info("Caller ACK received.");
     }
 }
 

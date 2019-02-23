@@ -15,6 +15,7 @@ using namespace std;
 
 class Player {
     private:
+        bool registered;
         string name;
         string ip;
         unsigned int port;
@@ -25,6 +26,7 @@ class Player {
         string to_string(void);
         string getName(void);
         string getIP(void);
+        bool isRegistered(void);
         unsigned int getPort(void);
         void listenBingo(void);
         void regist(ClientSocket *sock);

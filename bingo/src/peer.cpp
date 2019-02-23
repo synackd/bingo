@@ -210,6 +210,7 @@ Player::Player(string inputName, string inputIP, unsigned int inputPort)
     this->name = inputName;
     this->ip = inputIP;
     this->port = inputPort;
+    this->registered = false;
 }
 
 /**
@@ -285,6 +286,7 @@ void Player::regist(ClientSocket *sock)
     // Examine return code
     if (reg_rsp.mgr_rsp_register.ret_code == SUCCESS) {
         info("Registration success!");
+        this->registered = true;
     } else if (reg_rsp.mgr_rsp_register.ret_code == FAILURE) {
         error("Registration failed!");
     } else {
@@ -317,9 +319,18 @@ void Player::deregist(ClientSocket *sock)
     // Examine return code
     if (dereg_rsp.mgr_rsp_deregister.ret_code == SUCCESS) {
         info("Deregistration success!");
+        this->registered = false;
     } else if (dereg_rsp.mgr_rsp_deregister.ret_code == FAILURE) {
         error("Deregistration failed!");
     } else {
         error("Manager returned unknown value.");
     }
+}
+
+/**
+ * Check if a player is registered
+ */
+bool Player::isRegistered()
+{
+    return this->registered;
 }

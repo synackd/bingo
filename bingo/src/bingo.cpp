@@ -245,11 +245,8 @@ int main(int argc, char **argv)
     unsigned int p_port;
     getPeerInfo(&p_name, &p_ip, &p_port);
 
-    // Create socket for communication with manager
-    bingo_sock = new ClientSocket(mgr_ip, mgr_port);
-
     // Create socket for registration
-    ClientSocket *gameSetup_sock = new ClientSocket(mgr_ip, mgr_port);
+    bingo_sock = new ClientSocket(mgr_ip, mgr_port);
 
     // Establish connection with manager
     info("Establishing connection with manager...");
@@ -290,11 +287,18 @@ int main(int argc, char **argv)
 
             // Start a game
             case 1:
+                // Check if player is registered
+                if (!me->isRegistered()) {
+                    cprintf(stdout, BOLD, "Player not registered. Please register first.\n");
+                    break;
+                }
+
                 cprintf(stdout, BOLD, "Start Game\n");
 
                 // Establish connection with manager
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port);
                 info("Establishing connection with manager for Game Setup ...");
-                gameSetup_sock->start();
+                bingo_sock->start();
 
                 // Get user input
                 cprintf(stdout, BOLD, "Number of Players: ");
@@ -313,21 +317,21 @@ int main(int argc, char **argv)
                 kValue = (int) tmp;
 
                 // Attempt to start game
-                bng->StartGame(gameSetup_sock, kValue);
+                bng->StartGame(bingo_sock, kValue);
                 bng->CheckStatus();
 
                 // Close connection with manager
                 info("Closing connection with manager...");
-                gameSetup_sock->stop();
-                delete gameSetup_sock;
-                gameSetup_sock = NULL;
+                bingo_sock->stop();
+                delete bingo_sock;
+                bingo_sock = NULL;
 
                 break;
 
             // Deregister player
             case 2:
                 // Check if player is registered
-                if (!me) {
+                if (!me->isRegistered()) {
                     cprintf(stdout, BOLD, "Player not registered.\n");
                     break;
                 }
@@ -429,9 +433,9 @@ void Bingo::StartGame(ClientSocket *sock, int inputK)
     callerACK.command = CALLERACK;
     msg_t mgrResponse;
 
+    info("Looking for players...");
     for (int i = 0; i < inputK; i++){
         // startGameResponse response;
-        info("Looking for players...");
         n = sock->receive((void*) &mgrResponse, sizeof(msg_t));
         if (mgrResponse.command == FAILURE){
             error("Not enough registered players!");
@@ -443,10 +447,10 @@ void Bingo::StartGame(ClientSocket *sock, int inputK)
         newName = mgrResponse.mgr_rsp_startgame.playerName;
         newPort = mgrResponse.mgr_rsp_startgame.playerPort;
 
-        info("Receiving player %s...", newName);
+        info("Receiving player %s...", newName.c_str());
         PlayerData tempPlayer(newName, newIP, newPort);
         gamingPlayers.push_back(tempPlayer);
-        numberOfGamingPlayers ++;
+        numberOfGamingPlayers++;
 
         // Sending ACK back to manager:
         n = sock->send((void*) &callerACK, sizeof(msg_t));
@@ -462,6 +466,6 @@ void Bingo::CheckStatus(){
     info("Number of Gaming Players: %d", numberOfGamingPlayers);
     info("Name:\tIP Address:\tPort:");
     for (int i = 0; i < numberOfGamingPlayers; i ++){
-        info("%s\t%s\t%d", gamingPlayers[i].getName(), gamingPlayers[i].getIP(), gamingPlayers[i].getPort());
+        info("%s\t%s\t\t%d", gamingPlayers[i].getName().c_str(), gamingPlayers[i].getIP().c_str(), gamingPlayers[i].getPort());
     }
 }
