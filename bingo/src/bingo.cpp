@@ -292,11 +292,13 @@ int main(int argc, char **argv)
     unsigned int local_callerGamePort = 7500; // TEMPORARY!
     int remote_playerGamePort;
     string remote_playerIP;
+    ClientSocket *caller_player1Socket;
 
     // Player Gameplay variables:
     unsigned int remote_callerGamePort;
     string remote_callerIP;
     unsigned int local_playerGamePort = 7600;
+    ServerSocket *player1_callerSocket;
 
     // Forever get user's choice
     for ( ; ; ) {
@@ -358,15 +360,14 @@ int main(int argc, char **argv)
                 for (int i = 0; i < bng->numberOfGamingPlayers; i++){
                     remote_playerIP = bng->gamingPlayers[i].getIP();
                     remote_playerGamePort = bng->NegotiateGameplayPort(bng->gamingPlayers[i], local_callerGamePort);
-                    cout << "PlayerGamePort Received: " << remote_playerGamePort << "\n";
                 }
 
                 info("GAMEPLAY!");
-                // ClientSocket *player1Socket = new ClientSocket(remote_playerIP, remote_playerGamePort);
+                caller_player1Socket = new ClientSocket(remote_playerIP, remote_playerGamePort);
                 // Creating sockets for gameplay as CALLER:
-                // player1Socket->start();
+                caller_player1Socket->start();
                 //
-                // bng->CallBingo(player1Socket);
+                bng->CallBingo(caller_player1Socket);
 
 
                 break;
@@ -450,8 +451,8 @@ int main(int argc, char **argv)
                     if (default_sock->receive((void*) &data, sizeof(msg_t)) > 0){
                         switch (data.command) {
                             case PORT_HANDSHAKE:
-
-                                cout << "CallerGamePort Received: " << data.port_handshake.gamePort << "\n";
+                                remote_callerGamePort = data.port_handshake.gamePort;
+                                cout << "CallerGamePort Received: " << remote_callerGamePort << "\n";
                                 // Sending default port back to caller:
                                 handshakeResponse.command = PORT_HANDSHAKE;
                                 handshakeResponse.port_handshake.gamePort = local_playerGamePort;
@@ -459,7 +460,9 @@ int main(int argc, char **argv)
                                 default_sock->send((void*) &handshakeResponse, sizeof(msg_t));
 
                                 info("Gameplay!");
-                                // bng->PlayBingo()
+                                //Creating socket to listen to caller:
+                                player1_callerSocket = new ServerSocket(remote_callerGamePort);
+                                bng->PlayBingo(player1_callerSocket);
 
                         }
                     }
@@ -674,7 +677,7 @@ unsigned int Bingo::NegotiateGameplayPort(PlayerData player, unsigned int inputC
     info("Received %d bytes from socket.", n);
 
     playerGamePort = playerResponse.port_handshake.gamePort;
-    cout << "PlayerGamePort: " << playerGamePort << "\n";
+    cout << "Received PlayerGamePort: " << playerGamePort << "\n";
     info("Closing connection with manager...");
     playerSocket->stop();
     delete playerSocket;
