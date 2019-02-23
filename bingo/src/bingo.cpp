@@ -386,7 +386,12 @@ int main(int argc, char **argv)
 
             // Query players
             case 4:
-                // Do stuff...
+                cprintf(stdout, BOLD, "Query Players\n");
+
+                // Connect to manager
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+                info("Establishing connection with manager...");
+                bingo_sock->start();
                 break;
 
             // Any other choice
@@ -499,6 +504,58 @@ void Bingo::startGame(ClientSocket *sock, int inputK)
     // Verifying gamingPlayers:
 
 
+}
+
+/**
+ * Query all registered players from manager and print them
+ */
+void Bingo::queryPlayers(ClientSocket *sock)
+{
+    ssize_t status, response;
+
+    // Populate command body
+    msg_t query;
+    query.command = QUERY_PLAYERS;
+
+    // Send command
+    info("Sending QUERY_PLAYERS...");
+    status = sock->send((void*) query, sizeof(msg_t));
+
+    // Look for response
+    status = sock->receive((void*) &response, sizeof(msg_t));
+
+    // Decide what to do
+    if (status > 0) {
+        // Failure
+        if (response.command == FAILURE) {
+            error("No registered players!");
+        } else if (response.command == SUCCESS) {
+            info("Receiving players from manager...");
+            info("NAME\t\tIP\t\tPort");
+
+            // Print first player sent
+            info("%s\t\t%s\t\t%d", response.mgr_rsp_queryplayers.name, response.mgr_rsp_queryplayers.ip, response.mgr_rsp_queryplayers.port);
+
+            // Keep track of how many players left to expect
+            int players_left = response.mgr_rsp_queryplayers.players_left;
+
+            // Receive the rest of the players
+            while (players_left > 0) {
+                // Receive next player
+                sock->receive((void*) &response, sizeof(msg_t));
+
+                // Print player
+                info("%s\t\t%s\t\t%d", response.mgr_rsp_queryplayers.name, response.mgr_rsp_queryplayers.ip, response.mgr_rsp_queryplayers.port);
+
+                // See how many players are left
+                players_left = response.mgr_rsp_queryplayers.players_left;
+            }
+        } else {
+            error("Manager returned unknown data.");
+        }
+    } else {
+        error("No data received from manager!");
+    }
 }
 
 void Bingo::checkStatus(){

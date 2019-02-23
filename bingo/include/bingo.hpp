@@ -37,6 +37,7 @@ class Bingo{
         void callBingo(ClientSocket *sock);
         void playBingo(ServerSocket *sock);
         void startGame(ClientSocket *sock, int inputK);
+        void queryPlayers(ClientSocket *sock);
         void checkStatus();
 };
 
