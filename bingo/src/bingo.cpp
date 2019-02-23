@@ -282,12 +282,21 @@ int main(int argc, char **argv)
      ********/
     int choice = -1;
     int kValue = 1;
-    unsigned int callerGamePort = 7500;
-    int playerGamePort;
     unsigned int defaultPlayerPort = p_port;
     ServerSocket *default_sock = new ServerSocket(defaultPlayerPort);
+    ServerSocket *gameplay_sock = new ServerSocket()
     msg_t data;
     msg_t handshakeResponse;
+
+    // Caller Gameplay variables:
+    unsigned int local_callerGamePort = 7500; // TEMPORARY!
+    int remote_playerGamePort;
+    string remote_playerIP;
+
+    // Player Gameplay variables:
+    unsigned int remote_callerGamePort;
+    string remote_callerIP;
+    unsigned int local_playerGamePort = 7600;
 
     // Forever get user's choice
     for ( ; ; ) {
@@ -347,9 +356,18 @@ int main(int argc, char **argv)
 
                 info("Negotiating gameplay port numbers...");
                 for (int i = 0; i < bng->numberOfGamingPlayers; i++){
-                    playerGamePort = bng->NegotiateGameplayPort(bng->gamingPlayers[i], callerGamePort);
-                    cout << "PlayerGamePort Received: " << playerGamePort << "\n";
+                    remote_playerIP = bng->gamingPlayers[i].getIP();
+                    remote_playerGamePort = bng->NegotiateGameplayPort(bng->gamingPlayers[i], callerGamePort);
+                    cout << "PlayerGamePort Received: " << remote_playerGamePort << "\n";
                 }
+
+                info("GAMEPLAY!");
+                // Creating sockets for gameplay as CALLER:
+                ClientSocket *player1Socket = new ClientSocket(remote_playerIP, remote_playerGamePort);
+                player1Socket->start();
+
+                bng->CallBingo(player1Socket);
+
 
                 break;
 
@@ -424,7 +442,7 @@ int main(int argc, char **argv)
             // Listen for games
             case 5:
                 // After registration, creating socket for listening for new games:
-                cout << "listening on default port " << defaultPlayerPort << " for starting games...\n";
+                cout << "Listening on default port " << defaultPlayerPort << " for starting games...\n";
                 default_sock->start();
 
                 while (true){
@@ -432,11 +450,16 @@ int main(int argc, char **argv)
                     if (default_sock->receive((void*) &data, sizeof(msg_t)) > 0){
                         switch (data.command) {
                             case PORT_HANDSHAKE:
-                                cout << "callerGamePort Received: " << data.port_handshake.gamePort << "\n";
+
+                                cout << "CallerGamePort Received: " << data.port_handshake.gamePort << "\n";
                                 // Sending default port back to caller:
                                 handshakeResponse.command = PORT_HANDSHAKE;
-                                handshakeResponse.port_handshake.gamePort = defaultPlayerPort;
+                                handshakeResponse.port_handshake.gamePort = local_playerGamePort;
+                                cout << "Sending gamePort to caller: " << local_playerGamePort << "\n";
                                 default_sock->send((void*) &handshakeResponse, sizeof(msg_t));
+
+                                info("Gameplay!");
+                                bng->PlayBingo()
 
                         }
                     }
