@@ -524,8 +524,11 @@ void Bingo::queryPlayers(ClientSocket *sock)
     ssize_t status;
 
     // Populate command body
-    msg_t query, response;
+    msg_t query;
     query.command = QUERY_PLAYERS;
+
+    // Initialize response
+    msg_t response;
 
     // Send command
     info("Sending QUERY_PLAYERS...");

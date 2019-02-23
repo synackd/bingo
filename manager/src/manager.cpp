@@ -133,6 +133,12 @@ int main(int argc, char **argv)
 
                     break;
 
+                case QUERY_PLAYERS:
+                    info("Number of registered players: %d", mgr->numberOfRegPlayers);
+                    mgr->sendAllPlayers(mgr_sock);
+
+                    break;
+
                 // Anything else
                 default:
                     error("Unknown command received.");
@@ -193,7 +199,7 @@ void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
 /**
  * Send all registered players to caller requesting them
  */
-int Manager::sendAllPlayers(ServerSocket *sock, msg_t data)
+int Manager::sendAllPlayers(ServerSocket *sock)
 {
     int numberOfPlayersToSend = this->numberOfRegPlayers;
     msg_t response;
@@ -211,7 +217,7 @@ int Manager::sendAllPlayers(ServerSocket *sock, msg_t data)
         sock->send((void*) &response, sizeof(msg_t));
     } else {
         info("Sending %d players to caller...", numberOfPlayersToSend);
-        for (int i = numberOfPlayersToSend; i > 0; i++) {
+        for (int i = numberOfPlayersToSend; i > 0; i--) {
             // Populate response
             response.command = SUCCESS;
             response.mgr_rsp_queryplayers.players_left = i - 1;
@@ -222,11 +228,6 @@ int Manager::sendAllPlayers(ServerSocket *sock, msg_t data)
             // Send response
             info("Sending player \"%s\": IP: %s\tPort: %d", response.mgr_rsp_queryplayers.name, response.mgr_rsp_queryplayers.ip, response.mgr_rsp_queryplayers.port);
             sock->send((void*) &response, sizeof(msg_t));
-
-            // Wait for ACK
-            sock->receive((void*) &data, sizeof(msg_t));
-            if (data.command == CALLERACK)
-                info("Caller ACK received.");
         }
     }
 
