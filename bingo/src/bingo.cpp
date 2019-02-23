@@ -351,7 +351,6 @@ int main(int argc, char **argv)
                 bng->startGame(bingo_sock, kValue);
                 bng->checkStatus();
 
-                // Close connection with manager
                 info("Closing connection with manager...");
                 bingo_sock->stop();
                 delete bingo_sock;
@@ -367,9 +366,9 @@ int main(int argc, char **argv)
                 caller_player1Socket = new ClientSocket(remote_playerIP, remote_playerGamePort);
                 // Creating sockets for gameplay as CALLER:
                 caller_player1Socket->start();
-                //
-                bng->CallBingo(caller_player1Socket);
 
+                // Calling numbers until GAMEOVER:
+                bng->CallBingo(caller_player1Socket);
 
                 break;
 
@@ -465,6 +464,8 @@ int main(int argc, char **argv)
                                 player1_callerSocket = new ServerSocket(local_playerGamePort);
                                 player1_callerSocket->start();
                                 bng->PlayBingo(player1_callerSocket);
+
+                                break;
 
                         }
                     }
