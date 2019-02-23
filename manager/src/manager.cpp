@@ -191,6 +191,36 @@ void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
 }
 
 /**
+ * Send all registered players to caller requesting them
+ */
+int Manager::sendAllPlayers(ServerSocket *sock, msg_t data)
+{
+    int numberOfPlayersToSend = this->numberOfRegPlayers;
+    msg_t response;
+
+    info("QUERY_PLAYERS command received.");
+    info("Sending %d players to caller...", numberOfPlayersToSend);
+    for (int i = numberOfPlayersToSend; i > 0; i++) {
+        // Populate response
+        response.players_left = i - 1;
+        strncpy(response.mgr_rsp_queryplayers.name, registeredPlayers[i-1].getName().c_str(), BUFMAX);
+        strncpy(response.mgr_rsp_queryplayers.ip, registeredPlayers[i-1].getIP().c_str(), BUFMAX);
+        response.mgr_rsp_queryplayers.port = registeredPlayers[i-1].getPort();
+
+        // Send response
+        info("Sending player \"%s\": IP: %s\tPort: %d", response.mgr_rsp_startgame.name, response.mgr_rsp_startgame.ip, response.mgr_rsp_startgame.port);
+        sock->send((void*) &response, sizeof(msg_t));
+
+        // Wait for ACK
+        sock->receive((void*) &data, sizeof(msg_t));
+        if (data.command == CALLERACK)
+            info("Caller ACK received.");
+    }
+
+    return numberOfPlayersToSend;
+}
+
+/**
  * Register players who want to be considered to play Bingo
  */
 int Manager::registerPlayer(string name, string ip, unsigned int port)

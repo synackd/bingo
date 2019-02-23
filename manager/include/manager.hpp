@@ -29,6 +29,7 @@ class Manager {
 
         Manager(void);
         void sendKPlayers(ServerSocket *sock, msg_t data);
+        int sendAllPlayers(ServerSocket *sock, msg_t data);
         int registerPlayer(string name, string ip, unsigned int port);
         int deregisterPlayer(string name);
 };
