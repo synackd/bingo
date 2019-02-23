@@ -34,10 +34,10 @@ class Bingo{
 
         // TODO: These methods need implementation
         Bingo(void);
-        void CallBingo(ClientSocket *sock);
-        void PlayBingo(ServerSocket *sock);
-        void StartGame(ClientSocket *sock, int inputK);
-        void CheckStatus();
+        void callBingo(ClientSocket *sock);
+        void playBingo(ServerSocket *sock);
+        void startGame(ClientSocket *sock, int inputK);
+        void checkStatus();
 };
 
 #endif

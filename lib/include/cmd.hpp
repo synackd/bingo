@@ -167,7 +167,7 @@ typedef struct {
 
         /* Start game command/response */
         clr_cmd_startgame_t clr_cmd_startgame;  /**< Caller Start Command data */
-        mgr_rsp_startgame_t mgr_rsp_startgame;  /**< Manager Response to StartGame command */
+        mgr_rsp_startgame_t mgr_rsp_startgame;  /**< Manager Response to startGame command */
 
         /* Query players response */
         mgr_rsp_queryplayers_t mgr_rsp_queryplayers;    /**< Manager response to Query Players command */

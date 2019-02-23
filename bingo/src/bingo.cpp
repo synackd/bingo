@@ -169,7 +169,7 @@ Bingo::Bingo()
 /**
  * Calls Numbers to Players until there is a Winner
  */
-void Bingo::CallBingo(ClientSocket *sock)
+void Bingo::callBingo(ClientSocket *sock)
 {
     ssize_t n;
     int value;
@@ -325,8 +325,8 @@ int main(int argc, char **argv)
                 kValue = (int) tmp;
 
                 // Attempt to start game
-                bng->StartGame(bingo_sock, kValue);
-                bng->CheckStatus();
+                bng->startGame(bingo_sock, kValue);
+                bng->checkStatus();
 
                 // Close connection with manager
                 info("Closing connection with manager...");
@@ -402,7 +402,7 @@ int main(int argc, char **argv)
 /**
  * Listens to numbers until the game is over or player wins:
  */
-void Bingo::PlayBingo(ServerSocket *sock)
+void Bingo::playBingo(ServerSocket *sock)
 {
     ssize_t n;
     int inputCode;
@@ -452,7 +452,7 @@ void Bingo::PlayBingo(ServerSocket *sock)
 /**
  * Sends START_GAME_K command to Manager and stores players:
  */
-void Bingo::StartGame(ClientSocket *sock, int inputK)
+void Bingo::startGame(ClientSocket *sock, int inputK)
 {
     // Starting Game:
     // Populating message body:
@@ -501,7 +501,7 @@ void Bingo::StartGame(ClientSocket *sock, int inputK)
 
 }
 
-void Bingo::CheckStatus(){
+void Bingo::checkStatus(){
     info("Number of Gaming Players: %d", numberOfGamingPlayers);
     info("Name:\tIP Address:\tPort:");
     for (int i = 0; i < numberOfGamingPlayers; i ++){
