@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include "client.hpp"
-#include "bingo.hpp"
+// #include "bingo.hpp"
 
 using namespace std;
 
@@ -40,10 +40,11 @@ class Game {
     private:
         int id;
         int k;
+        Player *gameCaller;
         vector<Player> playersList;
 
     public:
-        Game(int inputGameID, int inputK);
+        Game(int inputGameID, int inputK, Player *inputCaller);
         void addPlayer(Player inputPlayer);
 };
 

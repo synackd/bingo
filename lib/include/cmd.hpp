@@ -114,7 +114,9 @@ typedef struct ply_rsp_bingocall_t {
  * Start Game command
  */
 typedef struct clr_cmd_startgame_t {
-    int k;              /**< Number of players requested for new bingo game */
+    int k;                  /**< Number of players requested for new bingo game */
+    char callerIP[BUFMAX];  /**< Caller's IP address */
+    int callerPort;         /**< Caller's port */
 } clr_cmd_startgame_t;
 
 /**

@@ -15,6 +15,7 @@
 #include "player.hpp"
 #include "server.hpp"
 #include "cmd.hpp"
+#include "peer.hpp"
 
 using namespace std;
 
@@ -26,6 +27,7 @@ class Manager {
     public:
         int numberOfRegPlayers;
         vector<PlayerData> registeredPlayers;
+        // vector<Game> gameList;
 
         Manager(void);
         void sendKPlayers(ServerSocket *sock, msg_t data);

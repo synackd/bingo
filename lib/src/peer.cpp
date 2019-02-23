@@ -11,10 +11,11 @@ using namespace std;
 /**
  * Create a game for the caller
  */
-Game::Game(int inputGameID, int inputK)
+Game::Game(int inputGameID, int inputK, Player *inputCaller)
 {
     this->id = inputGameID;
     this->k = inputK;
+    this->gameCaller = inputCaller;
 }
 
 /**
@@ -155,18 +156,10 @@ bool Board::checkWin()
  */
 void Board::printBoard()
 {
-    info("Value matrix:");
+    info("|| BINGO BOARD ||");
     for (int row = 0; row < 5; row++){
         for (int column = 0; column < 5; column++){
             cout << to_string(this->getValue(row, column)) << "\t";
-        }
-        cout << "\n";
-    }
-
-    info("Called matrix:");
-    for (int row = 0; row < 5; row++){
-        for (int column = 0; column < 5; column++){
-            cout << this->isCalled(row, column) << "\t";
         }
         cout << "\n";
     }

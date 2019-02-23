@@ -58,6 +58,9 @@ int main(int argc, char **argv)
     int status, requestedK;
     ssize_t size = 0;
     msg_t data;
+
+    int newGameID = 1;      // RANDOMIZATION PENDING!!!!!!!!!!
+
     for ( ; ; ) {
         if ((size = mgr_sock->receive((void*) &data, sizeof(msg_t))) != 0) {
             info("Received %d bytes from socket.", size);
@@ -121,9 +124,17 @@ int main(int argc, char **argv)
                 case START_GAME:
                     info("Registered Players Count: %d", mgr->numberOfRegPlayers);
                     requestedK = data.clr_cmd_startgame.k;
+                    cout << "Received Caller: " << data.clr_cmd_startgame.callerIP << "\t : " << data.clr_cmd_startgame.callerPort << "\n";
 
+                    // Checking if there are enought registered players:
                     if (requestedK <= mgr->numberOfRegPlayers){
                         mgr->sendKPlayers(mgr_sock, data);
+
+                        // Saving Game Details:
+
+                        // Game *newGame = new Game(newGameID, requestedK, )
+
+
                     } else {
                         error("There are not enough registered players.");
                         msg_t startGameFail;
@@ -192,8 +203,6 @@ void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
 
         // Waiting for ACK
         sock->receive((void*) &data, sizeof(msg_t));
-        if (data.command == CALLERACK)
-            info("Caller ACK received.");
     }
 }
 

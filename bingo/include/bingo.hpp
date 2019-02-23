@@ -12,6 +12,7 @@
 #include "server.hpp"
 #include "client.hpp"
 #include "player.hpp"
+#include "cmd.hpp"
 #include "peer.hpp"
 
 using namespace std;
@@ -36,10 +37,11 @@ class Bingo{
         Bingo(void);
         void callBingo(ClientSocket *sock);
         void playBingo(ServerSocket *sock);
-        void startGame(ClientSocket *sock, int inputK);
+        void startGame(ClientSocket *sock, int inputK, Player *currentPlayer);
         void queryPlayers(ClientSocket *sock);
-        unsigned int NegotiateGameplayPort(PlayerData player, unsigned int inputCallerGamePort);
-        bool CheckRepeatedValue(int value, vector<int>list, int listSize);
+        void checkStatus();
+        unsigned int negotiateGameplayPort(PlayerData player, unsigned int inputCallerGamePort);
+        bool checkRepeatedValue(int value, vector<int>list, int listSize);
 };
 
 #endif
