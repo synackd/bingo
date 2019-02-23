@@ -285,7 +285,7 @@ int main(int argc, char **argv)
 
     unsigned int callerGamePort = 2000;
     int playerGamePort;
-    unsigned int defaultPlayerPort = 3000;
+    unsigned int defaultPlayerPort = p_port;
     ServerSocket *default_sock = new ServerSocket(defaultPlayerPort);
     msg_t data;
     msg_t handshakeResponse;
@@ -425,9 +425,8 @@ int main(int argc, char **argv)
             // Listen for games
             case 5:
                 // After registration, creating socket for listening for new games:
-
+                info("listening on default port %d for starting games...");
                 default_sock->start();
-
 
                 while (true){
 
