@@ -39,7 +39,7 @@ class Bingo{
         void startGame(ClientSocket *sock, int inputK);
         void queryPlayers(ClientSocket *sock);
         unsigned int NegotiateGameplayPort(PlayerData player, unsigned int inputCallerGamePort);
-        void checkStatus();
+        bool CheckRepeatedValue(int value, vector<int>list, int listSize);
 };
 
 #endif

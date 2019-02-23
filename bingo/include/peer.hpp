@@ -68,7 +68,7 @@ class Cell {
  */
 class Board {
     private:
-        Cell values[3][3];
+        Cell values[5][5];
 
     public:
         Board(void);

@@ -80,9 +80,9 @@ int Cell::getValue()
  */
 Board::Board()
 {
-    for (int row = 0; row < 3; row++){
-        for (int column = 0; column < 3; column++){
-            this->values[row][column] = Cell(row*3 + column);
+    for (int row = 0; row < 5; row++){
+        for (int column = 0; column < 5; column++){
+            this->values[row][column] = Cell(row*5 + column);
         }
     }
 }
@@ -92,8 +92,8 @@ Board::Board()
  */
 void Board::markNumber(int calledValue)
 {
-    for (int row = 0; row < 3; row++){
-        for (int column = 0; column < 3; column++){
+    for (int row = 0; row < 5; row++){
+        for (int column = 0; column < 5; column++){
             if (this->getValue(row, column) == calledValue){
                 this->setCalled(row, column, true);
             }
@@ -156,16 +156,16 @@ bool Board::checkWin()
 void Board::printBoard()
 {
     info("Value matrix:");
-    for (int row = 0; row < 3; row++){
-        for (int column = 0; column < 3; column++){
+    for (int row = 0; row < 5; row++){
+        for (int column = 0; column < 5; column++){
             cout << to_string(this->getValue(row, column)) << "\t";
         }
         cout << "\n";
     }
 
     info("Called matrix:");
-    for (int row = 0; row < 3; row++){
-        for (int column = 0; column < 3; column++){
+    for (int row = 0; row < 5; row++){
+        for (int column = 0; column < 5; column++){
             cout << this->isCalled(row, column) << "\t";
         }
         cout << "\n";

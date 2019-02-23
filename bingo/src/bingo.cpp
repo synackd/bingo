@@ -481,6 +481,79 @@ int main(int argc, char **argv)
     }
 
     return SUCCESS;
+}// end of main()
+
+/*
+ * Class Implementations
+ */
+
+/***********
+ * Bingo *
+ ***********/
+
+/**
+ * Create a new Bingo
+ */
+Bingo::Bingo()
+{
+}
+
+bool Bingo::CheckRepeatedValue(int value, vector<int>list, int listSize){
+    for (int i = 0; i < listSize; i ++){
+        if (value == list[i])
+            return true;
+    }
+    return false;
+}
+
+/**
+ * Calls Numbers to Players until there is a Winner
+ */
+void Bingo::CallBingo(ClientSocket *sock)
+{
+    ssize_t n;
+    int value;
+    bool gameOver = false;
+    vector<int>calledNumbers;
+    int calledNumbersCount = 0;
+    srand(time(NULL));
+
+    msg_t callMessage; 	// message for sending
+	msg_t playerResponse;		// message to receive ACK from player
+
+    while (!gameOver){
+        // Populating Call Message:
+        callMessage.command = BINGOCALL;
+
+        // Generating new random value:
+        value = rand() % 75;
+        while (!CheckRepeatedValue(value, calledNumbers, calledNumbersCount)){
+            value = rand() % 75;
+        }
+
+        // Updating list of called numbers:
+        calledNumbers.push_back(value);
+        calledNumbersCount ++;
+
+		callMessage.clr_cmd_bingocals.bingoNumber = value;
+
+        // Calling number:
+		cout << "Calling " << value << "\n";
+		n = sock->send((void*) &callMessage, sizeof(msg_t));
+        // cout << " Sending " << n << " bytes over socket.\n";
+
+        // Receiving ACK from player:
+		n = sock->receive((void*) &playerResponse, sizeof(msg_t));
+        // cout << "Receiving " << n << " bytes over socket. CommandCode " << playerResponse.commandCode << "\n";
+
+        // Confirming player feedback:
+		if (playerResponse.command == PLAYERACK)
+			cout << "Player ACK received.\n";
+		if (playerResponse.command == GAMEOVER){
+            info("GAMEOVER");
+            gameOver = true;
+        }
+    }
 }
 
 /**
