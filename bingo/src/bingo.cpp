@@ -282,8 +282,7 @@ int main(int argc, char **argv)
      ********/
     int choice = -1;
     int kValue = 1;
-
-    unsigned int callerGamePort = 2000;
+    unsigned int callerGamePort = 7500;
     int playerGamePort;
     unsigned int defaultPlayerPort = p_port;
     ServerSocket *default_sock = new ServerSocket(defaultPlayerPort);
@@ -349,7 +348,7 @@ int main(int argc, char **argv)
                 info("Negotiating gameplay port numbers...");
                 for (int i = 0; i < bng->numberOfGamingPlayers; i++){
                     playerGamePort = bng->NegotiateGameplayPort(bng->gamingPlayers[i], callerGamePort);
-                    info("PlayerGamePort Received = %d", playerGamePort);
+                    info("PlayerGamePort Received = %u", playerGamePort);
                 }
 
                 break;
@@ -425,7 +424,7 @@ int main(int argc, char **argv)
             // Listen for games
             case 5:
                 // After registration, creating socket for listening for new games:
-                info("listening on default port %d for starting games...");
+                info("listening on default port %i for starting games...", defaultPlayerPort);
                 default_sock->start();
 
                 while (true){
@@ -634,6 +633,7 @@ unsigned int Bingo::NegotiateGameplayPort(PlayerData player, unsigned int inputC
     ClientSocket *playerSocket = new ClientSocket(player.getIP(), player.getPort());
     playerSocket->start();
 
+    ssize_t n;
     msg_t callerMessage;
     msg_t playerResponse;
     unsigned int playerGamePort;
@@ -641,13 +641,16 @@ unsigned int Bingo::NegotiateGameplayPort(PlayerData player, unsigned int inputC
     callerMessage.port_handshake.gamePort = inputCallerGamePort;   // TEMPORAL!!!!!!
 
     // Sending callerGamePort to player:
-    info("Sending callerGamePort to player...");
-    playerSocket->send((void*) &callerMessage, sizeof(msg_t));
+    info("Sending callerGamePort (%u) to player...", inputCallerGamePort);
+    n = playerSocket->send((void*) &callerMessage, sizeof(msg_t));
+    info("Sent %d bytes from socket.", n);
 
     // Receiving playerGamePort
-    playerSocket->receive((void*) &playerResponse, sizeof(msg_t));
-    playerGamePort = playerResponse.port_handshake.gamePort;
+    n = playerSocket->receive((void*) &playerResponse, sizeof(msg_t));
+    info("Received %d bytes from socket.", n);
 
+    playerGamePort = playerResponse.port_handshake.gamePort;
+    info("PlayerGamePort = %u", playerGamePort);
     info("Closing connection with manager...");
     playerSocket->stop();
     delete playerSocket;
