@@ -392,6 +392,16 @@ int main(int argc, char **argv)
                 bingo_sock = new ClientSocket(mgr_ip, mgr_port);
                 info("Establishing connection with manager...");
                 bingo_sock->start();
+
+                // Attempt to query players
+                bng->queryPlayers(bingo_sock);
+
+                // Close connection with manager
+                info("Closing connection with manager...");
+                bingo_sock->stop();
+                delete bingo_sock;
+                bingo_sock = NULL;
+
                 break;
 
             // Any other choice
