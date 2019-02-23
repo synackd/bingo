@@ -462,6 +462,7 @@ int main(int argc, char **argv)
                                 info("Gameplay!");
                                 //Creating socket to listen to caller:
                                 player1_callerSocket = new ServerSocket(local_playerGamePort);
+                                player1_callerSocket->start();
                                 bng->PlayBingo(player1_callerSocket);
 
                         }
