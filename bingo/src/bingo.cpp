@@ -284,7 +284,7 @@ int main(int argc, char **argv)
     int kValue = 1;
     unsigned int defaultPlayerPort = p_port;
     ServerSocket *default_sock = new ServerSocket(defaultPlayerPort);
-    ServerSocket *gameplay_sock = new ServerSocket()
+    // ServerSocket *gameplay_sock = new ServerSocket()
     msg_t data;
     msg_t handshakeResponse;
 
@@ -357,16 +357,16 @@ int main(int argc, char **argv)
                 info("Negotiating gameplay port numbers...");
                 for (int i = 0; i < bng->numberOfGamingPlayers; i++){
                     remote_playerIP = bng->gamingPlayers[i].getIP();
-                    remote_playerGamePort = bng->NegotiateGameplayPort(bng->gamingPlayers[i], callerGamePort);
+                    remote_playerGamePort = bng->NegotiateGameplayPort(bng->gamingPlayers[i], local_callerGamePort);
                     cout << "PlayerGamePort Received: " << remote_playerGamePort << "\n";
                 }
 
                 info("GAMEPLAY!");
+                // ClientSocket *player1Socket = new ClientSocket(remote_playerIP, remote_playerGamePort);
                 // Creating sockets for gameplay as CALLER:
-                ClientSocket *player1Socket = new ClientSocket(remote_playerIP, remote_playerGamePort);
-                player1Socket->start();
-
-                bng->CallBingo(player1Socket);
+                // player1Socket->start();
+                //
+                // bng->CallBingo(player1Socket);
 
 
                 break;
@@ -459,7 +459,7 @@ int main(int argc, char **argv)
                                 default_sock->send((void*) &handshakeResponse, sizeof(msg_t));
 
                                 info("Gameplay!");
-                                bng->PlayBingo()
+                                // bng->PlayBingo()
 
                         }
                     }
