@@ -146,6 +146,7 @@ int main(int argc, char **argv)
             }
         } else {
             // Restart socket
+            cout << "Restarting socket.\n";
             mgr_sock->stop();
             mgr_sock->start();
         }
