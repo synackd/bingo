@@ -427,7 +427,7 @@ void Bingo::StartGame(ClientSocket *sock, int inputK)
     n = sock->send((void*) &startGameCmd, sizeof(msg_t));
 
     // Receiving K Players:
-    char newIP[BUFMAX], newName[BUFMAX];
+    string newIP, newName;
     int newGameID, newPort;
     msg_t callerACK;
     callerACK.command = CALLERACK;
@@ -443,11 +443,11 @@ void Bingo::StartGame(ClientSocket *sock, int inputK)
         }
 
         newGameID = mgrResponse.mgr_rsp_startgame.gameID;
-        strncpy(newIP, mgrResponse.mgr_rsp_startgame.playerIP, BUFMAX);
-        strncpy(newName, mgrResponse.mgr_rsp_startgame.playerName, BUFMAX);
+        newIP = mgrResponse.mgr_rsp_startgame.playerIP;
+        newName = mgrResponse.mgr_rsp_startgame.playerName;
         newPort = mgrResponse.mgr_rsp_startgame.playerPort;
 
-        info("Receiving player %s...", newName);
+        info("Receiving player %s...", newName.c_str());
         PlayerData tempPlayer(newName, newIP, newPort);
         gamingPlayers.push_back(tempPlayer);
         numberOfGamingPlayers++;
@@ -466,6 +466,6 @@ void Bingo::CheckStatus(){
     info("Number of Gaming Players: %d", numberOfGamingPlayers);
     info("Name:\tIP Address:\tPort:");
     for (int i = 0; i < numberOfGamingPlayers; i ++){
-        info("%s\t%s\t%d", gamingPlayers[i].getName(), gamingPlayers[i].getIP(), gamingPlayers[i].getPort());
+        info("%s\t%s\t\t%d", gamingPlayers[i].getName().c_str(), gamingPlayers[i].getIP().c_str(), gamingPlayers[i].getPort());
     }
 }
