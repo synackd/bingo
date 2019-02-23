@@ -19,24 +19,18 @@
 using namespace std;
 
 /*
- * Function Prototypes
- */
-void info(const char *fmt, ...);
-void error(const char *fmt, ...);
-
-/*
  * Class Prototypes
  */
 
-class Manager{
+class Manager {
     public:
         int numberOfRegPlayers;
         vector<PlayerData> registeredPlayers;
 
-        // TODO: These methods need implementation
         Manager(void);
         void sendKPlayers(ServerSocket *sock, msg_t data);
         int registerPlayer(string name, string ip, unsigned int port);
+        int deregisterPlayer(string name);
 };
 
 #endif

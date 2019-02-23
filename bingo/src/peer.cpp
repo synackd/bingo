@@ -125,6 +125,9 @@ void Board::setCalled(int row, int column, bool value)
     this->values[row][column].setCalled(value);
 }
 
+/**
+ * Check board if there is a bingo
+ */
 bool Board::checkWin()
 {
     bool winnerRow, winnerColumn;
@@ -135,7 +138,7 @@ bool Board::checkWin()
         for (int column = 0; column < 3; column++){
             // Looking for not called number
             if (values[row][column].isCalled() == false){
-                // cout << "row " << row << " not completed\n";
+                // info("Row %d not completed.", row);
                 winnerRow = false;
             }
         }
@@ -246,19 +249,19 @@ unsigned int Player::getPort()
 {
     return this->port;
 }
+
 /**
  * Player listens for Numbers called by Caller
  */
 // TODO: Make this object oriented using ClientSocket...
 void Player::listenBingo()
 {
-
 }
 
 /**
  * Registers to Manager for future games
  */
-void Player::registerToManager(ClientSocket *sock)
+void Player::regist(ClientSocket *sock)
 {
     ssize_t size = 0;
 
@@ -284,6 +287,38 @@ void Player::registerToManager(ClientSocket *sock)
         info("Registration success!");
     } else if (reg_rsp.mgr_rsp_register.ret_code == FAILURE) {
         error("Registration failed!");
+    } else {
+        error("Manager returned unknown value.");
+    }
+}
+
+/**
+ * Deregister player from manager
+ */
+void Player::deregist(ClientSocket *sock)
+{
+    ssize_t size = 0;
+
+    // Create deregister packet
+    msg_t dereg_cmd;
+    dereg_cmd.command = DEREGISTER;
+    strncpy(dereg_cmd.mgr_cmd_deregister.name, this->name.c_str(), BUFMAX);
+
+    // Send packet to manager
+    info("Attempting to deregister player \"%s\"...", this->name.c_str());
+    size = sock->send((void*) &dereg_cmd, sizeof(msg_t));
+    info("Sent %d bytes to manager.", size);
+
+    // Listen for manager's response
+    msg_t dereg_rsp;
+    size = sock->receive((void*) &dereg_rsp, sizeof(msg_t));
+    info("Received %d bytes from manager.", size);
+
+    // Examine return code
+    if (dereg_rsp.mgr_rsp_deregister.ret_code == SUCCESS) {
+        info("Deregistration success!");
+    } else if (dereg_rsp.mgr_rsp_deregister.ret_code == FAILURE) {
+        error("Deregistration failed!");
     } else {
         error("Manager returned unknown value.");
     }

@@ -9,53 +9,17 @@
 #include <stdarg.h>
 #include <vector>
 #include "colors.hpp"
+#include "log.hpp"
 #include "manager.hpp"
 #include "player.hpp"
 #include "cmd.hpp"
 #include "server.hpp"
-
-// GLOBAL LIST OF REGISTERED PLAYERS:
-vector<PlayerData> playersList;
-
-/**
- * Log an info message to stdout
- * from the manager.
- */
-void info(const char *fmt, ...)
-{
-    va_list vaList;
-    cprintf(stdout, BOLD, "[MGR] ");
-    va_start(vaList, fmt);
-    vfprintf(stdout, fmt, vaList);
-    va_end(vaList);
-    fprintf(stdout, "\n");
-}
-
-/**
- * Log an error message to stderr
- * from the manager.
- */
-void error(const char *fmt, ...)
-{
-    va_list vaList;
-    cprintf(stderr, BOLD, "[MGR][ERR] ");
-    va_start(vaList, fmt);
-    vfprintf(stderr, fmt, vaList);
-    va_end(vaList);
-    fprintf(stderr, "\n");
-}
-
-void startGame(ServerSocket *socket){
-
-}
-
 
 /**
  * Main runtime of manager application.
  */
 int main(int argc, char **argv)
 {
-
     /*****************
      * HOUSECLEANING *
      *****************/
@@ -82,18 +46,6 @@ int main(int argc, char **argv)
         exit(FAILURE);
     }
 
-    // // TEMPORAL LIST OF PLAYERS FOR TESTING: //////////////////////
-    //
-    // // LIST OF REGISTERED PLAYERS:
-    //
-    // int numberOfRegPlayers = 5;
-    //
-    // for (int i = 0; i < numberOfRegPlayers; i++){
-    //     string playerIP = "IP" + std::to_string(i);
-    //     PlayerData tempPlayer("name", playerIP, i);
-    //     playersList.push_back(tempPlayer);
-    // }
-
     // Create new manager object
     Manager *mgr = new Manager();
 
@@ -103,9 +55,8 @@ int main(int argc, char **argv)
 
     // Continuously listen for requests and decide what to
     // do based on data
-    int status;
+    int status, requestedK;
     ssize_t size = 0;
-    int requestedK;
     msg_t data;
     for ( ; ; ) {
         if ((size = mgr_sock->receive((void*) &data, sizeof(msg_t))) != 0) {
@@ -118,6 +69,7 @@ int main(int argc, char **argv)
              * the return code of the request. Return codes are 0 or less,
              * distinguishing them from commands.
              */
+            msg_t mgr_rsp;
             switch (data.command) {
                 // Register command
                 case REGISTER:
@@ -127,7 +79,6 @@ int main(int argc, char **argv)
                     status = mgr->registerPlayer(data.mgr_cmd_register.name, data.mgr_cmd_register.ip, data.mgr_cmd_register.port);
 
                     // Form response
-                    msg_t mgr_rsp;
                     if (status == SUCCESS) {
                         info("Registration succeeded!");
                         mgr_rsp.command = SUCCESS;
@@ -143,20 +94,45 @@ int main(int argc, char **argv)
                     info("Sent response of %d bytes.", size);
 
                     break;
+
+                case DEREGISTER:
+                    // Deregister the player
+                    info("Command received was DEREGISTER.");
+                    info("Attempting to deregister player \"%s\"...", data.mgr_cmd_deregister.name);
+                    status = mgr->deregisterPlayer(data.mgr_cmd_deregister.name);
+
+                    // Form response
+                    if (status == SUCCESS) {
+                        info("Deregistration succeeded!");
+                        mgr_rsp.command = SUCCESS;
+                        mgr_rsp.mgr_rsp_register.ret_code = SUCCESS;
+                    } else {
+                        error("Registration failed!");
+                        mgr_rsp.command = FAILURE;
+                        mgr_rsp.mgr_rsp_register.ret_code = FAILURE;
+                    }
+
+                    // Send response
+                    size = mgr_sock->send((void*) &mgr_rsp, sizeof(msg_t));
+                    info("Sent response of %d bytes.", size);
+
+                    break;
+
                 case START_GAME:
-                    cout << "Registered Players Count = " << mgr->numberOfRegPlayers << "\n";
+                    info("Registered Players Count: %d", mgr->numberOfRegPlayers);
                     requestedK = data.clr_cmd_startgame.k;
 
                     if (requestedK <= mgr->numberOfRegPlayers){
                         mgr->sendKPlayers(mgr_sock, data);
-                    }else{
-                        cout << "There are not enough registered players.\n";
+                    } else {
+                        error("There are not enough registered players.");
                         msg_t startGameFail;
                         startGameFail.command = FAILURE;
                         mgr_sock->send((void*) &startGameFail, sizeof(msg_t));
                     }
 
                     break;
+
                 // Anything else
                 default:
                     error("Unknown command received.");
@@ -167,12 +143,8 @@ int main(int argc, char **argv)
             mgr_sock->stop();
             mgr_sock->start();
         }
-
-  } // end of while
-
-} // end of main()
-
-
+    }
+}
 
 /*
  * Class Implementations
@@ -187,7 +159,7 @@ int main(int argc, char **argv)
  */
 Manager::Manager()
 {
-    numberOfRegPlayers = 0;
+    this->numberOfRegPlayers = 0;
 }
 
 /**
@@ -195,26 +167,23 @@ Manager::Manager()
  */
 void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
 {
-    info("START_GAME command received.");
-    // cout << "Getting K ...\n";
     int numberOfPlayersToSend = data.clr_cmd_startgame.k;
     msg_t response;
-    // ssize_t size = 0;
-    // response.command =
-    cout << "Sending " << numberOfPlayersToSend << " players to caller...\n";
-    for (int i = 0; i < numberOfPlayersToSend; i++){
-        // cout << "Populating response gameID...\n";
 
+    info("START_GAME command received.");
+    info("Sending %d players to caller...", numberOfPlayersToSend);
+    for (int i = 0; i < numberOfPlayersToSend; i++){
+        // TODO: Randomize game id (have a global counter?)
         response.mgr_rsp_startgame.gameID = 1;
         strcpy(response.mgr_rsp_startgame.playerName, registeredPlayers[i].getName().c_str());
         strcpy(response.mgr_rsp_startgame.playerIP, registeredPlayers[i].getIP().c_str());
         response.mgr_rsp_startgame.playerPort = registeredPlayers[i].getPort();
 
-        cout << "Sending Player: GameID = " << response.mgr_rsp_startgame.gameID << "\tIP = " << response.mgr_rsp_startgame.playerIP << "\tPort = " << response.mgr_rsp_startgame.playerPort << "\n";
-        // response.gamePlayer->PrintPlayer();
+        // Send player data back to caller
+        info("Sending Player: GameID = %d\tIP = %s\tPort = %d", response.mgr_rsp_startgame.gameID, response.mgr_rsp_startgame.playerIP, response.mgr_rsp_startgame.playerPort);
         sock->send((void*) &response, sizeof(msg_t));
 
-        // waiting for ACK:
+        // Waiting for ACK
         sock->receive((void*) &data, sizeof(msg_t));
         if (data.command == CALLERACK)
             printf("Caller ACK received.\n");
@@ -235,6 +204,25 @@ int Manager::registerPlayer(string name, string ip, unsigned int port)
     // If not, add player
     PlayerData newPlayer(name, ip, port);
     registeredPlayers.push_back(newPlayer);
-    numberOfRegPlayers ++;
+    numberOfRegPlayers++;
+
     return SUCCESS;
+}
+
+/**
+ * Deregister a player
+ */
+int Manager::deregisterPlayer(string name)
+{
+    // Check if player is in list
+    for (int i = 0; i < registeredPlayers.size(); i++) {
+        if (registeredPlayers[i].getName() == name) {
+            // Player is in list, deregister
+            registeredPlayers.erase(registeredPlayers.begin()+i);
+            return SUCCESS;
+        }
+    }
+
+    // Otherwise, fail
+    return FAILURE;
 }

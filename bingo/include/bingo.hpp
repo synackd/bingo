@@ -8,22 +8,20 @@
 #ifndef _BINGO_HPP_
 #define _BINGO_HPP_
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include "colors.hpp"
-#include "player.hpp"
-#include "client.hpp"
+#include "constants.hpp"
 #include "server.hpp"
-#include "cmd.hpp"
+#include "client.hpp"
+#include "player.hpp"
+#include "peer.hpp"
 
 using namespace std;
 
 /*
  * Functions
  */
-void info(const char *fmt, ...);
-void error(const char *fmt, ...);
+void getPeerInfo(char **name_ptr, char **ip_ptr, unsigned int *port_ptr);
+void printMenu(void);
+int getChoice(void);
 
 /*
  * Class Prototypes
@@ -33,7 +31,6 @@ class Bingo{
     public:
         int numberOfGamingPlayers;
         vector<PlayerData> gamingPlayers;
-
 
         // TODO: These methods need implementation
         Bingo(void);
