@@ -352,17 +352,12 @@ int main(int argc, char **argv)
                 delete bingo_sock;
                 bingo_sock = NULL;
 
-                if (status == SUCCESS) {
-                    info("Deleting player...");
-                    delete me;
-                    me = NULL;
-                }
                 break;
 
             // Reregister a player
             case 3:
                 // Check if player is already registered
-                if (me) {
+                if (me->isRegistered()) {
                     cprintf(stdout, BOLD, "Player already registered.\n");
                     break;
                 }
