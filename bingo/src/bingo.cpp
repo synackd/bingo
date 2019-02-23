@@ -348,7 +348,7 @@ int main(int argc, char **argv)
                 info("Negotiating gameplay port numbers...");
                 for (int i = 0; i < bng->numberOfGamingPlayers; i++){
                     playerGamePort = bng->NegotiateGameplayPort(bng->gamingPlayers[i], callerGamePort);
-                    info("PlayerGamePort Received = %u", playerGamePort);
+                    cout << "PlayerGamePort Received: " << playerGamePort << "\n";
                 }
 
                 break;
@@ -428,7 +428,7 @@ int main(int argc, char **argv)
                 default_sock->start();
 
                 while (true){
-                    
+
                     if (default_sock->receive((void*) &data, sizeof(msg_t)) > 0){
                         switch (data.command) {
                             case PORT_HANDSHAKE:
@@ -651,7 +651,7 @@ unsigned int Bingo::NegotiateGameplayPort(PlayerData player, unsigned int inputC
     info("Received %d bytes from socket.", n);
 
     playerGamePort = playerResponse.port_handshake.gamePort;
-    info("PlayerGamePort = %u", playerGamePort);
+    cout << "PlayerGamePort: " << playerGamePort << "\n";
     info("Closing connection with manager...");
     playerSocket->stop();
     delete playerSocket;
