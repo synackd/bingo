@@ -199,22 +199,35 @@ int Manager::sendAllPlayers(ServerSocket *sock, msg_t data)
     msg_t response;
 
     info("QUERY_PLAYERS command received.");
-    info("Sending %d players to caller...", numberOfPlayersToSend);
-    for (int i = numberOfPlayersToSend; i > 0; i++) {
+
+    // Check if there are any players
+    if (numberOfPlayersToSend == 0) {
+        info("There are no players!");
+
         // Populate response
-        response.mgr_rsp_queryplayers.players_left = i - 1;
-        strncpy(response.mgr_rsp_queryplayers.name, registeredPlayers[i-1].getName().c_str(), BUFMAX);
-        strncpy(response.mgr_rsp_queryplayers.ip, registeredPlayers[i-1].getIP().c_str(), BUFMAX);
-        response.mgr_rsp_queryplayers.port = registeredPlayers[i-1].getPort();
+        response.command = FAILURE;
 
         // Send response
-        info("Sending player \"%s\": IP: %s\tPort: %d", response.mgr_rsp_queryplayers.name, response.mgr_rsp_queryplayers.ip, response.mgr_rsp_queryplayers.port);
         sock->send((void*) &response, sizeof(msg_t));
+    } else {
+        info("Sending %d players to caller...", numberOfPlayersToSend);
+        for (int i = numberOfPlayersToSend; i > 0; i++) {
+            // Populate response
+            response.command = SUCCESS;
+            response.mgr_rsp_queryplayers.players_left = i - 1;
+            strncpy(response.mgr_rsp_queryplayers.name, registeredPlayers[i-1].getName().c_str(), BUFMAX);
+            strncpy(response.mgr_rsp_queryplayers.ip, registeredPlayers[i-1].getIP().c_str(), BUFMAX);
+            response.mgr_rsp_queryplayers.port = registeredPlayers[i-1].getPort();
 
-        // Wait for ACK
-        sock->receive((void*) &data, sizeof(msg_t));
-        if (data.command == CALLERACK)
-            info("Caller ACK received.");
+            // Send response
+            info("Sending player \"%s\": IP: %s\tPort: %d", response.mgr_rsp_queryplayers.name, response.mgr_rsp_queryplayers.ip, response.mgr_rsp_queryplayers.port);
+            sock->send((void*) &response, sizeof(msg_t));
+
+            // Wait for ACK
+            sock->receive((void*) &data, sizeof(msg_t));
+            if (data.command == CALLERACK)
+                info("Caller ACK received.");
+        }
     }
 
     return numberOfPlayersToSend;
