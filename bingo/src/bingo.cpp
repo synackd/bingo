@@ -287,6 +287,12 @@ int main(int argc, char **argv)
 
             // Start a game
             case 1:
+                // Check if player is registered
+                if (!me->isRegistered()) {
+                    cprintf(stdout, BOLD, "Player not registered. Please register first.\n");
+                    break;
+                }
+
                 cprintf(stdout, BOLD, "Start Game\n");
 
                 // Establish connection with manager
@@ -325,7 +331,7 @@ int main(int argc, char **argv)
             // Deregister player
             case 2:
                 // Check if player is registered
-                if (!me) {
+                if (!me->isRegistered()) {
                     cprintf(stdout, BOLD, "Player not registered.\n");
                     break;
                 }
