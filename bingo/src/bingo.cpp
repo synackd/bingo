@@ -527,7 +527,7 @@ void Bingo::CallBingo(ClientSocket *sock)
 
         // Generating new random value:
         value = rand() % 75;
-        while (!CheckRepeatedValue(value, calledNumbers, calledNumbersCount)){
+        while (CheckRepeatedValue(value, calledNumbers, calledNumbersCount)){
             value = rand() % 75;
         }
 
