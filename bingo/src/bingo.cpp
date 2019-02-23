@@ -424,7 +424,7 @@ int main(int argc, char **argv)
             // Listen for games
             case 5:
                 // After registration, creating socket for listening for new games:
-                info("listening on default port %i for starting games...", defaultPlayerPort);
+                info("listening on default port %u for starting games...", defaultPlayerPort);
                 default_sock->start();
 
                 while (true){
@@ -432,7 +432,7 @@ int main(int argc, char **argv)
                     if (default_sock->receive((void*) &data, sizeof(msg_t)) != 0){
                         switch (data.command) {
                             case PORT_HANDSHAKE:
-                                info("callerGamePort Received: %d", data.port_handshake.gamePort);
+                                info("callerGamePort Received: %u", data.port_handshake.gamePort);
                                 handshakeResponse.command = PORT_HANDSHAKE;
                                 handshakeResponse.port_handshake.gamePort = defaultPlayerPort;
                                 default_sock->send((void*) &handshakeResponse, sizeof(msg_t));
