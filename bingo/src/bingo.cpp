@@ -66,6 +66,10 @@ void printMenu()
     cprintf(stdout, BOLD, "  4) ");
     fprintf(stdout, "Query Players\n");
 
+    // Listen
+    cprintf(stdout, BOLD, "  5) ");
+    fprintf(stdout, "Listen\n");
+
     fprintf(stdout, "\n");
 }
 
@@ -272,15 +276,23 @@ int main(int argc, char **argv)
     delete bingo_sock;
     bingo_sock = NULL;
 
+
     /********
      * MENU *
      ********/
     int choice = -1;
     int kValue = 1;
-    char *choice_str;
+
+    unsigned int callerGamePort = 2000;
+    int playerGamePort;
+    unsigned int defaultPlayerPort = 3000;
+    ServerSocket *default_sock = new ServerSocket(defaultPlayerPort);
+    msg_t data;
+    msg_t handshakeResponse;
 
     // Forever get user's choice
     for ( ; ; ) {
+
         // Get user's choice
         printMenu();
         choice = getChoice();
@@ -333,6 +345,12 @@ int main(int argc, char **argv)
                 bingo_sock->stop();
                 delete bingo_sock;
                 bingo_sock = NULL;
+
+                info("Negotiating gameplay port numbers...");
+                for (int i = 0; i < bng->numberOfGamingPlayers; i++){
+                    playerGamePort = bng->NegotiateGameplayPort(bng->gamingPlayers[i], callerGamePort);
+                    info("PlayerGamePort Received = %d", playerGamePort);
+                }
 
                 break;
 
@@ -401,6 +419,30 @@ int main(int argc, char **argv)
                 bingo_sock->stop();
                 delete bingo_sock;
                 bingo_sock = NULL;
+
+                break;
+
+            // Listen for games
+            case 5:
+                // After registration, creating socket for listening for new games:
+
+                default_sock->start();
+
+
+                while (true){
+
+                    if (default_sock->receive((void*) &data, sizeof(msg_t)) != 0){
+                        switch (data.command) {
+                            case PORT_HANDSHAKE:
+                                info("callerGamePort Received: %d", data.port_handshake.gamePort);
+                                handshakeResponse.command = PORT_HANDSHAKE;
+                                handshakeResponse.port_handshake.gamePort = defaultPlayerPort;
+                                default_sock->send((void*) &handshakeResponse, sizeof(msg_t));
+
+                        }
+                    }
+
+                }
 
                 break;
 
@@ -571,10 +613,47 @@ void Bingo::queryPlayers(ClientSocket *sock)
     }
 }
 
+/*
+ * Shows the players that the caller receives after sending "start game K":
+ * (Troubleshooting)
+ */
 void Bingo::checkStatus(){
     info("Number of Gaming Players: %d", numberOfGamingPlayers);
     info("Name:\tIP Address:\tPort:");
     for (int i = 0; i < numberOfGamingPlayers; i ++){
         info("%s\t%s\t\t%d", gamingPlayers[i].getName().c_str(), gamingPlayers[i].getIP().c_str(), gamingPlayers[i].getPort());
     }
+}
+
+
+/**
+ * Caller negotiates gameplay port numbers with input player:
+ */
+unsigned int Bingo::NegotiateGameplayPort(PlayerData player, unsigned int inputCallerGamePort){
+
+    // Initializing socket to talk to default player socket:
+    ClientSocket *playerSocket = new ClientSocket(player.getIP(), player.getPort());
+    playerSocket->start();
+
+    msg_t callerMessage;
+    msg_t playerResponse;
+    unsigned int playerGamePort;
+    callerMessage.command = PORT_HANDSHAKE;
+    callerMessage.port_handshake.gamePort = inputCallerGamePort;   // TEMPORAL!!!!!!
+
+    // Sending callerGamePort to player:
+    info("Sending callerGamePort to player...");
+    playerSocket->send((void*) &callerMessage, sizeof(msg_t));
+
+    // Receiving playerGamePort
+    playerSocket->receive((void*) &playerResponse, sizeof(msg_t));
+    playerGamePort = playerResponse.port_handshake.gamePort;
+
+    info("Closing connection with manager...");
+    playerSocket->stop();
+    delete playerSocket;
+    playerSocket = NULL;
+
+    return playerGamePort;
+
 }
