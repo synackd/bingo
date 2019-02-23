@@ -284,7 +284,7 @@ int main(int argc, char **argv)
     int kValue = 1;
     unsigned int callerGamePort = 7500;
     int playerGamePort;
-    unsigned int defaultPlayerPort = port;
+    unsigned int defaultPlayerPort = p_port;
     ServerSocket *default_sock = new ServerSocket(defaultPlayerPort);
     msg_t data;
     msg_t handshakeResponse;
