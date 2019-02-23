@@ -245,11 +245,8 @@ int main(int argc, char **argv)
     unsigned int p_port;
     getPeerInfo(&p_name, &p_ip, &p_port);
 
-    // Create socket for communication with manager
-    bingo_sock = new ClientSocket(mgr_ip, mgr_port);
-
     // Create socket for registration
-    ClientSocket *gameSetup_sock = new ClientSocket(mgr_ip, mgr_port);
+    bingo_sock = new ClientSocket(mgr_ip, mgr_port);
 
     // Establish connection with manager
     info("Establishing connection with manager...");
@@ -293,8 +290,9 @@ int main(int argc, char **argv)
                 cprintf(stdout, BOLD, "Start Game\n");
 
                 // Establish connection with manager
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port);
                 info("Establishing connection with manager for Game Setup ...");
-                gameSetup_sock->start();
+                bingo_sock->start();
 
                 // Get user input
                 cprintf(stdout, BOLD, "Number of Players: ");
@@ -313,14 +311,14 @@ int main(int argc, char **argv)
                 kValue = (int) tmp;
 
                 // Attempt to start game
-                bng->StartGame(gameSetup_sock, kValue);
+                bng->StartGame(bingo_sock, kValue);
                 bng->CheckStatus();
 
                 // Close connection with manager
                 info("Closing connection with manager...");
-                gameSetup_sock->stop();
-                delete gameSetup_sock;
-                gameSetup_sock = NULL;
+                bingo_sock->stop();
+                delete bingo_sock;
+                bingo_sock = NULL;
 
                 break;
 

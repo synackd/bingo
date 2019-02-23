@@ -186,7 +186,7 @@ void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
         // Waiting for ACK
         sock->receive((void*) &data, sizeof(msg_t));
         if (data.command == CALLERACK)
-            printf("Caller ACK received.\n");
+            info("Caller ACK received.");
     }
 }
 
