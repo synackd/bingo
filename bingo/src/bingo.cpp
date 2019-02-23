@@ -62,6 +62,10 @@ void printMenu()
     cprintf(stdout, BOLD, "  3) ");
     fprintf(stdout, "Reregister\n");
 
+    // Query Players
+    cprintf(stdout, BOLD, "  4) ");
+    fprintf(stdout, "Query Players\n");
+
     fprintf(stdout, "\n");
 }
 
@@ -378,6 +382,11 @@ int main(int argc, char **argv)
                 bingo_sock->stop();
                 delete bingo_sock;
                 bingo_sock = NULL;
+                break;
+
+            // Query players
+            case 4:
+                // Do stuff...
                 break;
 
             // Any other choice
