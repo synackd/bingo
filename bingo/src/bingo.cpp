@@ -511,15 +511,15 @@ void Bingo::startGame(ClientSocket *sock, int inputK)
  */
 void Bingo::queryPlayers(ClientSocket *sock)
 {
-    ssize_t status, response;
+    ssize_t status;
 
     // Populate command body
-    msg_t query;
+    msg_t query, response;
     query.command = QUERY_PLAYERS;
 
     // Send command
     info("Sending QUERY_PLAYERS...");
-    status = sock->send((void*) query, sizeof(msg_t));
+    status = sock->send((void*) &query, sizeof(msg_t));
 
     // Look for response
     status = sock->receive((void*) &response, sizeof(msg_t));
