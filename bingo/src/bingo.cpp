@@ -15,8 +15,11 @@
 #include "log.hpp"
 #include "bingo.hpp"
 #include "cmd.hpp"
+#include "constants.hpp"
 #include "client.hpp"
 #include "server.hpp"
+#include "input.hpp"
+#include "player.hpp"
 #include "peer.hpp"
 #include "input.hpp"
 
@@ -140,6 +143,59 @@ void getPeerInfo(char **name_ptr, char **ip_ptr, unsigned int *port_ptr)
     *port_ptr = (unsigned short) tmp;
 }
 
+/*
+ * Class Implementations
+ */
+
+/*********
+ * Bingo *
+ *********/
+
+/**
+ * Create a new Bingo
+ */
+Bingo::Bingo()
+{
+}
+
+/**
+ * Calls Numbers to Players until there is a Winner
+ */
+void Bingo::CallBingo(ClientSocket *sock)
+{
+    ssize_t n;
+    int value;
+    bool gameOver = false;
+
+    msg_t callMessage; 	// message for sending
+	msg_t playerResponse;		// message to receive ACK from player
+
+    while (!gameOver){
+        // Populating Call Message:
+        callMessage.command = BINGOCALL;
+		value = rand() % 10;
+		callMessage.clr_cmd_bingocals.bingoNumber = value;
+
+        // Calling number:
+		info("Calling %d...", value);
+		n = sock->send((void*) &callMessage, sizeof(msg_t));
+        // info("Sending %d bytes over socket...", n);
+
+        // Receiving ACK from player:
+		n = sock->receive((void*) &playerResponse, sizeof(msg_t));
+        // info("Receiving %d bytes over socket. Command Code: %d", n, playerResponse.commandCode);
+
+        // Confirming player feedback:
+		if (playerResponse.command == PLAYERACK)
+			info("Player ACK received.");
+		if (playerResponse.command == GAMEOVER){
+            info("GAMEOVER");
+            gameOver = true;
+        }
+    }
+}
+
+
 /**
  * Main runtime of bingo application
  */
@@ -180,6 +236,8 @@ int main(int argc, char **argv)
         exit(FAILURE);
     }
 
+    Bingo *bng = new Bingo();
+
     /****************
      * REGISTRATION *
      ****************/
@@ -189,6 +247,9 @@ int main(int argc, char **argv)
 
     // Create socket for communication with manager
     bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+
+    // Create socket for registration
+    ClientSocket *gameSetup_sock = new ClientSocket(mgr_ip, mgr_port);
 
     // Establish connection with manager
     info("Establishing connection with manager...");
@@ -210,6 +271,8 @@ int main(int argc, char **argv)
      * MENU *
      ********/
     int choice = -1;
+    int kValue = 1;
+    char *choice_str;
 
     // Forever get user's choice
     for ( ; ; ) {
@@ -219,15 +282,49 @@ int main(int argc, char **argv)
 
         // Decide what to do
         switch (choice) {
+            // Exit game
             case 0:
                 cprintf(stdout, BOLD, "Exit\n");
                 exit(SUCCESS);
                 break;  // <-- Here for aesthetic purposes :)
 
+            // Start a game
             case 1:
                 cprintf(stdout, BOLD, "Start Game\n");
+
+                // Establish connection with manager
+                info("Establishing connection with manager for Game Setup ...");
+                gameSetup_sock->start();
+
+                // Get user input
+                cprintf(stdout, BOLD, "Number of Players: ");
+                choice_str = read_line();
+
+                // Convert choice
+                errno = 0;
+                tmp = strtol(choice_str, NULL, 10);
+                while (errno != 0 || tmp == -1) {
+                    cprintf(stdout, BOLD, "Needs to be a positive integer!\n");
+                    cprintf(stdout, BOLD, "Number of Players: ");
+                    choice_str = read_line();
+                    errno = 0;
+                    tmp = strtol(choice_str, NULL, 10);
+                }
+                kValue = (int) tmp;
+
+                // Attempt to start game
+                bng->StartGame(gameSetup_sock, kValue);
+                bng->CheckStatus();
+
+                // Close connection with manager
+                info("Closing connection with manager...");
+                gameSetup_sock->stop();
+                delete gameSetup_sock;
+                gameSetup_sock = NULL;
+
                 break;
 
+            // Deregister player
             case 2:
                 // Check if player is registered
                 if (!me) {
@@ -240,7 +337,7 @@ int main(int argc, char **argv)
                 info("Establishing connection with manager...");
                 bingo_sock->start();
 
-                info("Attempting to register player \"%s\"...", me->getName().c_str());
+                info("Attempting to deregister player \"%s\"...", me->getName().c_str());
                 me->deregist(bingo_sock);
 
                 info("Closing connection to manager...");
@@ -249,6 +346,7 @@ int main(int argc, char **argv)
                 bingo_sock = NULL;
                 break;
 
+            // Any other choice
             default:
                 cprintf(stdout, BOLD, "No such choice on menu.\n");
                 break;
@@ -256,4 +354,114 @@ int main(int argc, char **argv)
     }
 
     return SUCCESS;
+}
+
+/**
+ * Listens to numbers until the game is over or player wins:
+ */
+void Bingo::PlayBingo(ServerSocket *sock)
+{
+    ssize_t n;
+    int inputCode;
+    int calledNumber;
+    bool gameOver = false;
+
+    Board gameBoard = Board();
+    gameBoard.printBoard();
+
+    msg_t inputMessage;
+    msg_t callerACK;
+    callerACK.command = PLAYERACK;
+
+    while (!gameOver){
+        // Listening:
+        n = sock->receive((void*) &inputMessage, sizeof(msg_t));
+        // info("Receiving %d bytes over socket. Command Code: %d", n, inputMessage.commandCode);
+        inputCode = inputMessage.command;
+
+        // Checking command code:
+        if (inputCode == BINGOCALL) {
+           calledNumber = inputMessage.clr_cmd_bingocals.bingoNumber;
+           info("Number Called: %d", calledNumber);
+
+           // Updating GameBoard:
+           gameBoard.markNumber(calledNumber);
+
+           // Checking for Win:
+           gameOver = gameBoard.checkWin();
+           if (gameOver){
+               gameBoard.printBoard();
+               gameOver = true;
+               callerACK.command = GAMEOVER;
+               n = sock->send((void*) &callerACK, sizeof(msg_t));
+               info("Sending GAMEOVER signal.");
+               // info("Sending GAMEOVER %d bytes over socket.", n);
+               return;
+           }
+
+           n = sock->send((void*) &callerACK, sizeof(msg_t));
+           info("Sending ACK to Caller.");
+           // info("Sending ACK %d bytes over socket.", n);
+        }
+   }// end of while
+}
+
+/**
+ * Sends START_GAME_K command to Manager and stores players:
+ */
+void Bingo::StartGame(ClientSocket *sock, int inputK)
+{
+    // Starting Game:
+    // Populating message body:
+    msg_t startGameCmd;
+    ssize_t n;
+    startGameCmd.command = START_GAME;
+    startGameCmd.clr_cmd_startgame.k = inputK;
+
+    // Sending 'Start game K' command:
+    info("Sending START_GAME %d...", inputK);
+    n = sock->send((void*) &startGameCmd, sizeof(msg_t));
+
+    // Receiving K Players:
+    string newIP, newName;
+    int newGameID, newPort;
+    msg_t callerACK;
+    callerACK.command = CALLERACK;
+    msg_t mgrResponse;
+
+    for (int i = 0; i < inputK; i++){
+        // startGameResponse response;
+        info("Looking for players...");
+        n = sock->receive((void*) &mgrResponse, sizeof(msg_t));
+        if (mgrResponse.command == FAILURE){
+            error("Not enough registered players!");
+            return;
+        }
+
+        newGameID = mgrResponse.mgr_rsp_startgame.gameID;
+        newIP = mgrResponse.mgr_rsp_startgame.playerIP;
+        newName = mgrResponse.mgr_rsp_startgame.playerName;
+        newPort = mgrResponse.mgr_rsp_startgame.playerPort;
+
+        info("Receiving player %s...", newName);
+        PlayerData tempPlayer(newName, newIP, newPort);
+        gamingPlayers.push_back(tempPlayer);
+        numberOfGamingPlayers ++;
+
+        // Sending ACK back to manager:
+        n = sock->send((void*) &callerACK, sizeof(msg_t));
+        info("ACK sent to manager.");
+    }
+
+    // Verifying gamingPlayers:
+
+
+}
+
+void Bingo::CheckStatus(){
+    info("Number of Gaming Players: %d", numberOfGamingPlayers);
+    info("Name:\tIP Address:\tPort:");
+    for (int i = 0; i < numberOfGamingPlayers; i ++){
+        info("%s\t%s\t%d", gamingPlayers[i].getName(), gamingPlayers[i].getIP(), gamingPlayers[i].getPort());
+    }
 }

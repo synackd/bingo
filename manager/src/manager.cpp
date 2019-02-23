@@ -46,10 +46,6 @@ int main(int argc, char **argv)
         exit(FAILURE);
     }
 
-    /******************************
-     * COMMUNICATING WITH CALLERS *
-     ******************************/
-
     // Create new manager object
     Manager *mgr = new Manager();
 
@@ -59,7 +55,7 @@ int main(int argc, char **argv)
 
     // Continuously listen for requests and decide what to
     // do based on data
-    int status;
+    int status, requestedK;
     ssize_t size = 0;
     msg_t data;
     for ( ; ; ) {
@@ -122,6 +118,21 @@ int main(int argc, char **argv)
 
                     break;
 
+                case START_GAME:
+                    info("Registered Players Count: %d", mgr->numberOfRegPlayers);
+                    requestedK = data.clr_cmd_startgame.k;
+
+                    if (requestedK <= mgr->numberOfRegPlayers){
+                        mgr->sendKPlayers(mgr_sock, data);
+                    } else {
+                        error("There are not enough registered players.");
+                        msg_t startGameFail;
+                        startGameFail.command = FAILURE;
+                        mgr_sock->send((void*) &startGameFail, sizeof(msg_t));
+                    }
+
+                    break;
+
                 // Anything else
                 default:
                     error("Unknown command received.");
@@ -148,13 +159,35 @@ int main(int argc, char **argv)
  */
 Manager::Manager()
 {
+    this->numberOfRegPlayers = 0;
 }
 
 /**
  * Send k players to caller that requested them
  */
-void Manager::sendKPlayers()
+void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
 {
+    int numberOfPlayersToSend = data.clr_cmd_startgame.k;
+    msg_t response;
+
+    info("START_GAME command received.");
+    info("Sending %d players to caller...", numberOfPlayersToSend);
+    for (int i = 0; i < numberOfPlayersToSend; i++){
+        // TODO: Randomize game id (have a global counter?)
+        response.mgr_rsp_startgame.gameID = 1;
+        strcpy(response.mgr_rsp_startgame.playerName, registeredPlayers[i].getName().c_str());
+        strcpy(response.mgr_rsp_startgame.playerIP, registeredPlayers[i].getIP().c_str());
+        response.mgr_rsp_startgame.playerPort = registeredPlayers[i].getPort();
+
+        // Send player data back to caller
+        info("Sending Player: GameID = %d\tIP = %s\tPort = %d", response.mgr_rsp_startgame.gameID, response.mgr_rsp_startgame.playerIP, response.mgr_rsp_startgame.playerPort);
+        sock->send((void*) &response, sizeof(msg_t));
+
+        // Waiting for ACK
+        sock->receive((void*) &data, sizeof(msg_t));
+        if (data.command == CALLERACK)
+            printf("Caller ACK received.\n");
+    }
 }
 
 /**
@@ -171,6 +204,7 @@ int Manager::registerPlayer(string name, string ip, unsigned int port)
     // If not, add player
     PlayerData newPlayer(name, ip, port);
     registeredPlayers.push_back(newPlayer);
+    numberOfRegPlayers++;
 
     return SUCCESS;
 }

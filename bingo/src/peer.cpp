@@ -125,6 +125,9 @@ void Board::setCalled(int row, int column, bool value)
     this->values[row][column].setCalled(value);
 }
 
+/**
+ * Check board if there is a bingo
+ */
 bool Board::checkWin()
 {
     bool winnerRow, winnerColumn;
@@ -135,7 +138,7 @@ bool Board::checkWin()
         for (int column = 0; column < 3; column++){
             // Looking for not called number
             if (values[row][column].isCalled() == false){
-                // cout << "row " << row << " not completed\n";
+                // info("Row %d not completed.", row);
                 winnerRow = false;
             }
         }
@@ -246,19 +249,19 @@ unsigned int Player::getPort()
 {
     return this->port;
 }
+
 /**
  * Player listens for Numbers called by Caller
  */
 // TODO: Make this object oriented using ClientSocket...
 void Player::listenBingo()
 {
-
 }
 
 /**
  * Registers to Manager for future games
  */
-void Player::registerToManager(ClientSocket *sock)
+void Player::regist(ClientSocket *sock)
 {
     ssize_t size = 0;
 

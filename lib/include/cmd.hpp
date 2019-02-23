@@ -7,8 +7,9 @@
 #ifndef _CMD_HPP_
 #define _CMD_HPP_
 
-#include "constants.hpp"
 #include <string>
+#include "constants.hpp"
+
 using namespace std;
 
 //****************
@@ -43,6 +44,7 @@ using namespace std;
 
 // Player-Caller codes
 
+
 //***********************
 //* Payload Definitions *
 //***********************
@@ -66,7 +68,7 @@ typedef struct {
  * 'register' command.
  */
 typedef struct {
-    int ret_code;   /**< Return code of the previously sent 'register command */
+    int ret_code;   /**< Return code of the previously sent 'register' command */
 } mgr_rsp_register_t;
 
 /*
@@ -89,6 +91,42 @@ typedef struct {
     int ret_code;   /**< Return code of the sent 'deregister' command */
 } mgr_rsp_deregister_t;
 
+/*
+ * START GAME
+ */
+
+/**
+ * Bingo Call command
+ */
+typedef struct clr_cmd_bingocall_t {
+    int bingoNumber;    /**< The number being called (e.g. 'B7') */
+} clr_cmd_bingocall_t;
+
+/**
+ * Player response to Bingo Call
+ */
+typedef struct ply_rsp_bingocall_t {
+    int ret_code;       /**< Return code from caller for bingo call */
+} ply_rsp_bingocall_t;
+
+/**
+ * Start Game command
+ */
+typedef struct clr_cmd_startgame_t {
+    int k;              /**< Number of players requested for new bingo game */
+} clr_cmd_startgame_t;
+
+/**
+ * Manager's response to Start Game command
+ */
+typedef struct {
+    int gameID;                 /**< New game's ID (if started) */
+    int playersLeft;            /**< Sentinel for caller to know how many responses left */
+    char playerIP[BUFMAX];      /**< Player's default IP address */
+    char playerName[BUFMAX];    /**< Player's name */
+    unsigned int playerPort;    /**< Player's default port */
+} mgr_rsp_startgame_t;
+
 /*****************************
  * GENERIC PAYLOAD STRUCTURE *
  *****************************/
@@ -105,9 +143,17 @@ typedef struct {
         mgr_cmd_register_t mgr_cmd_register;    /**< Register player command data */
         mgr_rsp_register_t mgr_rsp_register;    /**< Register player response data */
 
-        /* Deregister command/resoonse */
+        /* Deregister command/response */
         mgr_cmd_deregister_t mgr_cmd_deregister;    /**< Deregister player command data */
         mgr_rsp_deregister_t mgr_rsp_deregister;    /**< Deregister player response data */
+
+        /* Calling command/response (caller-player) */
+        clr_cmd_bingocall_t clr_cmd_bingocals;  /**< Bingo Call command data */
+        ply_rsp_bingocall_t ply_rsp_bingocall;  /**< Player response to Bingo Call data */
+
+        /* Start game command/response */
+        clr_cmd_startgame_t clr_cmd_startgame;  /**< Caller Start Command data */
+        mgr_rsp_startgame_t mgr_rsp_startgame;  /**< Manager REsponse to StartGame command */
     };
 } msg_t;
 
