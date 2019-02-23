@@ -185,6 +185,7 @@ void Bingo::callBingo(ClientSocket *sock)
     while (!gameOver){
         // Populating Call Message:
         callMessage.command = BINGOCALL;
+        srand(time(NULL));
 		value = rand() % 10;
 		callMessage.clr_cmd_bingocals.bingoNumber = value;
 
