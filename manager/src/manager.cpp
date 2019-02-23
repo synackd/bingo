@@ -202,13 +202,13 @@ int Manager::sendAllPlayers(ServerSocket *sock, msg_t data)
     info("Sending %d players to caller...", numberOfPlayersToSend);
     for (int i = numberOfPlayersToSend; i > 0; i++) {
         // Populate response
-        response.players_left = i - 1;
+        response.mgr_rsp_queryplayers.players_left = i - 1;
         strncpy(response.mgr_rsp_queryplayers.name, registeredPlayers[i-1].getName().c_str(), BUFMAX);
         strncpy(response.mgr_rsp_queryplayers.ip, registeredPlayers[i-1].getIP().c_str(), BUFMAX);
         response.mgr_rsp_queryplayers.port = registeredPlayers[i-1].getPort();
 
         // Send response
-        info("Sending player \"%s\": IP: %s\tPort: %d", response.mgr_rsp_startgame.name, response.mgr_rsp_startgame.ip, response.mgr_rsp_startgame.port);
+        info("Sending player \"%s\": IP: %s\tPort: %d", response.mgr_rsp_queryplayers.name, response.mgr_rsp_queryplayers.ip, response.mgr_rsp_queryplayers.port);
         sock->send((void*) &response, sizeof(msg_t));
 
         // Wait for ACK
