@@ -12,7 +12,7 @@ using namespace std;
 void info(const char *fmt, ...)
 {
     va_list vaList;
-    cprintf(stdout, BOLD, "[PLR] ");
+    cprintf(stdout, BOLD, "[GEN] ");
     va_start(vaList, fmt);
     vfprintf(stdout, fmt, vaList);
     va_end(vaList);
@@ -26,9 +26,22 @@ void info(const char *fmt, ...)
 void error(const char *fmt, ...)
 {
     va_list vaList;
-    cprintf(stderr, BOLD, "[PLR][ERR] ");
+    cprintf(stderr, BOLD, "[GEN][ERR] ");
     va_start(vaList, fmt);
     vfprintf(stderr, fmt, vaList);
     va_end(vaList);
     fprintf(stderr, "\n");
+}
+
+/**
+ * Log a message to a log file
+ */
+void log(FILE *file, const char *fmt, ...)
+{
+    va_list vaList;
+    fprintf(file, "[GEN] ");
+    va_start(vaList, fmt);
+    vfprintf(file, fmt, vaList);
+    va_end(vaList);
+    fprintf(file, "\n");
 }
