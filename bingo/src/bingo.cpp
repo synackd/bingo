@@ -284,7 +284,7 @@ int main(int argc, char **argv)
     getPeerInfo(&p_name, &p_ip, &p_port);
 
     // Create socket for registration
-    bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+    bingo_sock = new ClientSocket(mgr_ip, mgr_port, true);
 
     // Establish connection with manager
     info("Establishing connection with manager...");
@@ -342,7 +342,7 @@ int main(int argc, char **argv)
                 cprintf(stdout, BOLD, "Start Game\n");
 
                 // Establish connection with manager
-                bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port, true);
                 info("Establishing connection with manager for Game Setup ...");
                 bingo_sock->start();
 
@@ -383,7 +383,7 @@ int main(int argc, char **argv)
                     // Create socket for player
                     info("Creating socket for player \"%s\"...", caller_bingo->gamingPlayers[i].getName().c_str());
                     info("IP: %s\t Port: %d", caller_bingo->gamingPlayers[i].getIP().c_str(), caller_bingo->gamingPlayers[i].getPort());
-                    tmp_sock = new ClientSocket(caller_bingo->gamingPlayers[i].getIP(), caller_bingo->gamingPlayers[i].getPort());
+                    tmp_sock = new ClientSocket(caller_bingo->gamingPlayers[i].getIP(), caller_bingo->gamingPlayers[i].getPort(), true);
                     caller_bingo->player_socks.push_back(tmp_sock);
                 }
 
@@ -402,7 +402,7 @@ int main(int argc, char **argv)
                     break;
                 }
 
-                bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port, true);
 
                 info("Establishing connection with manager...");
                 bingo_sock->start();
@@ -424,7 +424,7 @@ int main(int argc, char **argv)
                     break;
                 }
 
-                bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port, true);
 
                 info("Establishing connection with manager...");
                 bingo_sock->start();
@@ -447,7 +447,7 @@ int main(int argc, char **argv)
                 cprintf(stdout, BOLD, "Query Players\n");
 
                 // Connect to manager
-                bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port, true);
                 info("Establishing connection with manager...");
                 bingo_sock->start();
 
@@ -748,7 +748,7 @@ void Bingo::checkStatus(){
 unsigned int Bingo::negotiateGameplayPort(PlayerData player, unsigned int inputCallerGamePort){
 
     // Initializing socket to talk to default player socket:
-    ClientSocket *playerSocket = new ClientSocket(player.getIP(), player.getPort());
+    ClientSocket *playerSocket = new ClientSocket(player.getIP(), player.getPort(), true);
     playerSocket->start();
 
     ssize_t n;
