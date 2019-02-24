@@ -18,14 +18,6 @@
 using namespace std;
 
 /*
- * Functions
- */
-void getPeerInfo(char **name_ptr, char **ip_ptr, unsigned int *port_ptr);
-void printMenu(void);
-int getChoice(void);
-void listen(void);
-
-/*
  * Class Prototypes
  */
 
@@ -44,5 +36,14 @@ class Bingo{
         unsigned int negotiateGameplayPort(PlayerData player, unsigned int inputCallerGamePort);
         bool checkRepeatedValue(int value, vector<int>list, int listSize);
 };
+
+/*
+ * Functions
+ */
+void getPeerInfo(char **name_ptr, char **ip_ptr, unsigned int *port_ptr);
+void printMenu(void);
+int getChoice(void);
+void listen(void);
+void play(unsigned int port, Bingo *game);
 
 #endif
