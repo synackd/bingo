@@ -26,11 +26,12 @@ class Bingo
     public:
         int numberOfGamingPlayers;
         vector<PlayerData> gamingPlayers;
+        vector<ClientSocket> player_socks;
 
         // TODO: These methods need implementation
         Bingo(void);
         bool call(ClientSocket sock, int num);
-        void callBingo(vector<ClientSocket> player_socks);
+        void callBingo(void);
         void playBingo(ServerSocket *sock);
         void startGame(ClientSocket *sock, int inputK, Caller *currentPlayer);
         void queryPlayers(ClientSocket *sock);
