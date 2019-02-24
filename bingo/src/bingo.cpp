@@ -305,6 +305,8 @@ int main(int argc, char **argv)
     char *choice_str;
     msg_t data;
     msg_t handshakeResponse;
+    Bingo *caller_bingo;
+    Caller *caller_me;
 
     // Forever get user's choice
     for ( ; ; ) {
@@ -352,8 +354,9 @@ int main(int argc, char **argv)
                 kValue = (int) tmp;
 
                 // Starting game:
-                /*Bingo *caller_bingo = new Bingo();
-                caller_bingo->startGame(bingo_sock, kValue, me);
+                caller_me = new Caller(me->getName(), me->getIP(), me->getPort());
+                caller_bingo = new Bingo();
+                caller_bingo->startGame(bingo_sock, kValue, caller_me);
                 caller_bingo->checkStatus();
 
                 info("Closing connection with manager...");
@@ -362,7 +365,7 @@ int main(int argc, char **argv)
                 bingo_sock = NULL;
 
                 // TODO: Actual negotiation
-                info("Negotiating gameplay port numbers...");
+                /*info("Negotiating gameplay port numbers...");
                 for (int i = 0; i < caller_bingo->numberOfGamingPlayers; i++){
                     remote_playerIP = bng->gamingPlayers[i].getIP();
                     remote_playerGamePort = bng->negotiateGameplayPort(bng->gamingPlayers[i], me->getPort());
@@ -480,6 +483,32 @@ bool Bingo::checkRepeatedValue(int value, vector<int>list, int listSize){
 }
 
 /**
+ * Call a number to a player; return true if there is a winner
+ */
+bool Bingo::call(ClientSocket *sock, int num)
+{
+    msg_t call_msg, call_rsp;
+    ssize_t size;
+
+    // Populate call
+    call_msg.command = BINGOCALL;
+    call_msg.clr_cmd_bingocals.bingoNumber = num;
+
+    // Send call to player
+    info("Calling %d...", num);
+    size = sock->send((void*) &call_msg, sizeof(msg_t));
+
+    // Receive ACK from player
+    size = sock->receive((void*) &call_rsp, sizeof(msg_t));
+
+    // Check for winner
+    if (call_rsp.command == GAMEOVER)
+        return true;
+    else
+        return false;
+}
+
+/**
  * Calls Numbers to Players until there is a Winner
  */
 void Bingo::callBingo(ClientSocket *sock)
@@ -508,24 +537,10 @@ void Bingo::callBingo(ClientSocket *sock)
         calledNumbers.push_back(value);
         calledNumbersCount ++;
 
-        // Populating message:
-		callMessage.clr_cmd_bingocals.bingoNumber = value;
-
-        // Calling number:
-		info("Calling %d", value);
-		n = sock->send((void*) &callMessage, sizeof(msg_t));
-
-        // Receiving ACK from player:
-		n = sock->receive((void*) &playerResponse, sizeof(msg_t));
-
-        // Confirming player feedback:
-		// if (playerResponse.command == PLAYERACK)
-			// cout << "Player ACK received.\n";
-		if (playerResponse.command == GAMEOVER){
+		if (call(sock, value)){
             info("GAMEOVER");
             gameOver = true;
             // Send GAMEOVER signal to players PENDING!!!!!!!!!!!!!!!!!!
-
         }
     }
 }
@@ -582,7 +597,7 @@ void Bingo::playBingo(ServerSocket *sock)
 /**
  * Sends START_GAME_K command to Manager and stores players:
  */
-void Bingo::startGame(ClientSocket *sock, int inputK, Player *currentPlayer)
+void Bingo::startGame(ClientSocket *sock, int inputK, Caller *currentPlayer)
 {
     // Starting Game:
     // Populating message body:
@@ -727,7 +742,7 @@ unsigned int Bingo::negotiateGameplayPort(PlayerData player, unsigned int inputC
     info("Received %d bytes from socket.", n);
 
     playerGamePort = playerResponse.port_handshake.gamePort;
-    cout << "Received PlayerGamePort: " << playerGamePort << "\n";
+    info("Received player's new game port: %d", playerGamePort);
     info("Closing connection with manager...");
     playerSocket->stop();
     delete playerSocket;
