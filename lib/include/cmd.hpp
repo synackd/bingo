@@ -35,6 +35,7 @@ using namespace std;
 #define BINGOCALL       8
 #define PLAYERACK       9
 #define GAMEOVER        10
+#define PORT_HANDSHAKE  11
 
 /*
  * "Meta" codes defined by project
@@ -113,7 +114,9 @@ typedef struct ply_rsp_bingocall_t {
  * Start Game command
  */
 typedef struct clr_cmd_startgame_t {
-    int k;              /**< Number of players requested for new bingo game */
+    int k;                  /**< Number of players requested for new bingo game */
+    char callerIP[BUFMAX];  /**< Caller's IP address */
+    int callerPort;         /**< Caller's port */
 } clr_cmd_startgame_t;
 
 /**
@@ -126,6 +129,13 @@ typedef struct {
     char playerName[BUFMAX];    /**< Player's name */
     unsigned int playerPort;    /**< Player's default port */
 } mgr_rsp_startgame_t;
+
+/**
+ * New port negotiation data
+ */
+typedef struct port_handshake_t {
+    unsigned int gamePort;      /**< New pprt to negotiate */
+} port_handshake_t;
 
 /*
  * QUERY PLAYERS
@@ -168,6 +178,7 @@ typedef struct {
         /* Start game command/response */
         clr_cmd_startgame_t clr_cmd_startgame;  /**< Caller Start Command data */
         mgr_rsp_startgame_t mgr_rsp_startgame;  /**< Manager Response to startGame command */
+        port_handshake_t port_handshake;        /**< Port negotiation information */
 
         /* Query players response */
         mgr_rsp_queryplayers_t mgr_rsp_queryplayers;    /**< Manager response to Query Players command */
