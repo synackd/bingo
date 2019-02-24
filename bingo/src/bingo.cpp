@@ -207,6 +207,7 @@ void listener(Bingo *bng)
                     info("Gameplay!");
 
                     // Spawn new thread for new game
+
                     Bingo *new_game = new Bingo();
                     thread *player_thread = new thread(play, next_port, new_game);
                     break;
@@ -239,6 +240,8 @@ int main(int argc, char **argv)
     /****************
      * HOUSEKEEPING *
      ****************/
+
+     srand(time(NULL)); // help randomize the board values
 
     // Arg checking.
     if (argc != 3) {
@@ -528,7 +531,6 @@ void Bingo::callBingo()
     bool gameOver = false;
     vector<int>calledNumbers;
     int calledNumbersCount = 0;
-    srand(time(NULL));
 
     msg_t callMessage; 	    // message for sending
 	msg_t playerResponse;	// message to receive ACK from player
@@ -582,6 +584,7 @@ void Bingo::playBingo(ServerSocket *sock)
     int inputCode;
     int calledNumber;
     bool gameOver = false;
+    // srand(time(NULL));
 
     Board gameBoard = Board();
     gameBoard.printBoard();
