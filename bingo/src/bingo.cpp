@@ -312,6 +312,7 @@ int main(int argc, char **argv)
     msg_t handshakeResponse;
     Bingo *caller_bingo;
     Caller *caller_me;
+    ClientSocket *tmp_sock;
 
     // Forever get user's choice
     for ( ; ; ) {
@@ -379,8 +380,8 @@ int main(int argc, char **argv)
                     // Create socket for player
                     info("Creating socket for player \"%s\"...", caller_bingo->gamingPlayers[i].getName().c_str());
                     info("IP: %s\t Port: %d", caller_bingo->gamingPlayers[i].getIP().c_str(), caller_bingo->gamingPlayers[i].getPort());
-                    ClientSocket sock(caller_bingo->gamingPlayers[i].getIP(), caller_bingo->gamingPlayers[i].getPort());
-                    caller_bingo->player_socks.push_back(sock);
+                    tmp_sock = new ClientSocket(caller_bingo->gamingPlayers[i].getIP(), caller_bingo->gamingPlayers[i].getPort());
+                    caller_bingo->player_socks.push_back(tmp_sock);
                 }
 
                 info("GAMEPLAY!");
@@ -494,7 +495,7 @@ bool Bingo::checkRepeatedValue(int value, vector<int>list, int listSize){
 /**
  * Call a number to a player; return true if there is a winner
  */
-bool Bingo::call(ClientSocket sock, int num)
+bool Bingo::call(ClientSocket *sock, int num)
 {
     msg_t call_msg, call_rsp;
     ssize_t size;
@@ -505,10 +506,10 @@ bool Bingo::call(ClientSocket sock, int num)
 
     // Send call to player
     info("Calling %d...", num);
-    size = sock.send((void*) &call_msg, sizeof(msg_t));
+    size = sock->send((void*) &call_msg, sizeof(msg_t));
 
     // Receive ACK from player
-    size = sock.receive((void*) &call_rsp, sizeof(msg_t));
+    size = sock->receive((void*) &call_rsp, sizeof(msg_t));
 
     // Check for winner
     if (call_rsp.command == GAMEOVER)
@@ -534,7 +535,7 @@ void Bingo::callBingo()
 
     // Start sockets
     for (size_t i = 0; i < player_socks.size(); ++i) {
-        player_socks[i].start();
+        player_socks[i]->start();
     }
 
     while (!gameOver){
@@ -563,7 +564,7 @@ void Bingo::callBingo()
 
     // Stop sockets
     for (size_t i = 0; i < player_socks.size(); ++i) {
-        player_socks[i].stop();
+        player_socks[i]->stop();
     }
 }
 
