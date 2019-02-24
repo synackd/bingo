@@ -535,7 +535,11 @@ void Bingo::callBingo()
 
     // Start sockets
     for (size_t i = 0; i < player_socks.size(); ++i) {
-        player_socks[i]->start();
+        // Wait until player has set up their socket
+        do {
+            errno = 0;
+            player_socks[i]->start();
+        } while (errno != 0);
     }
 
     while (!gameOver){
