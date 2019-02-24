@@ -35,7 +35,7 @@ char mgr_ip[BUFMAX];        /**< Holds the manager's IP address */
 unsigned int mgr_port;      /**< Holds the manager's port */
 vector<Player> *players;    /**< List of in-game players */
 Game *myGame;               /**< This peer's game */
-Player *me;                 /**< Holds this peer's player data */
+Peer *me;                    /**< Holds this peer's player data */
 
 
 /**
@@ -255,7 +255,7 @@ int main(int argc, char **argv)
     bingo_sock->start();
 
     // Create player
-    me = new Player(p_name, p_ip, p_port);
+    me = new Peer(p_name, p_ip, p_port);
 
     // Attempt to register player with manager
     me->regist(bingo_sock);

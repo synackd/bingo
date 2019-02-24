@@ -13,24 +13,52 @@ using namespace std;
  * Class Prototypes
  */
 
-class Player {
-    private:
+/**
+ * Represents a base class for Player and Caller
+ */
+class Peer
+{
+    protected:
         bool registered;
         string name;
         string ip;
         unsigned int port;
-        ClientSocket *sock;
 
     public:
-        Player(string inputName, string inputIP, unsigned int inputPort);
+        Peer(string inputName, string inputIP, unsigned int inputPort);
         string to_string(void);
         string getName(void);
         string getIP(void);
-        bool isRegistered(void);
         unsigned int getPort(void);
-        void listenBingo(void);
+        bool isRegistered(void);
+        int setPort(unsigned int newPort);
         int regist(ClientSocket *sock);
         int deregist(ClientSocket *sock);
+};
+
+/**
+ * The player in the bingo game which listens for
+ * numbers called by the Caller
+ */
+class Player: public Peer
+{
+    public:
+        Player(string inputName, string inputIP, unsigned int inputPort): Peer(inputName, inputIP, inputPort) {}
+        string to_string(void);
+        void listenBingo(void);
+};
+
+/**
+ * The caller of the bingo game which calls numbers
+ * for the Players
+ */
+class Caller: public Peer
+{
+    public:
+        Caller(string inputName, string inputIP, unsigned int inputPort): Peer(inputName, inputIP, inputPort) {}
+        void call(int sockfd);
+        void startGame(void);
+        void printBoard(void);
 };
 
 /**
@@ -81,13 +109,5 @@ class Board {
         bool isCalled(int row, int column);
 };
 
-
-class Caller{
-    public:
-        Caller(void);
-        void call(int sockfd);
-        void startGame(void);
-        void printBoard(void);
-};
 
 #endif
