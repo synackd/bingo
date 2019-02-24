@@ -160,7 +160,6 @@ void listener(Bingo *bng)
     // After registration, creating socket for listening for new games:
     info("Listening on default port %d for starting games...", me->getPort());
     ServerSocket *listener_sock = new ServerSocket(me->getPort());  // For listening on default port
-    ServerSocket *player1_callerSocket;     // For listening on new, negotiated port for player
     int status = listener_sock->start();
 
     // Make sure socket starts
@@ -172,9 +171,10 @@ void listener(Bingo *bng)
     unsigned int remote_callerGamePort;
 
     // Listen for invitations to other games
+    ssize_t size;
     msg_t data, handshakeResponse;
     while (true) {
-        if (listener_sock->receive((void*) &data, sizeof(msg_t)) > 0) {
+        if ((size = listener_sock->receive((void*) &data, sizeof(msg_t))) != 0) {
             switch (data.command) {
                 // Negotiate new port for game communication
                 case PORT_HANDSHAKE:
@@ -208,6 +208,9 @@ void listener(Bingo *bng)
                     thread *player_thread = new thread(play, next_port, new_game);
                     break;
             }
+        } else {
+            listener_sock->stop();
+            listener_sock->start();
         }
     }
 }

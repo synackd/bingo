@@ -141,6 +141,7 @@ ssize_t ServerSocket::receive(void* data, size_t size)
     if (bytes < 0) {
         cprintf(stderr, BOLD, "[SRV][ERR] ");
         fprintf(stderr, "read() failed: %s\n", strerror(errno));
+        errno = CANNOTREAD;
     }
 
     return bytes;
