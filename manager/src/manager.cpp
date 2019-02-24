@@ -14,6 +14,7 @@
 #include "player.hpp"
 #include "cmd.hpp"
 #include "server.hpp"
+#include "constants.hpp"
 
 /**
  * Main runtime of manager application.
@@ -23,6 +24,7 @@ int main(int argc, char **argv)
     /*****************
      * HOUSECLEANING *
      *****************/
+     srand(time(NULL)); // Randomize
 
     // Arg checking.
     if (argc != 2) {
@@ -130,10 +132,13 @@ int main(int argc, char **argv)
                     if (requestedK <= mgr->numberOfRegPlayers){
                         mgr->sendKPlayers(mgr_sock, data);
 
-                        // Saving Game Details:
+                        // Saving Caller Details:
                         Player *inputCaller = new Player("caller", data.clr_cmd_startgame.callerIP, data.clr_cmd_startgame.callerPort);
                         Game *newGame = new Game(newGameID, requestedK, inputCaller);
+
+                        // UPdating gameList and number of games:
                         mgr->gameList.push_back(*newGame);
+                        mgr->numberOfGames++;
 
                     } else {
                         error("There are not enough registered players.");
@@ -180,11 +185,31 @@ Manager::Manager()
     this->numberOfRegPlayers = 0;
 }
 
+bool Manager::checkUsedIDs(int newID, vector<Game> list, int size){
+    for (int i = 0; i < size; i ++){
+        if (newID == list[i].getID())
+            return true;
+    }
+    return false;
+}
+
+int Manager::generateGameID(){
+    // Assuming gameIDs between 0-10:
+    int newID = rand() & 10;
+    while (this->checkUsedIDs(newID, this->gameList, this->numberOfGames)){
+        newID = rand() & 10;
+    }
+
+    return newID;
+}
+
+
 /**
  * Send k players to caller that requested them
  */
 void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
 {
+    int gameID = this->generateGameID();
     int numberOfPlayersToSend = data.clr_cmd_startgame.k;
     msg_t response;
 
@@ -192,7 +217,7 @@ void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
     info("Sending %d players to caller...", numberOfPlayersToSend);
     for (int i = 0; i < numberOfPlayersToSend; i++){
         // TODO: Randomize game id (have a global counter?)
-        response.mgr_rsp_startgame.gameID = 1;
+        response.mgr_rsp_startgame.gameID = gameID;
         strcpy(response.mgr_rsp_startgame.playerName, registeredPlayers[i].getName().c_str());
         strcpy(response.mgr_rsp_startgame.playerIP, registeredPlayers[i].getIP().c_str());
         response.mgr_rsp_startgame.playerPort = registeredPlayers[i].getPort();

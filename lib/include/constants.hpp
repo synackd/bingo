@@ -9,6 +9,7 @@
 
 #define BUFMAX          100  /**< Maximum buffer size for strings */
 #define INPUT_BUFSIZE   1024 /**< Maximum buffer size for user input */
+#define GAMESMAX        10
 
 //****************
 //* Return Codes *
