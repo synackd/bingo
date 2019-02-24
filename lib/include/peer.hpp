@@ -44,7 +44,7 @@ class Game {
         vector<Player> playersList;
 
     public:
-        Game(int inputGameID, int inputK, Player *inputCaller);
+        Game(int inputGameID, int inputK, Player *inputCaller);        
         void addPlayer(Player inputPlayer);
 };
 

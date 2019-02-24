@@ -27,7 +27,7 @@ class Manager {
     public:
         int numberOfRegPlayers;
         vector<PlayerData> registeredPlayers;
-        // vector<Game> gameList;
+        vector<Game> gameList;
 
         Manager(void);
         void sendKPlayers(ServerSocket *sock, msg_t data);

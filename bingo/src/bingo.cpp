@@ -485,14 +485,14 @@ void Bingo::callBingo(ClientSocket *sock)
 		callMessage.clr_cmd_bingocals.bingoNumber = value;
 
         // Calling number:
-		cout << "Calling " << value << "\n";
+		info("Calling %d", value);
 		n = sock->send((void*) &callMessage, sizeof(msg_t));
 
         // Receiving ACK from player:
 		n = sock->receive((void*) &playerResponse, sizeof(msg_t));
 
         // Confirming player feedback:
-		if (playerResponse.command == PLAYERACK)
+		// if (playerResponse.command == PLAYERACK)
 			// cout << "Player ACK received.\n";
 		if (playerResponse.command == GAMEOVER){
             info("GAMEOVER");

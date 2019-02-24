@@ -124,16 +124,16 @@ int main(int argc, char **argv)
                 case START_GAME:
                     info("Registered Players Count: %d", mgr->numberOfRegPlayers);
                     requestedK = data.clr_cmd_startgame.k;
-                    cout << "Received Caller: " << data.clr_cmd_startgame.callerIP << "\t : " << data.clr_cmd_startgame.callerPort << "\n";
+                    info("Received Caller: %s\t %d", data.clr_cmd_startgame.callerIP, data.clr_cmd_startgame.callerPort);
 
                     // Checking if there are enought registered players:
                     if (requestedK <= mgr->numberOfRegPlayers){
                         mgr->sendKPlayers(mgr_sock, data);
 
                         // Saving Game Details:
-
-                        // Game *newGame = new Game(newGameID, requestedK, )
-
+                        Player *inputCaller = new Player("caller", data.clr_cmd_startgame.callerIP, data.clr_cmd_startgame.callerPort);
+                        Game *newGame = new Game(newGameID, requestedK, inputCaller);
+                        mgr->gameList.push_back(*newGame);
 
                     } else {
                         error("There are not enough registered players.");
@@ -157,7 +157,7 @@ int main(int argc, char **argv)
             }
         } else {
             // Restart socket
-            cout << "Restarting socket.\n";
+            info("Restarting socket");
             mgr_sock->stop();
             mgr_sock->start();
         }
