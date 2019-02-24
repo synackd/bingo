@@ -29,8 +29,8 @@ class Bingo
 
         // TODO: These methods need implementation
         Bingo(void);
-        bool call(ClientSocket *sock, int num);
-        void callBingo(ClientSocket *sock);
+        bool call(ClientSocket sock, int num);
+        void callBingo(vector<ClientSocket> player_socks);
         void playBingo(ServerSocket *sock);
         void startGame(ClientSocket *sock, int inputK, Caller *currentPlayer);
         void queryPlayers(ClientSocket *sock);

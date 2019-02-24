@@ -55,6 +55,8 @@ class Player: public Peer
 class Caller: public Peer
 {
     public:
+        vector<Player> players;
+
         Caller(string inputName, string inputIP, unsigned int inputPort): Peer(inputName, inputIP, inputPort) {}
         void call(int sockfd);
         void startGame(void);
