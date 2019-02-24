@@ -74,7 +74,7 @@ class Game {
         vector<Player> playersList;
 
     public:
-        Game(int inputGameID, int inputK, Player *inputCaller);        
+        Game(int inputGameID, int inputK, Player *inputCaller);
         void addPlayer(Player inputPlayer);
 };
 
@@ -103,6 +103,7 @@ class Board {
 
     public:
         Board(void);
+        bool checkUsedValue(int value, vector<int>list, int listSize);
         void markNumber(int calledValue);
         bool checkWin(void);
         void printBoard(void);
