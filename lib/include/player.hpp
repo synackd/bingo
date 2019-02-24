@@ -10,14 +10,14 @@ class PlayerData {
     private:
         string name;
         string ip;
-        int port;
+        unsigned int port;
 
     public:
         PlayerData(string inputName, string inputIP, int inputPort);
         string to_string(void);
         string getName(void);
         string getIP(void);
-        int getPort(void);
+        unsigned int getPort(void);
         void setName(string newName){
             name = newName;
         }
@@ -26,7 +26,7 @@ class PlayerData {
             ip = newIP;
         }
 
-        void setPort(int newPort){
+        void setPort(unsigned int newPort){
             port = newPort;
         }
 };

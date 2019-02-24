@@ -18,30 +18,35 @@
 using namespace std;
 
 /*
- * Functions
- */
-void getPeerInfo(char **name_ptr, char **ip_ptr, unsigned int *port_ptr);
-void printMenu(void);
-int getChoice(void);
-
-/*
  * Class Prototypes
  */
 
-class Bingo{
+class Bingo
+{
     public:
         int numberOfGamingPlayers;
         vector<PlayerData> gamingPlayers;
+        vector<ClientSocket*> player_socks;
 
         // TODO: These methods need implementation
         Bingo(void);
-        void callBingo(ClientSocket *sock);
+        bool call(ClientSocket *sock, int num);
+        void callBingo(void);
         void playBingo(ServerSocket *sock);
-        void startGame(ClientSocket *sock, int inputK, Player *currentPlayer);
+        void startGame(ClientSocket *sock, int inputK, Caller *currentPlayer);
         void queryPlayers(ClientSocket *sock);
         void checkStatus();
         unsigned int negotiateGameplayPort(PlayerData player, unsigned int inputCallerGamePort);
         bool checkRepeatedValue(int value, vector<int>list, int listSize);
 };
+
+/*
+ * Functions
+ */
+void getPeerInfo(char **name_ptr, char **ip_ptr, unsigned int *port_ptr);
+void printMenu(void);
+int getChoice(void);
+void listen(void);
+void play(unsigned int port, Bingo *game);
 
 #endif

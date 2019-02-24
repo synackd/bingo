@@ -6,6 +6,7 @@
 
 #include <errno.h>
 #include <string.h>
+#include "constants.hpp"
 #include "colors.hpp"
 #include "server.hpp"
 
@@ -43,6 +44,7 @@ ServerSocket::ServerSocket(unsigned short port)
     if (bind(this->sockfd, (struct sockaddr*) &this->srvAddr, sizeof(this->srvAddr)) < 0) {
         cprintf(stderr, BOLD, "[SRV][ERR] ");
         fprintf(stderr, "bind() failed: %s\n", strerror(errno));
+        errno = CANNOTBIND;
         return;
     }
     cprintf(stdout, BOLD, "[SRV] ");
@@ -55,6 +57,7 @@ ServerSocket::ServerSocket(unsigned short port)
     if (listen(this->sockfd, BACKLOG) < 0) {
         cprintf(stderr, BOLD, "[SRV][ERR] ");
         fprintf(stderr, "listen() failed: %s\n", strerror(errno));
+        errno = CANNOTLISTEN;
         return;
     }
 }
@@ -81,15 +84,16 @@ int ServerSocket::start(void)
     if (this->sockfd == 0) {
         cprintf(stderr, BOLD, "[SRV][ERR] ");
         fprintf(stderr, "No socket to listen on!\n");
-        return -1;
+        return FAILURE;
     }
 
     /* Start accepting connections */
     this->cliAddrLen = sizeof(this->cliAddr);
     this->connfd = accept(this->sockfd, (struct sockaddr*) &this->cliAddr, &cliAddrLen);
     if (this->connfd < 0) {
-        cprintf(stdout, BOLD, "[SRV] ");
-        fprintf(stdout, "accept() failed: %s\n", strerror(errno));
+        cprintf(stderr, BOLD, "[SRV][ERR] ");
+        fprintf(stderr, "accept() failed: %s\n", strerror(errno));
+        return FAILURE;
     }
 
     /* Return connection file descriptor */
@@ -137,6 +141,7 @@ ssize_t ServerSocket::receive(void* data, size_t size)
     if (bytes < 0) {
         cprintf(stderr, BOLD, "[SRV][ERR] ");
         fprintf(stderr, "read() failed: %s\n", strerror(errno));
+        errno = CANNOTREAD;
     }
 
     return bytes;

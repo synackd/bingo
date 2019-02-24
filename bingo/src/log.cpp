@@ -32,3 +32,16 @@ void error(const char *fmt, ...)
     va_end(vaList);
     fprintf(stderr, "\n");
 }
+
+/**
+ * Log a message to a log file
+ */
+void log(FILE *file, const char *fmt, ...)
+{
+    va_list vaList;
+    fprintf(file, "[PLR] ");
+    va_start(vaList, fmt);
+    vfprintf(file, fmt, vaList);
+    va_end(vaList);
+    fprintf(file, "\n");
+}

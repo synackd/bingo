@@ -6,6 +6,7 @@
 
 #include <string.h>
 #include <errno.h>
+#include "constants.hpp"
 #include "colors.hpp"
 #include "client.hpp"
 
@@ -68,6 +69,7 @@ int ClientSocket::start(void)
     if (status < 0) {
         cprintf(stderr, BOLD, "[CLI][ERR] ");
         fprintf(stderr, "connect() failed: %s\n", strerror(errno));
+        errno = CANNOTCONN;
     }
 
     return status;
@@ -114,6 +116,7 @@ ssize_t ClientSocket::receive(void* data, size_t size)
     if (bytes < 0) {
         cprintf(stderr, BOLD, "[CLI][ERR] ");
         fprintf(stderr, "read() failed: %s\n", strerror(errno));
+        errno = CANNOTREAD;
     }
 
     return bytes;
@@ -149,6 +152,7 @@ ssize_t ClientSocket::send(void* data, size_t size)
     if (bytes < 0) {
         cprintf(stderr, BOLD, "[CLI][ERR] ");
         fprintf(stderr, "write() failed: %s\n", strerror(errno));
+        errno = CANNOTWRITE;
     }
 
     return bytes;

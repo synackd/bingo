@@ -170,13 +170,6 @@ void Board::printBoard()
  **********/
 
 /**
- * Create a new caller
- */
-Caller::Caller()
-{
-}
-
-/**
  * Calls numbers to players
  */
 // TODO: Make this object oriented with ServerSocket...
@@ -191,14 +184,14 @@ void Caller::startGame()
 {
 }
 
-/**********
- * Player *
- **********/
+/********
+ * Peer *
+ ********/
 
 /**
- * Store player's information
+ * Store peer's information
  */
-Player::Player(string inputName, string inputIP, unsigned int inputPort)
+Peer::Peer(string inputName, string inputIP, unsigned int inputPort)
 {
     this->name = inputName;
     this->ip = inputIP;
@@ -207,11 +200,11 @@ Player::Player(string inputName, string inputIP, unsigned int inputPort)
 }
 
 /**
- * Return string of player's information
+ * Return string of peer's information
  */
-string Player::to_string()
+string Peer::to_string()
 {
-    string str = "Player Name: ";
+    string str = "Peer Name: ";
     str += this->name;
     str += "\tPlayer IP: ";
     str += this->ip;
@@ -221,41 +214,46 @@ string Player::to_string()
 }
 
 /**
- * Getter for player's name
+ * Getter for peer's name
  */
-string Player::getName()
+string Peer::getName()
 {
     return this->name;
 }
 
 /**
- * Getter for player's IP address
+ * Getter for peer's IP address
  */
-string Player::getIP()
+string Peer::getIP()
 {
     return this->ip;
 }
 
 /**
- * Getter for player's port
+ * Getter for peer's port
  */
-unsigned int Player::getPort()
+unsigned int Peer::getPort()
 {
     return this->port;
 }
 
 /**
- * Player listens for Numbers called by Caller
+ * Setter for peer's port
  */
-// TODO: Make this object oriented using ClientSocket...
-void Player::listenBingo()
+int Peer::setPort(unsigned int newPort)
 {
+    if (1 <= newPort && newPort <= 65535) {
+        this->port = newPort;
+        return SUCCESS;
+    } else {
+        return FAILURE;
+    }
 }
 
 /**
  * Registers to Manager for future games
  */
-int Player::regist(ClientSocket *sock)
+int Peer::regist(ClientSocket *sock)
 {
     ssize_t size = 0;
 
@@ -291,9 +289,9 @@ int Player::regist(ClientSocket *sock)
 }
 
 /**
- * Deregister player from manager
+ * Deregister peer from manager
  */
-int Player::deregist(ClientSocket *sock)
+int Peer::deregist(ClientSocket *sock)
 {
     ssize_t size = 0;
 
@@ -327,9 +325,35 @@ int Player::deregist(ClientSocket *sock)
 }
 
 /**
- * Check if a player is registered
+ * Check if a peer is registered
  */
-bool Player::isRegistered()
+bool Peer::isRegistered()
 {
     return this->registered;
+}
+
+/**********
+ * Player *
+ **********/
+
+/**
+ * Return string of player's information
+ */
+string Player::to_string()
+{
+    string str = "Player Name: ";
+    str += this->name;
+    str += "\tPlayer IP: ";
+    str += this->ip;
+    str += "\tPort: ";
+    str += std::to_string(this->port);
+    return str;
+}
+
+/**
+ * Player listens for Numbers called by Caller
+ */
+// TODO: Make this object oriented using ClientSocket...
+void Player::listenBingo()
+{
 }
