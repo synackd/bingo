@@ -156,6 +156,14 @@ void getPeerInfo(char **name_ptr, char **ip_ptr, unsigned int *port_ptr)
 }
 
 /**
+ * The runtime of the listener thread that is created
+ * after the player registers
+ */
+void listen()
+{
+}
+
+/**
  * Main runtime of bingo application
  */
 int main(int argc, char **argv)
