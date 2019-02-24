@@ -12,12 +12,6 @@
 
 using namespace std;
 
-//****************
-//* Return Codes *
-//****************
-#define FAILURE        -1   /**< The command failed to complete successfully */
-#define SUCCESS         0   /**< The command completed successfully */
-
 //*****************
 //* Command Codes *
 //*****************

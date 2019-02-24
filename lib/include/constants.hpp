@@ -10,4 +10,10 @@
 #define BUFMAX          100  /**< Maximum buffer size for strings */
 #define INPUT_BUFSIZE   1024 /**< Maximum buffer size for user input */
 
+//****************
+//* Return Codes *
+//****************
+#define FAILURE        -1   /**< The command failed to complete successfully */
+#define SUCCESS         0   /**< The command completed successfully */
+
 #endif

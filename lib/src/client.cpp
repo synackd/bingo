@@ -6,6 +6,7 @@
 
 #include <string.h>
 #include <errno.h>
+#include "constants.hpp"
 #include "colors.hpp"
 #include "client.hpp"
 

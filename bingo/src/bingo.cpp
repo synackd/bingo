@@ -162,7 +162,13 @@ void listener(Bingo *bng)
     info("Listening on default port %d for starting games...", me->getPort());
     ServerSocket *listener_sock = new ServerSocket(me->getPort());  // For listening on default port
     ServerSocket *player1_callerSocket;     // For listening on new, negotiated port for player
-    listener_sock->start();
+    int status = listener_sock->start();
+
+    // Make sure socket starts
+    if (status == FAILURE) {
+        error("Could not start socket!");
+        return;
+    }
 
     unsigned int remote_callerGamePort, local_playerGamePort = 7500;
 

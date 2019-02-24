@@ -6,6 +6,7 @@
 
 #include <errno.h>
 #include <string.h>
+#include "constants.hpp"
 #include "colors.hpp"
 #include "server.hpp"
 
@@ -81,15 +82,16 @@ int ServerSocket::start(void)
     if (this->sockfd == 0) {
         cprintf(stderr, BOLD, "[SRV][ERR] ");
         fprintf(stderr, "No socket to listen on!\n");
-        return -1;
+        return FAILURE;
     }
 
     /* Start accepting connections */
     this->cliAddrLen = sizeof(this->cliAddr);
     this->connfd = accept(this->sockfd, (struct sockaddr*) &this->cliAddr, &cliAddrLen);
     if (this->connfd < 0) {
-        cprintf(stdout, BOLD, "[SRV] ");
-        fprintf(stdout, "accept() failed: %s\n", strerror(errno));
+        cprintf(stderr, BOLD, "[SRV][ERR] ");
+        fprintf(stderr, "accept() failed: %s\n", strerror(errno));
+        return FAILURE;
     }
 
     /* Return connection file descriptor */
