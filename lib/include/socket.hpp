@@ -31,6 +31,7 @@ class Socket
     protected:
         int sockfd;     /**< File descriptor of socket */
         int connfd;     /**< File descriptor of connection */
+        bool verbose;   /**< Whether to print to stdout */
 };
 
 #endif
