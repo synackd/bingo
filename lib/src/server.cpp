@@ -44,6 +44,7 @@ ServerSocket::ServerSocket(unsigned short port)
     if (bind(this->sockfd, (struct sockaddr*) &this->srvAddr, sizeof(this->srvAddr)) < 0) {
         cprintf(stderr, BOLD, "[SRV][ERR] ");
         fprintf(stderr, "bind() failed: %s\n", strerror(errno));
+        errno = CANNOTBIND;
         return;
     }
     cprintf(stdout, BOLD, "[SRV] ");
@@ -56,6 +57,7 @@ ServerSocket::ServerSocket(unsigned short port)
     if (listen(this->sockfd, BACKLOG) < 0) {
         cprintf(stderr, BOLD, "[SRV][ERR] ");
         fprintf(stderr, "listen() failed: %s\n", strerror(errno));
+        errno = CANNOTLISTEN;
         return;
     }
 }
