@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "log.hpp"
 #include "peer.hpp"
 #include "cmd.hpp"
@@ -205,6 +206,23 @@ void Board::printBoard()
             cout << to_string(this->getValue(row, column)) << "\t";
         }
         cout << "\n";
+    }
+}
+
+/**
+ * Log the bingo board to a file
+ */
+void Board::logBoard(FILE *fp)
+{
+    log(fp, "|| BINGO BOARD ||");
+    for (int row = 0; row < 5; row++){
+        for (int column = 0; column < 5; column++){
+            char *str = (char*) malloc(BUFMAX*sizeof(char));
+            strcpy(str, to_string(this->getValue(row, column)).c_str());
+            strcat(str, "\t");
+            fprintf(fp, str);
+        }
+        log(fp, "");
     }
 }
 

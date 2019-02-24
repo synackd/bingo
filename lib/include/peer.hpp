@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <stdio.h>
 #include "client.hpp"
 #include "player.hpp"
 // #include "bingo.hpp"
@@ -110,6 +111,7 @@ class Board {
         void markNumber(int calledValue);
         bool checkWin(void);
         void printBoard(void);
+        void logBoard(FILE *fp);
         int getValue(int row, int column);
         void setCalled(int row, int column, bool value);
         bool isCalled(int row, int column);

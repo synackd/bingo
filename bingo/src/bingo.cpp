@@ -157,14 +157,21 @@ void getPeerInfo(char **name_ptr, char **ip_ptr, unsigned int *port_ptr)
  */
 void listener(Bingo *bng)
 {
+    // Open log file
+    FILE *listen_fp = fopen("listener.txt", "w+");
+    if (!listen_fp) {
+        error("Could not open listener log file!");
+        return;
+    }
+
     // After registration, creating socket for listening for new games:
-    info("Listening on default port %d for starting games...", me->getPort());
+    log(listen_fp, "Listening on default port %d for starting games...", me->getPort());
     ServerSocket *listener_sock = new ServerSocket(me->getPort(), false);  // For listening on default port
     int status = listener_sock->start();
 
     // Make sure socket starts
     if (status == FAILURE) {
-        error("Could not start socket!");
+        log(listen_fp, "Could not start socket!");
         return;
     }
 
@@ -183,7 +190,7 @@ void listener(Bingo *bng)
 
                     // Extract caller's port
                     unsigned int remote_callerGamePort = data.port_handshake.gamePort;
-                    info("Caller's game port received: %d", remote_callerGamePort);
+                    log(listen_fp, "Caller's game port received: %d", remote_callerGamePort);
 
                     // Find the next available port
                     ServerSocket *game_sock;                // Socket for testing availability
@@ -201,10 +208,10 @@ void listener(Bingo *bng)
                     // Send new port back to caller:
                     handshakeResponse.command = PORT_HANDSHAKE;
                     handshakeResponse.port_handshake.gamePort = next_port;
-                    info("Sending game port to caller: %d", next_port);
+                    log(listen_fp, "Sending game port to caller: %d", next_port);
                     listener_sock->send((void*) &handshakeResponse, sizeof(msg_t));
 
-                    info("Gameplay!");
+                    log(listen_fp, "Gameplay!");
 
                     // Spawn new thread for new game
 
@@ -217,6 +224,8 @@ void listener(Bingo *bng)
             listener_sock->start();
         }
     }
+
+    fclose(listen_fp);
 }
 
 /**
@@ -224,12 +233,24 @@ void listener(Bingo *bng)
  */
 void play(unsigned int port, Bingo *game)
 {
+    // Open log file
+    char *name = (char*) malloc((BUFMAX+11)*sizeof(char));
+    sprintf(name, "player-%s.txt", me->getName().c_str());
+    FILE *play_fp = fopen(name, "w+");
+    if (!play_fp) {
+        error("Could not open player log file for player \"%s\"!", me->getName().c_str());
+        return;
+    }
+
     // Create socket with negotiated port
     ServerSocket *game_sock = new ServerSocket(port, false);
     game_sock->start();
 
     // Play Bingo with caller
-    game->playBingo(game_sock);
+    game->playBingo(game_sock, play_fp);
+
+    // Close log file
+    fclose(play_fp);
 }
 
 /**
@@ -578,7 +599,7 @@ void Bingo::callBingo()
 /**
  * Listens to numbers until GAMEOVER:
  */
-void Bingo::playBingo(ServerSocket *sock)
+void Bingo::playBingo(ServerSocket *sock, FILE *fp)
 {
     ssize_t n;
     int inputCode;
@@ -587,7 +608,7 @@ void Bingo::playBingo(ServerSocket *sock)
     // srand(time(NULL));
 
     Board gameBoard = Board();
-    gameBoard.printBoard();
+    gameBoard.logBoard(fp);
 
     msg_t inputMessage;
     msg_t callerACK;
@@ -602,7 +623,7 @@ void Bingo::playBingo(ServerSocket *sock)
         // Checking command code:
         if (inputCode == BINGOCALL) {
            calledNumber = inputMessage.clr_cmd_bingocals.bingoNumber;
-           info("Number Called: %d", calledNumber);
+           log(fp, "Number called: %d", calledNumber);
 
            // Updating GameBoard:
            gameBoard.markNumber(calledNumber);
@@ -610,11 +631,11 @@ void Bingo::playBingo(ServerSocket *sock)
            // Checking for Win:
            gameOver = gameBoard.checkWin();
            if (gameOver){
-               gameBoard.printBoard();
+               gameBoard.logBoard(fp);
                gameOver = true;
                callerACK.command = GAMEOVER;
                n = sock->send((void*) &callerACK, sizeof(msg_t));
-               info("Sending GAMEOVER signal.");
+               log(fp, "Sending GAMEOVER signal.");
                // info("Sending GAMEOVER %d bytes over socket.", n);
                return;
            }
