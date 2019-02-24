@@ -170,7 +170,7 @@ void listener(Bingo *bng)
         return;
     }
 
-    unsigned int remote_callerGamePort, local_playerGamePort = 7500;
+    unsigned int remote_callerGamePort;
 
     msg_t data, handshakeResponse;
     while (true) {
@@ -182,14 +182,14 @@ void listener(Bingo *bng)
 
                     // Sending default port back to caller:
                     handshakeResponse.command = PORT_HANDSHAKE;
-                    handshakeResponse.port_handshake.gamePort = local_playerGamePort;
-                    info("Sending gamePort to caller: %d", local_playerGamePort);
+                    handshakeResponse.port_handshake.gamePort = me->getPort();
+                    info("Sending gamePort to caller: %d", me->getPort());
                     listener_sock->send((void*) &handshakeResponse, sizeof(msg_t));
 
                     info("Gameplay!");
 
                     // Creating socket to listen to caller:
-                    player1_callerSocket = new ServerSocket(local_playerGamePort);
+                    player1_callerSocket = new ServerSocket(me->getPort());
                     player1_callerSocket->start();
                     bng->playBingo(player1_callerSocket);
                     break;
@@ -281,15 +281,12 @@ int main(int argc, char **argv)
     msg_t handshakeResponse;
 
     // Caller Gameplay variables:
-    unsigned int local_callerGamePort = 7500; // TEMPORARY!
     int remote_playerGamePort;
     string remote_playerIP;
     ClientSocket *caller_player1Socket;
 
     // Player Gameplay variables:
-    unsigned int remote_callerGamePort;
     string remote_callerIP;
-    unsigned int local_playerGamePort = 7600;
     ServerSocket *player1_callerSocket;
 
     // Forever get user's choice
@@ -350,7 +347,7 @@ int main(int argc, char **argv)
                 info("Negotiating gameplay port numbers...");
                 for (int i = 0; i < bng->numberOfGamingPlayers; i++){
                     remote_playerIP = bng->gamingPlayers[i].getIP();
-                    remote_playerGamePort = bng->negotiateGameplayPort(bng->gamingPlayers[i], local_callerGamePort);
+                    remote_playerGamePort = bng->negotiateGameplayPort(bng->gamingPlayers[i], me->getPort());
                 }
 
                 info("GAMEPLAY!");
