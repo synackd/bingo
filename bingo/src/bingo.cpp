@@ -277,8 +277,6 @@ int main(int argc, char **argv)
     unsigned int defaultPlayerPort = p_port;
     char *choice_str;
     string defaultPlayerIP = p_ip;
-    ServerSocket *default_sock = new ServerSocket(defaultPlayerPort);
-    // ServerSocket *gameplay_sock = new ServerSocket()
     msg_t data;
     msg_t handshakeResponse;
 
