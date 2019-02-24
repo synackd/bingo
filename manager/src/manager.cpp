@@ -185,6 +185,9 @@ Manager::Manager()
     this->numberOfRegPlayers = 0;
 }
 
+/**
+ * Return true if an ID is taken
+ */
 bool Manager::checkUsedIDs(int newID, vector<Game> list, int size){
     for (int i = 0; i < size; i ++){
         if (newID == list[i].getID())
