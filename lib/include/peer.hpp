@@ -76,6 +76,7 @@ class Game {
     public:
         Game(int inputGameID, int inputK, Player *inputCaller);
         void addPlayer(Player inputPlayer);
+        int getID();
 };
 
 /*

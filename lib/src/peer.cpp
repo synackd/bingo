@@ -26,6 +26,13 @@ void Game::addPlayer(Player inputPlayer)
     this->playersList.push_back(inputPlayer);
 }
 
+/**
+ * Return this game's UID
+ */
+int Game::getID(){
+    return this->id;
+}
+
 /********
  * Cell *
  ********/

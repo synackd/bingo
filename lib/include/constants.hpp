@@ -7,8 +7,9 @@
 #ifndef _CONSTANTS_HPP_
 #define _CONSTANTS_HPP_
 
-#define BUFMAX          100  /**< Maximum buffer size for strings */
-#define INPUT_BUFSIZE   1024 /**< Maximum buffer size for user input */
+#define BUFMAX          100     /**< Maximum buffer size for strings */
+#define INPUT_BUFSIZE   1024    /**< Maximum buffer size for user input */
+#define GAMESMAX        10      /**< Maximum number of games at a time */
 
 //****************
 //* Return Codes *
