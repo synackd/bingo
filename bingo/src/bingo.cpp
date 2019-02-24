@@ -536,6 +536,7 @@ void Bingo::callBingo()
     // Start sockets
     for (size_t i = 0; i < player_socks.size(); ++i) {
         // Wait until player has set up their socket
+        info("Waiting for player \"%s\"...", gamingPlayers[i].getName().c_str());
         do {
             errno = 0;
             player_socks[i]->start();
