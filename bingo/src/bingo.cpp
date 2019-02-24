@@ -161,6 +161,7 @@ void listener(Bingo *bng)
     FILE *listen_fp = fopen("listener.txt", "w+");
     if (!listen_fp) {
         error("Could not open listener log file!");
+        fclose(listen_fp);
         return;
     }
 
@@ -172,10 +173,15 @@ void listener(Bingo *bng)
     // Make sure socket starts
     if (status == FAILURE) {
         log(listen_fp, "Could not start socket!");
+        fclose(listen_fp);
         return;
     }
 
     unsigned int remote_callerGamePort;
+
+    // Close log file to write everything
+    fclose(listen_fp);
+    listen_fp = 0;
 
     // Listen for invitations to other games
     ssize_t size;
@@ -185,6 +191,14 @@ void listener(Bingo *bng)
             switch (data.command) {
                 // Negotiate new port for game communication
                 case PORT_HANDSHAKE:
+                    // Reopen log file for writing
+                    listen_fp = fopen("listener.txt", "w+");
+                    if (!listen_fp) {
+                        error("Could not open listener log file!");
+                        fclose(listen_fp);
+                        return;
+                    }
+
                     // Create a new player
                     Player *new_player = new Player(me->getName(), me->getIP(), me->getPort());
 
@@ -193,17 +207,27 @@ void listener(Bingo *bng)
                     log(listen_fp, "Caller's game port received: %d", remote_callerGamePort);
 
                     // Find the next available port
+                    log(listen_fp, "Finding next available port...");
                     ServerSocket *game_sock;                // Socket for testing availability
                     unsigned int next_port = me->getPort(); // Current default port
                     do {
+                        // Reset socket if exists
+                        if (game_sock) {
+                            delete game_sock;
+                            game_sock = NULL;
+                        }
+
                         // Test the next port
                         next_port = (next_port + 1) % 65535;
                         errno = 0;
                         game_sock = new ServerSocket(next_port, false);
-                        delete game_sock;
                     } while(errno != 0);
 
+                    // Get rid of temp socket
+                    delete game_sock;
                     game_sock = NULL;
+
+                    log(listen_fp, "Next available port found: %d", next_port);
 
                     // Send new port back to caller:
                     handshakeResponse.command = PORT_HANDSHAKE;
@@ -217,6 +241,10 @@ void listener(Bingo *bng)
 
                     Bingo *new_game = new Bingo();
                     thread *player_thread = new thread(play, next_port, new_game);
+
+                    // Reclose log file to write everything
+                    fclose(listen_fp);
+
                     break;
             }
         } else {
