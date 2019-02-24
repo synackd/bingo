@@ -80,14 +80,35 @@ int Cell::getValue()
  * Board *
  *********/
 
+ bool Board::checkUsedValue(int value, vector<int>list, int listSize){
+     for (int i = 0; i < listSize; i ++){
+         if (value == list[i])
+             return true;
+     }
+     return false;
+ }
+
 /**
  * Create a new bingo board
  */
 Board::Board()
 {
-    for (int row = 0; row < 5; row++){
-        for (int column = 0; column < 5; column++){
-            this->values[row][column] = Cell(row*5 + column);
+    int value;
+    vector<int>usedNumbers;
+    int usedNumbersCount = 0;
+
+
+    for (int column = 0; column < 5; column++){
+        for (int row = 0; row < 5; row++){
+
+            value = (rand() % 15) + 15*column;
+            while (checkUsedValue(value, usedNumbers, usedNumbersCount)){
+                value = (rand() % 15) + 15*column;
+            }
+            this->values[row][column] = value;
+
+            usedNumbers.push_back(value);
+            usedNumbersCount++;
         }
     }
 }
@@ -138,9 +159,9 @@ bool Board::checkWin()
     bool winnerRow, winnerColumn;
 
     // Checking rows:
-    for (int row = 0; row < 3; row++){
+    for (int row = 0; row < 5; row++){
         winnerRow = true;   // Assuming row is completed
-        for (int column = 0; column < 3; column++){
+        for (int column = 0; column < 5; column++){
             // Looking for not called number
             if (values[row][column].isCalled() == false){
                 // info("Row %d not completed.", row);

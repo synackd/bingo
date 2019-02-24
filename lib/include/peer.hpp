@@ -104,6 +104,7 @@ class Board {
 
     public:
         Board(void);
+        bool checkUsedValue(int value, vector<int>list, int listSize);
         void markNumber(int calledValue);
         bool checkWin(void);
         void printBoard(void);
