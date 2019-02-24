@@ -155,60 +155,6 @@ void getPeerInfo(char **name_ptr, char **ip_ptr, unsigned int *port_ptr)
     *port_ptr = (unsigned short) tmp;
 }
 
-/*
- * Class Implementations
- */
-
-/*********
- * Bingo *
- *********/
-
-/**
- * Create a new Bingo
- */
-Bingo::Bingo()
-{
-}
-
-/**
- * Calls Numbers to Players until there is a Winner
- */
-void Bingo::callBingo(ClientSocket *sock)
-{
-    ssize_t n;
-    int value;
-    bool gameOver = false;
-
-    msg_t callMessage; 	// message for sending
-	msg_t playerResponse;		// message to receive ACK from player
-
-    while (!gameOver){
-        // Populating Call Message:
-        callMessage.command = BINGOCALL;
-        srand(time(NULL));
-		value = rand() % 10;
-		callMessage.clr_cmd_bingocals.bingoNumber = value;
-
-        // Calling number:
-		info("Calling %d...", value);
-		n = sock->send((void*) &callMessage, sizeof(msg_t));
-        // info("Sending %d bytes over socket...", n);
-
-        // Receiving ACK from player:
-		n = sock->receive((void*) &playerResponse, sizeof(msg_t));
-        // info("Receiving %d bytes over socket. Command Code: %d", n, playerResponse.commandCode);
-
-        // Confirming player feedback:
-		if (playerResponse.command == PLAYERACK)
-			info("Player ACK received.");
-		if (playerResponse.command == GAMEOVER){
-            info("GAMEOVER");
-            gameOver = true;
-        }
-    }
-}
-
-
 /**
  * Main runtime of bingo application
  */
@@ -284,6 +230,7 @@ int main(int argc, char **argv)
     int choice = -1;
     int kValue = 1;
     unsigned int defaultPlayerPort = p_port;
+    char *choice_str;
     string defaultPlayerIP = p_ip;
     ServerSocket *default_sock = new ServerSocket(defaultPlayerPort);
     // ServerSocket *gameplay_sock = new ServerSocket()
@@ -349,8 +296,8 @@ int main(int argc, char **argv)
                 kValue = (int) tmp;
 
                 // Starting game:
-                bng->StartGame(gameSetup_sock, kValue, newPlayer);
-                bng->CheckStatus();
+                bng->startGame(bingo_sock, kValue, me);
+                bng->checkStatus();
 
                 info("Closing connection with manager...");
                 bingo_sock->stop();
@@ -369,7 +316,7 @@ int main(int argc, char **argv)
                 caller_player1Socket->start();
 
                 // Calling numbers until GAMEOVER:
-                bng->CallBingo(caller_player1Socket);
+                bng->callBingo(caller_player1Socket);
 
                 break;
 
@@ -464,7 +411,7 @@ int main(int argc, char **argv)
                                 //Creating socket to listen to caller:
                                 player1_callerSocket = new ServerSocket(local_playerGamePort);
                                 player1_callerSocket->start();
-                                bng->PlayBingo(player1_callerSocket);
+                                bng->playBingo(player1_callerSocket);
                                 break;
                         }
                     }
@@ -508,7 +455,7 @@ bool Bingo::checkRepeatedValue(int value, vector<int>list, int listSize){
 /**
  * Calls Numbers to Players until there is a Winner
  */
-void Bingo::CallBingo(ClientSocket *sock)
+void Bingo::callBingo(ClientSocket *sock)
 {
     ssize_t n;
     int value;
@@ -603,7 +550,7 @@ void Bingo::playBingo(ServerSocket *sock)
            n = sock->send((void*) &callerACK, sizeof(msg_t));
         }
    }// end of while
-}// end of PlayBingo
+}// end of playBingo
 
 /**
  * Sends START_GAME_K command to Manager and stores players:
