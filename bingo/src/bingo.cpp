@@ -452,6 +452,59 @@ bool Bingo::checkRepeatedValue(int value, vector<int>list, int listSize){
     return false;
 }
 
+/*
+ * Class Implementations
+ */
+
+/*********
+ * Bingo *
+ *********/
+
+/**
+ * Create a new Bingo
+ */
+Bingo::Bingo()
+{
+}
+
+/**
+ * Calls Numbers to Players until there is a Winner
+ */
+void Bingo::callBingo(ClientSocket *sock)
+{
+    ssize_t n;
+    int value;
+    bool gameOver = false;
+
+    msg_t callMessage; 	// message for sending
+	msg_t playerResponse;		// message to receive ACK from player
+
+    while (!gameOver){
+        // Populating Call Message:
+        callMessage.command = BINGOCALL;
+		value = rand() % 10;
+		callMessage.clr_cmd_bingocals.bingoNumber = value;
+
+        // Calling number:
+		info("Calling %d...", value);
+		n = sock->send((void*) &callMessage, sizeof(msg_t));
+        // info("Sending %d bytes over socket...", n);
+
+        // Receiving ACK from player:
+		n = sock->receive((void*) &playerResponse, sizeof(msg_t));
+        // info("Receiving %d bytes over socket. Command Code: %d", n, playerResponse.commandCode);
+
+        // Confirming player feedback:
+		if (playerResponse.command == PLAYERACK)
+			info("Player ACK received.");
+		if (playerResponse.command == GAMEOVER){
+            info("GAMEOVER");
+            gameOver = true;
+        }
+    }
+}
+
+
 /**
  * Calls Numbers to Players until there is a Winner
  */
