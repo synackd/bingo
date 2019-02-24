@@ -365,13 +365,15 @@ int main(int argc, char **argv)
                 bingo_sock = NULL;
 
                 // Perform port negotiation with each player
-                info("Negotiating gameplay port numbers...");
-                for (int i = 0; i < caller_bingo->numberOfGamingPlayers; i++) {
+                info("Negotiating gameplay port numbers for %d players...", caller_bingo->gamingPlayers.size());
+                for (int i = 0; i < caller_bingo->gamingPlayers.size(); i++) {
                     // Set each player's new port for communication
-                    bng->gamingPlayers[i].setPort(bng->negotiateGameplayPort(bng->gamingPlayers[i], me->getPort()));
+                    info("Configuring port for player \"%s\"...", caller_bingo->gamingPlayers[i].getName());
+                    caller_bingo->gamingPlayers[i].setPort(caller_bingo->negotiateGameplayPort(caller_bingo->gamingPlayers[i], me->getPort()));
 
                     // Create socket for player
-                    ClientSocket *sock = new ClientSocket(bng->gamingPlayers[i].getIP(), bng->gamingPlayers[i].getPort());
+                    info("Creating socket for player \"%s\"...", caller_bingo->gamingPlayers[i].getName());
+                    ClientSocket *sock = new ClientSocket(caller_bingo->gamingPlayers[i].getIP(), caller_bingo->gamingPlayers[i].getPort());
                     player_socks.push_back(*sock);
                 }
 
@@ -640,16 +642,11 @@ void Bingo::startGame(ClientSocket *sock, int inputK, Caller *currentPlayer)
         info("Receiving player %s...", newName.c_str());
         PlayerData tempPlayer(newName, newIP, newPort);
         gamingPlayers.push_back(tempPlayer);
-        numberOfGamingPlayers++;
 
         // Sending ACK back to manager:
         n = sock->send((void*) &callerACK, sizeof(msg_t));
         info("ACK sent to manager.");
     }
-
-    // Verifying gamingPlayers:
-
-
 }
 
 /**
@@ -712,9 +709,9 @@ void Bingo::queryPlayers(ClientSocket *sock)
  * (Troubleshooting)
  */
 void Bingo::checkStatus(){
-    info("Number of Gaming Players: %d", numberOfGamingPlayers);
+    info("Number of Gaming Players: %d", this->gamingPlayers.size());
     info("Name:\tIP Address:\tPort:");
-    for (int i = 0; i < numberOfGamingPlayers; i ++){
+    for (int i = 0; i < this->gamingPlayers.size(); i ++){
         info("%s\t%s\t\t%d", gamingPlayers[i].getName().c_str(), gamingPlayers[i].getIP().c_str(), gamingPlayers[i].getPort());
     }
 }

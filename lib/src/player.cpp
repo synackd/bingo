@@ -36,7 +36,7 @@ string PlayerData::getIP()
 /**
  * Getter for player's port
  */
-int PlayerData::getPort()
+unsigned int PlayerData::getPort()
 {
     return this->port;
 }
