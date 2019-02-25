@@ -35,6 +35,7 @@ class Manager {
         int generateGameID();
         void sendKPlayers(ServerSocket *sock, msg_t data, Game *gameDetails);
         int sendAllPlayers(ServerSocket *sock);
+        int sendOngoingGames(ServerSocket *sock);
         int registerPlayer(string name, string ip, unsigned int port);
         int deregisterPlayer(string name);
 };

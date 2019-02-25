@@ -639,6 +639,7 @@ void Bingo::callBingo()
                 // Send GAMEOVER signal to players PENDING!!!!!!!!!!!!!!!!!!
             }
         }
+        sleep(1);
     }
 
     // Stop sockets
@@ -843,21 +844,41 @@ void Bingo::queryGames(ClientSocket *sock)
             info("Receiving games from manager...");
             //info("NAME\t\tIP\t\tPort");
 
-            // Print first player sent
-            //info("%s\t\t%s\t\t%d", response.mgr_rsp_queryplayers.name, response.mgr_rsp_queryplayers.ip, response.mgr_rsp_queryplayers.port);
-            response.mgr_rsp_querygames.game->printGameData();
+            // Print first game sent
+            info("Game ID:%d\t# Players: %d\tCaller:%s", response.mgr_rsp_querygames.uid, response.mgr_rsp_querygames.players_left+1, response.mgr_rsp_querygames.caller);
+            int players_left = response.mgr_rsp_querygames.players_left;
+            info("\tPlayer: %s", response.mgr_rsp_querygames.player);
+
+            while (players_left > 0) {
+                // Receive next player
+                sock->receive((void*) &response, sizeof(msg_t));
+
+                // Print player
+                info("\tPlayer: %s", response.mgr_rsp_querygames.player);
+
+                // See how many players are left
+                players_left = response.mgr_rsp_querygames.players_left;
+            }
 
             // Keep track of how many games are left to expect
             int games_left = response.mgr_rsp_querygames.games_left;
 
             // Receive the rest of the games
             while (games_left > 0) {
-                // Receive next game
-                sock->receive((void*) &response, sizeof(msg_t));
+                info("Game ID:%d\t# Players: %d\tCaller:%s", response.mgr_rsp_querygames.uid, response.mgr_rsp_querygames.players_left+1, response.mgr_rsp_querygames.caller);
+                int players_left = response.mgr_rsp_querygames.players_left;
+                info("\tPlayer: %s", response.mgr_rsp_querygames.player);
 
-                // Print game
-                //info("%s\t\t%s\t\t%d", response.mgr_rsp_queryplayers.name, response.mgr_rsp_queryplayers.ip, response.mgr_rsp_queryplayers.port);
-                response.mgr_rsp_querygames.game->printGameData();
+                while (players_left > 0) {
+                    // Receive next player
+                    sock->receive((void*) &response, sizeof(msg_t));
+
+                    // Print player
+                    info("\tPlayer: %s", response.mgr_rsp_querygames.player);
+
+                    // See how many players are left
+                    players_left = response.mgr_rsp_querygames.players_left;
+                }
 
                 // See how many players are left
                 games_left = response.mgr_rsp_querygames.games_left;

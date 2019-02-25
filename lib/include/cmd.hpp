@@ -154,8 +154,11 @@ typedef struct {
  * Query Games response from manager
  */
 typedef struct {
-    int games_left; /**< Sentinel for peer to know how many responses are left */
-    Game *game;     /**< Game object being returned */
+    int games_left;     /**< Sentinel for peer to know how many responses are left */
+    int players_left;   /**< Sentinel (per-game) to know how many players are left */
+    int uid;            /**< UID of current game */
+    char caller[BUFMAX];/**< Caller of game */
+    char player[BUFMAX];/**< Current player of game */
 } mgr_rsp_querygames_t;
 
 /*****************************

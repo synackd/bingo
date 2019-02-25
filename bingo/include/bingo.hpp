@@ -28,7 +28,6 @@ class Bingo
         vector<PlayerData> gamingPlayers;
         vector<ClientSocket*> player_socks;
 
-        // TODO: These methods need implementation
         Bingo(void);
         bool call(ClientSocket *sock, int num);
         void callBingo(void);
