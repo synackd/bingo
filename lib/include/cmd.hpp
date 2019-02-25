@@ -9,6 +9,7 @@
 
 #include <string>
 #include "constants.hpp"
+#include "peer.hpp"
 
 using namespace std;
 
@@ -145,6 +146,18 @@ typedef struct {
     unsigned int port;      /**< Player's default port */
 } mgr_rsp_queryplayers_t;
 
+/*
+ * QUERY GAMES
+ */
+
+/**
+ * Query Games response from manager
+ */
+typedef struct {
+    int games_left; /**< Sentinel for peer to know how many responses are left */
+    Game *game;     /**< Game object being returned */
+} mgr_rsp_querygames_t;
+
 /*****************************
  * GENERIC PAYLOAD STRUCTURE *
  *****************************/
@@ -176,6 +189,9 @@ typedef struct {
 
         /* Query players response */
         mgr_rsp_queryplayers_t mgr_rsp_queryplayers;    /**< Manager response to Query Players command */
+
+        /* Query games response */
+        mgr_rsp_querygames_t mgr_rsp_querygames;    /**< Manager response to Query Games command */
     };
 } msg_t;
 

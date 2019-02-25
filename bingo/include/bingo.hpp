@@ -35,6 +35,7 @@ class Bingo
         void playBingo(ServerSocket *sock, FILE *fp);
         void startGame(ClientSocket *sock, int inputK, Caller *currentPlayer);
         void queryPlayers(ClientSocket *sock);
+        void queryGames(ClientSocket *sock);
         void checkStatus();
         unsigned int negotiateGameplayPort(PlayerData player, unsigned int inputCallerGamePort);
         bool checkRepeatedValue(int value, vector<int>list, int listSize);
