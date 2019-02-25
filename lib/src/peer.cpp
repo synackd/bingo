@@ -37,6 +37,22 @@ int Game::getID()
 }
 
 /**
+ * Return number of players in game
+ */
+int Game::getPlayers()
+{
+    return this->playersList.size();
+}
+
+/**
+ * Return caller of the game
+ */
+Player *Game::getCaller()
+{
+    return this->gameCaller;
+}
+
+/**
  * Print specified game's data to stdout
  */
 void Game::printGameData()

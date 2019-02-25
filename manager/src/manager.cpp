@@ -158,6 +158,12 @@ int main(int argc, char **argv)
 
                     break;
 
+                case QUERY_GAMES:
+                    info("Number of ongoing games: %d", mgr->numberOfGames);
+                    mgr->sendOngoingGames(mgr_sock);
+
+                    break;
+
                 // Anything else
                 default:
                     error("Unknown command received.");
@@ -275,6 +281,46 @@ int Manager::sendAllPlayers(ServerSocket *sock)
     }
 
     return numberOfPlayersToSend;
+}
+
+/**
+ * Send all ongoing games to caller requesting them
+ */
+int Manager::sendOngoingGames(ServerSocket *sock)
+{
+    int numberOfGamesToSend = this->numberOfGames;
+    msg_t response;
+
+    info("QUERY_GAMES command received.");
+
+    // Check if there are any games
+    if (numberOfGamesToSend == 0) {
+        info("There are no ongoing games!");
+
+        // Populate response
+        response.command = FAILURE;
+
+        // Send response
+        sock->send((void*) &response, sizeof(msg_t));
+    } else {
+        info("Sending %d games to caller...", numberOfGamesToSend);
+        for (int i = numberOfGamesToSend; i > 0; i--) {
+            for (int j = 0; j < this->gameList[i].playersList.size(); j++) {
+                // Populate response
+                response.command = SUCCESS;
+                response.mgr_rsp_querygames.uid = this->gameList[i-1].getID();
+                response.mgr_rsp_querygames.games_left = i - 1;
+                response.mgr_rsp_querygames.players_left = j;
+                strncpy(response.mgr_rsp_querygames.player, this->gameList[i-1].playersList[j].getName().c_str(), BUFMAX);
+                strncpy(response.mgr_rsp_querygames.caller, this->gameList[i-1].getCaller()->getName().c_str(), BUFMAX);
+
+                // Send response
+                sock->send((void*) &response, sizeof(msg_t));
+            }
+        }
+    }
+
+    return numberOfGamesToSend;
 }
 
 /**

@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include "client.hpp"
 #include "player.hpp"
-// #include "bingo.hpp"
 
 using namespace std;
 
@@ -73,11 +72,15 @@ class Game {
         int id;
         int k;
         Player *gameCaller;
-        vector<PlayerData> playersList;
 
     public:
+        vector<PlayerData> playersList;
+
         Game(int inputGameID, int inputK, Player *inputCaller);
         int getID();
+        int getPlayers();
+        int numPlayers();
+        Player *getCaller();
         void addPlayer(PlayerData inputPlayer);
         void printGameData();
 };

@@ -66,6 +66,10 @@ void printMenu()
     cprintf(stdout, BOLD, "  4) ");
     fprintf(stdout, "Query Players\n");
 
+    // Query Games
+    cprintf(stdout, BOLD, "  5) ");
+    fprintf(stdout, "Query Games\n");
+
     fprintf(stdout, "\n");
 }
 
@@ -511,6 +515,25 @@ int main(int argc, char **argv)
 
                 break;
 
+            // Query games
+            case 5:
+                cprintf(stdout, BOLD, "Query Games\n");
+
+                // Connect to manager
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port, true);
+                info("Establishing connection with manager...");
+                bingo_sock->start();
+
+                // Attempt to query games
+                bng->queryGames(bingo_sock);
+
+                // Close connection with manager
+                info("Closing connection with manager...");
+                bingo_sock->stop();
+                delete bingo_sock;
+                bingo_sock = NULL;
+
+                break;
             // Any other choice
             default:
                 cprintf(stdout, BOLD, "No such choice on menu.\n");
@@ -616,6 +639,7 @@ void Bingo::callBingo()
                 // Send GAMEOVER signal to players PENDING!!!!!!!!!!!!!!!!!!
             }
         }
+        sleep(1);
     }
 
     // Stop sockets
@@ -790,6 +814,82 @@ void Bingo::checkStatus(){
     }
 }
 
+/**
+ * Query all ongoing games from manager and print them
+ */
+void Bingo::queryGames(ClientSocket *sock)
+{
+    ssize_t status;
+
+    // Populate command body
+    msg_t query;
+    query.command = QUERY_GAMES;
+
+    // Initialize response
+    msg_t response;
+
+    // Send command
+    info("Sending QUERY_GAMES...");
+    status = sock->send((void*) &query, sizeof(msg_t));
+
+    // Look for response
+    status = sock->receive((void*) &response, sizeof(msg_t));
+
+    // Decide what to do
+    if (status > 0) {
+        // Failure
+        if (response.command == FAILURE) {
+            error("No ongoing games!");
+        } else if (response.command == SUCCESS) {
+            info("Receiving games from manager...");
+            //info("NAME\t\tIP\t\tPort");
+
+            // Print first game sent
+            info("Game ID:%d\t# Players: %d\tCaller:%s", response.mgr_rsp_querygames.uid, response.mgr_rsp_querygames.players_left+1, response.mgr_rsp_querygames.caller);
+            int players_left = response.mgr_rsp_querygames.players_left;
+            info("\tPlayer: %s", response.mgr_rsp_querygames.player);
+
+            while (players_left > 0) {
+                // Receive next player
+                sock->receive((void*) &response, sizeof(msg_t));
+
+                // Print player
+                info("\tPlayer: %s", response.mgr_rsp_querygames.player);
+
+                // See how many players are left
+                players_left = response.mgr_rsp_querygames.players_left;
+            }
+
+            // Keep track of how many games are left to expect
+            int games_left = response.mgr_rsp_querygames.games_left;
+
+            // Receive the rest of the games
+            while (games_left > 0) {
+                info("Game ID:%d\t# Players: %d\tCaller:%s", response.mgr_rsp_querygames.uid, response.mgr_rsp_querygames.players_left+1, response.mgr_rsp_querygames.caller);
+                int players_left = response.mgr_rsp_querygames.players_left;
+                info("\tPlayer: %s", response.mgr_rsp_querygames.player);
+
+                while (players_left > 0) {
+                    // Receive next player
+                    sock->receive((void*) &response, sizeof(msg_t));
+
+                    // Print player
+                    info("\tPlayer: %s", response.mgr_rsp_querygames.player);
+
+                    // See how many players are left
+                    players_left = response.mgr_rsp_querygames.players_left;
+                }
+
+                // See how many players are left
+                games_left = response.mgr_rsp_querygames.games_left;
+            }
+        } else {
+            error("Manager returned unknown data.");
+        }
+    } else {
+        error("No data received from manager!");
+    }
+}
 
 /**
  * Caller negotiates gameplay port numbers with input player:
