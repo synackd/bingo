@@ -171,7 +171,7 @@ void listener(Bingo *bng)
 
     // After registration, creating socket for listening for new games:
     log(listen_fp, "Listening on default port %d for starting games...", me->getPort());
-    ServerSocket *listener_sock = new ServerSocket(me->getPort(), true);  // For listening on default port
+    ServerSocket *listener_sock = new ServerSocket(me->getPort(), false);  // For listening on default port
     int status = listener_sock->start();
 
     // Make sure socket starts
@@ -224,7 +224,7 @@ void listener(Bingo *bng)
                         // Test the next port
                         next_port = (next_port + 1) % 65535;
                         errno = 0;
-                        game_sock = new ServerSocket(next_port, true);
+                        game_sock = new ServerSocket(next_port, false);
                     } while(errno != 0);
 
                     // Get rid of temp socket
@@ -275,7 +275,7 @@ void play(unsigned int port, Bingo *game)
     }
 
     // Create socket with negotiated port
-    ServerSocket *game_sock = new ServerSocket(port, true);
+    ServerSocket *game_sock = new ServerSocket(port, false);
     game_sock->start();
 
     // Play Bingo with caller
