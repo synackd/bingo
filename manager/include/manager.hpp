@@ -33,7 +33,7 @@ class Manager {
         Manager(void);
         bool checkUsedIDs(int newID, vector<Game> list, int size);
         int generateGameID();
-        void sendKPlayers(ServerSocket *sock, msg_t data);
+        void sendKPlayers(ServerSocket *sock, msg_t data, Game *gameDetails);
         int sendAllPlayers(ServerSocket *sock);
         int registerPlayer(string name, string ip, unsigned int port);
         int deregisterPlayer(string name);

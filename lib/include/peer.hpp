@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "client.hpp"
+#include "player.hpp"
 // #include "bingo.hpp"
 
 using namespace std;
@@ -71,12 +72,13 @@ class Game {
         int id;
         int k;
         Player *gameCaller;
-        vector<Player> playersList;
+        vector<PlayerData> playersList;
 
     public:
         Game(int inputGameID, int inputK, Player *inputCaller);
-        void addPlayer(Player inputPlayer);
         int getID();
+        void addPlayer(PlayerData inputPlayer);
+        void printGameData();
 };
 
 /*

@@ -1,6 +1,7 @@
 #include "log.hpp"
 #include "peer.hpp"
 #include "cmd.hpp"
+#include "player.hpp"
 
 using namespace std;
 
@@ -21,7 +22,7 @@ Game::Game(int inputGameID, int inputK, Player *inputCaller)
 /**
  * Add a player to the game
  */
-void Game::addPlayer(Player inputPlayer)
+void Game::addPlayer(PlayerData inputPlayer)
 {
     this->playersList.push_back(inputPlayer);
 }
@@ -29,8 +30,22 @@ void Game::addPlayer(Player inputPlayer)
 /**
  * Return this game's UID
  */
-int Game::getID(){
+int Game::getID()
+{
     return this->id;
+}
+
+/**
+ * Print specified game's data to stdout
+ */
+void Game::printGameData()
+{
+    info("Game %d Details:", this->id);
+    info("Caller: %s:%d", this->gameCaller->getIP().c_str(), this->gameCaller->getPort());
+    info("Players:");
+    for (int i = 0; i < this->k; i++){
+        info("Name: %s \tIP/Port: %s:%d", this->playersList[i].getName().c_str(), this->playersList[i].getIP().c_str(), this->playersList[i].getPort());
+    }
 }
 
 /********

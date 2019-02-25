@@ -130,15 +130,18 @@ int main(int argc, char **argv)
 
                     // Checking if there are enought registered players:
                     if (requestedK <= mgr->numberOfRegPlayers){
-                        mgr->sendKPlayers(mgr_sock, data);
 
                         // Saving Caller Details:
                         Player *inputCaller = new Player("caller", data.clr_cmd_startgame.callerIP, data.clr_cmd_startgame.callerPort);
                         Game *newGame = new Game(newGameID, requestedK, inputCaller);
 
-                        // UPdating gameList and number of games:
+                        mgr->sendKPlayers(mgr_sock, data, newGame);
+
                         mgr->gameList.push_back(*newGame);
                         mgr->numberOfGames++;
+
+                        // Printing out gameDetails:
+                        newGame->printGameData();
 
                     } else {
                         error("There are not enough registered players.");
@@ -210,7 +213,7 @@ int Manager::generateGameID(){
 /**
  * Send k players to caller that requested them
  */
-void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
+void Manager::sendKPlayers(ServerSocket *sock, msg_t data, Game *gameDetails)
 {
     int gameID = this->generateGameID();
     int numberOfPlayersToSend = data.clr_cmd_startgame.k;
@@ -224,6 +227,8 @@ void Manager::sendKPlayers(ServerSocket *sock, msg_t data)
         strcpy(response.mgr_rsp_startgame.playerName, registeredPlayers[i].getName().c_str());
         strcpy(response.mgr_rsp_startgame.playerIP, registeredPlayers[i].getIP().c_str());
         response.mgr_rsp_startgame.playerPort = registeredPlayers[i].getPort();
+
+        gameDetails->addPlayer(registeredPlayers[i]);
 
         // Send player data back to caller
         info("Sending player \"%s\": GameID = %d\tIP = %s\tPort = %d", response.mgr_rsp_startgame.playerName, response.mgr_rsp_startgame.gameID, response.mgr_rsp_startgame.playerIP, response.mgr_rsp_startgame.playerPort);
