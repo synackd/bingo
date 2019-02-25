@@ -157,18 +157,31 @@ void getPeerInfo(char **name_ptr, char **ip_ptr, unsigned int *port_ptr)
  */
 void listener(Bingo *bng)
 {
+    // Open log file
+    FILE *listen_fp = fopen("listener.txt", "w+");
+    if (!listen_fp) {
+        error("Could not open listener log file!");
+        fclose(listen_fp);
+        return;
+    }
+
     // After registration, creating socket for listening for new games:
-    info("Listening on default port %d for starting games...", me->getPort());
-    ServerSocket *listener_sock = new ServerSocket(me->getPort());  // For listening on default port
+    log(listen_fp, "Listening on default port %d for starting games...", me->getPort());
+    ServerSocket *listener_sock = new ServerSocket(me->getPort(), false);  // For listening on default port
     int status = listener_sock->start();
 
     // Make sure socket starts
     if (status == FAILURE) {
-        error("Could not start socket!");
+        log(listen_fp, "Could not start socket!");
+        fclose(listen_fp);
         return;
     }
 
     unsigned int remote_callerGamePort;
+
+    // Close log file to write everything
+    fclose(listen_fp);
+    listen_fp = 0;
 
     // Listen for invitations to other games
     ssize_t size;
@@ -178,38 +191,60 @@ void listener(Bingo *bng)
             switch (data.command) {
                 // Negotiate new port for game communication
                 case PORT_HANDSHAKE:
+                    // Reopen log file for writing
+                    listen_fp = fopen("listener.txt", "w+");
+                    if (!listen_fp) {
+                        error("Could not open listener log file!");
+                        fclose(listen_fp);
+                        return;
+                    }
+
                     // Create a new player
                     Player *new_player = new Player(me->getName(), me->getIP(), me->getPort());
 
                     // Extract caller's port
                     unsigned int remote_callerGamePort = data.port_handshake.gamePort;
-                    info("Caller's game port received: %d", remote_callerGamePort);
+                    log(listen_fp, "Caller's game port received: %d", remote_callerGamePort);
 
                     // Find the next available port
+                    log(listen_fp, "Finding next available port...");
                     ServerSocket *game_sock;                // Socket for testing availability
                     unsigned int next_port = me->getPort(); // Current default port
                     do {
+                        // Reset socket if exists
+                        if (game_sock) {
+                            delete game_sock;
+                            game_sock = NULL;
+                        }
+
                         // Test the next port
                         next_port = (next_port + 1) % 65535;
                         errno = 0;
-                        game_sock = new ServerSocket(next_port);
-                        delete game_sock;
+                        game_sock = new ServerSocket(next_port, false);
                     } while(errno != 0);
 
+                    // Get rid of temp socket
+                    delete game_sock;
                     game_sock = NULL;
+
+                    log(listen_fp, "Next available port found: %d", next_port);
 
                     // Send new port back to caller:
                     handshakeResponse.command = PORT_HANDSHAKE;
                     handshakeResponse.port_handshake.gamePort = next_port;
-                    info("Sending game port to caller: %d", next_port);
+                    log(listen_fp, "Sending game port to caller: %d", next_port);
                     listener_sock->send((void*) &handshakeResponse, sizeof(msg_t));
 
-                    info("Gameplay!");
+                    log(listen_fp, "Gameplay!");
 
                     // Spawn new thread for new game
 
                     Bingo *new_game = new Bingo();
                     thread *player_thread = new thread(play, next_port, new_game);
+
+                    // Reclose log file to write everything
+                    fclose(listen_fp);
+
                     break;
             }
         } else {
@@ -217,6 +252,8 @@ void listener(Bingo *bng)
             listener_sock->start();
         }
     }
+
+    fclose(listen_fp);
 }
 
 /**
@@ -224,12 +261,24 @@ void listener(Bingo *bng)
  */
 void play(unsigned int port, Bingo *game)
 {
+    // Open log file
+    char *name = (char*) malloc((BUFMAX+11)*sizeof(char));
+    sprintf(name, "player-%s.txt", me->getName().c_str());
+    FILE *play_fp = fopen(name, "w+");
+    if (!play_fp) {
+        error("Could not open player log file for player \"%s\"!", me->getName().c_str());
+        return;
+    }
+
     // Create socket with negotiated port
-    ServerSocket *game_sock = new ServerSocket(port);
+    ServerSocket *game_sock = new ServerSocket(port, false);
     game_sock->start();
 
     // Play Bingo with caller
-    game->playBingo(game_sock);
+    game->playBingo(game_sock, play_fp);
+
+    // Close log file
+    fclose(play_fp);
 }
 
 /**
@@ -284,7 +333,7 @@ int main(int argc, char **argv)
     getPeerInfo(&p_name, &p_ip, &p_port);
 
     // Create socket for registration
-    bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+    bingo_sock = new ClientSocket(mgr_ip, mgr_port, true);
 
     // Establish connection with manager
     info("Establishing connection with manager...");
@@ -342,7 +391,7 @@ int main(int argc, char **argv)
                 cprintf(stdout, BOLD, "Start Game\n");
 
                 // Establish connection with manager
-                bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port, true);
                 info("Establishing connection with manager for Game Setup ...");
                 bingo_sock->start();
 
@@ -383,7 +432,7 @@ int main(int argc, char **argv)
                     // Create socket for player
                     info("Creating socket for player \"%s\"...", caller_bingo->gamingPlayers[i].getName().c_str());
                     info("IP: %s\t Port: %d", caller_bingo->gamingPlayers[i].getIP().c_str(), caller_bingo->gamingPlayers[i].getPort());
-                    tmp_sock = new ClientSocket(caller_bingo->gamingPlayers[i].getIP(), caller_bingo->gamingPlayers[i].getPort());
+                    tmp_sock = new ClientSocket(caller_bingo->gamingPlayers[i].getIP(), caller_bingo->gamingPlayers[i].getPort(), true);
                     caller_bingo->player_socks.push_back(tmp_sock);
                 }
 
@@ -402,7 +451,7 @@ int main(int argc, char **argv)
                     break;
                 }
 
-                bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port, true);
 
                 info("Establishing connection with manager...");
                 bingo_sock->start();
@@ -424,7 +473,7 @@ int main(int argc, char **argv)
                     break;
                 }
 
-                bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port, true);
 
                 info("Establishing connection with manager...");
                 bingo_sock->start();
@@ -447,7 +496,7 @@ int main(int argc, char **argv)
                 cprintf(stdout, BOLD, "Query Players\n");
 
                 // Connect to manager
-                bingo_sock = new ClientSocket(mgr_ip, mgr_port);
+                bingo_sock = new ClientSocket(mgr_ip, mgr_port, true);
                 info("Establishing connection with manager...");
                 bingo_sock->start();
 
@@ -578,7 +627,7 @@ void Bingo::callBingo()
 /**
  * Listens to numbers until GAMEOVER:
  */
-void Bingo::playBingo(ServerSocket *sock)
+void Bingo::playBingo(ServerSocket *sock, FILE *fp)
 {
     ssize_t n;
     int inputCode;
@@ -587,7 +636,7 @@ void Bingo::playBingo(ServerSocket *sock)
     // srand(time(NULL));
 
     Board gameBoard = Board();
-    gameBoard.printBoard();
+    gameBoard.logBoard(fp);
 
     msg_t inputMessage;
     msg_t callerACK;
@@ -602,7 +651,7 @@ void Bingo::playBingo(ServerSocket *sock)
         // Checking command code:
         if (inputCode == BINGOCALL) {
            calledNumber = inputMessage.clr_cmd_bingocals.bingoNumber;
-           info("Number Called: %d", calledNumber);
+           log(fp, "Number called: %d", calledNumber);
 
            // Updating GameBoard:
            gameBoard.markNumber(calledNumber);
@@ -610,11 +659,11 @@ void Bingo::playBingo(ServerSocket *sock)
            // Checking for Win:
            gameOver = gameBoard.checkWin();
            if (gameOver){
-               gameBoard.printBoard();
+               gameBoard.logBoard(fp);
                gameOver = true;
                callerACK.command = GAMEOVER;
                n = sock->send((void*) &callerACK, sizeof(msg_t));
-               info("Sending GAMEOVER signal.");
+               log(fp, "Sending GAMEOVER signal.");
                // info("Sending GAMEOVER %d bytes over socket.", n);
                return;
            }
@@ -748,7 +797,7 @@ void Bingo::checkStatus(){
 unsigned int Bingo::negotiateGameplayPort(PlayerData player, unsigned int inputCallerGamePort){
 
     // Initializing socket to talk to default player socket:
-    ClientSocket *playerSocket = new ClientSocket(player.getIP(), player.getPort());
+    ClientSocket *playerSocket = new ClientSocket(player.getIP(), player.getPort(), true);
     playerSocket->start();
 
     ssize_t n;

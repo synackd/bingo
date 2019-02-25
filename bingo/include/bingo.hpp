@@ -32,7 +32,7 @@ class Bingo
         Bingo(void);
         bool call(ClientSocket *sock, int num);
         void callBingo(void);
-        void playBingo(ServerSocket *sock);
+        void playBingo(ServerSocket *sock, FILE *fp);
         void startGame(ClientSocket *sock, int inputK, Caller *currentPlayer);
         void queryPlayers(ClientSocket *sock);
         void checkStatus();

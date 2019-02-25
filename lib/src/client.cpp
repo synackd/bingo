@@ -17,19 +17,28 @@ using namespace std;
  *
  * @param port Port to bind the socket to.
  */
-ClientSocket::ClientSocket(string ip, unsigned short port)
+ClientSocket::ClientSocket(string ip, unsigned short port, bool verbose)
 {
+    /* Set verbosity */
+    this->verbose = verbose;
+
     /* Create socket */
     errno = 0;
-    cprintf(stdout, BOLD, "[CLI] ");
-    fprintf(stdout, "Creating socket...\n");
+    if (this->verbose) {
+        cprintf(stdout, BOLD, "[CLI] ");
+        fprintf(stdout, "Creating socket...\n");
+    }
     if ((this->sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        cprintf(stderr, BOLD, "[CLI][ERR] ");
-        fprintf(stderr, "socket() failed: %s\n", strerror(errno));
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[CLI][ERR] ");
+            fprintf(stderr, "socket() failed: %s\n", strerror(errno));
+        }
         return;
     }
-    cprintf(stdout, BOLD, "[CLI] ");
-    fprintf(stdout, "Socket created.\n");
+    if (this->verbose) {
+        cprintf(stdout, BOLD, "[CLI] ");
+        fprintf(stdout, "Socket created.\n");
+    }
 
     /* Construct local address structure */
     memset(&this->srvAddr, 0, sizeof(this->srvAddr));           // Reset memory of client IP struct
@@ -56,19 +65,25 @@ int ClientSocket::start(void)
 {
     /* Check for valid socket */
     if (this->sockfd == 0) {
-        cprintf(stderr, BOLD, "[CLI][ERR] ");
-        fprintf(stderr, "No socket to listen on!\n");
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[CLI][ERR] ");
+            fprintf(stderr, "No socket to listen on!\n");
+        }
         return -1;
     }
 
     /* Connect to server */
     errno = 0;
-    cprintf(stdout, BOLD, "[CLI] ");
-    fprintf(stdout, "Connecting to server...\n");
+    if (this->verbose) {
+        cprintf(stdout, BOLD, "[CLI] ");
+        fprintf(stdout, "Connecting to server...\n");
+    }
     int status = connect(this->sockfd, (struct sockaddr*) &this->srvAddr, sizeof(this->srvAddr));
     if (status < 0) {
-        cprintf(stderr, BOLD, "[CLI][ERR] ");
-        fprintf(stderr, "connect() failed: %s\n", strerror(errno));
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[CLI][ERR] ");
+            fprintf(stderr, "connect() failed: %s\n", strerror(errno));
+        }
         errno = CANNOTCONN;
     }
 
@@ -98,15 +113,19 @@ ssize_t ClientSocket::receive(void* data, size_t size)
 {
     /* Make sure there's a socket */
     if (this->sockfd == 0) {
-        cprintf(stderr, BOLD, "[SRV][ERR] ");
-        fprintf(stderr, "No open connection!\n");
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[SRV][ERR] ");
+            fprintf(stderr, "No open connection!\n");
+        }
         return -1;
     }
 
     /* Don't write to a nonexistent or NULL pointer */
     if (data == NULL) {
-        cprintf(stderr, BOLD, "[SRC][ERR] ");
-        fprintf(stderr, "Received data is NULL!\n");
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[SRC][ERR] ");
+            fprintf(stderr, "Received data is NULL!\n");
+        }
         return -1;
     }
 
@@ -114,8 +133,10 @@ ssize_t ClientSocket::receive(void* data, size_t size)
     errno = 0;
     ssize_t bytes = read(this->sockfd, data, size);
     if (bytes < 0) {
-        cprintf(stderr, BOLD, "[CLI][ERR] ");
-        fprintf(stderr, "read() failed: %s\n", strerror(errno));
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[CLI][ERR] ");
+            fprintf(stderr, "read() failed: %s\n", strerror(errno));
+        }
         errno = CANNOTREAD;
     }
 
@@ -134,15 +155,19 @@ ssize_t ClientSocket::send(void* data, size_t size)
 {
     /* Make sure there's a connection */
     if (this->sockfd == 0) {
-        cprintf(stderr, BOLD, "[CLI][ERR] ");
-        fprintf(stderr, "No open connection!\n");
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[CLI][ERR] ");
+            fprintf(stderr, "No open connection!\n");
+        }
         return -1;
     }
 
     /* Don't send NULL data */
     if (data == NULL) {
-        cprintf(stderr, BOLD, "[CLI][ERR] ");
-        fprintf(stderr, "Tried to send NULL data.\n");
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[CLI][ERR] ");
+            fprintf(stderr, "Tried to send NULL data.\n");
+        }
         return -1;
     }
 
@@ -150,8 +175,10 @@ ssize_t ClientSocket::send(void* data, size_t size)
     errno = 0;
     ssize_t bytes = write(this->sockfd, data, size);
     if (bytes < 0) {
-        cprintf(stderr, BOLD, "[CLI][ERR] ");
-        fprintf(stderr, "write() failed: %s\n", strerror(errno));
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[CLI][ERR] ");
+            fprintf(stderr, "write() failed: %s\n", strerror(errno));
+        }
         errno = CANNOTWRITE;
     }
 

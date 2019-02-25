@@ -17,19 +17,28 @@ using namespace std;
  *
  * @param port Port to bind the socket to.
  */
-ServerSocket::ServerSocket(unsigned short port)
+ServerSocket::ServerSocket(unsigned short port, bool verbose)
 {
+    /* Set verbosity */
+    this->verbose = verbose;
+
     /* Create socket */
     errno = 0;
-    cprintf(stdout, BOLD, "[SRV] ");
-    fprintf(stdout, "Creating socket...\n");
+    if (this->verbose) {
+        cprintf(stdout, BOLD, "[SRV] ");
+        fprintf(stdout, "Creating socket...\n");
+    }
     if ((this->sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        cprintf(stderr, BOLD, "[SRV][ERR] ");
-        fprintf(stderr, "socket() failed: %s\n", strerror(errno));
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[SRV][ERR] ");
+            fprintf(stderr, "socket() failed: %s\n", strerror(errno));
+        }
         return;
     }
-    cprintf(stdout, BOLD, "[SRV] ");
-    fprintf(stdout, "Socket created.\n");
+    if (this->verbose) {
+        cprintf(stdout, BOLD, "[SRV] ");
+        fprintf(stdout, "Socket created.\n");
+    }
 
     /* Construct local address structure */
     memset(&this->srvAddr, 0, sizeof(this->srvAddr));       // Reset memory of server IP struct
@@ -39,24 +48,34 @@ ServerSocket::ServerSocket(unsigned short port)
 
     /* Bind to local address */
     errno = 0;
-    cprintf(stdout, BOLD, "[SRV] ");
-    fprintf(stdout, "Binding socket to port %d...\n", port);
+    if (this->verbose) {
+        cprintf(stdout, BOLD, "[SRV] ");
+        fprintf(stdout, "Binding socket to port %d...\n", port);
+    }
     if (bind(this->sockfd, (struct sockaddr*) &this->srvAddr, sizeof(this->srvAddr)) < 0) {
-        cprintf(stderr, BOLD, "[SRV][ERR] ");
-        fprintf(stderr, "bind() failed: %s\n", strerror(errno));
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[SRV][ERR] ");
+            fprintf(stderr, "bind() failed: %s\n", strerror(errno));
+        }
         errno = CANNOTBIND;
         return;
     }
-    cprintf(stdout, BOLD, "[SRV] ");
-    fprintf(stdout, "Socket bound.\n");
+    if (this->verbose) {
+        cprintf(stdout, BOLD, "[SRV] ");
+        fprintf(stdout, "Socket bound.\n");
+    }
 
     /* Listen for incoming requests */
     errno = 0;
-    cprintf(stdout, BOLD, "[SRV] ");
-    fprintf(stdout, "Listening on port %d...\n", port);
+    if (this->verbose) {
+        cprintf(stdout, BOLD, "[SRV] ");
+        fprintf(stdout, "Listening on port %d...\n", port);
+    }
     if (listen(this->sockfd, BACKLOG) < 0) {
-        cprintf(stderr, BOLD, "[SRV][ERR] ");
-        fprintf(stderr, "listen() failed: %s\n", strerror(errno));
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[SRV][ERR] ");
+            fprintf(stderr, "listen() failed: %s\n", strerror(errno));
+        }
         errno = CANNOTLISTEN;
         return;
     }
@@ -82,8 +101,10 @@ int ServerSocket::start(void)
 {
     /* Check for valid socket */
     if (this->sockfd == 0) {
-        cprintf(stderr, BOLD, "[SRV][ERR] ");
-        fprintf(stderr, "No socket to listen on!\n");
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[SRV][ERR] ");
+            fprintf(stderr, "No socket to listen on!\n");
+        }
         return FAILURE;
     }
 
@@ -91,8 +112,10 @@ int ServerSocket::start(void)
     this->cliAddrLen = sizeof(this->cliAddr);
     this->connfd = accept(this->sockfd, (struct sockaddr*) &this->cliAddr, &cliAddrLen);
     if (this->connfd < 0) {
-        cprintf(stderr, BOLD, "[SRV][ERR] ");
-        fprintf(stderr, "accept() failed: %s\n", strerror(errno));
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[SRV][ERR] ");
+            fprintf(stderr, "accept() failed: %s\n", strerror(errno));
+        }
         return FAILURE;
     }
 
@@ -123,15 +146,19 @@ ssize_t ServerSocket::receive(void* data, size_t size)
 {
     /* Make sure there's a connection */
     if (this->connfd == 0) {
-        cprintf(stderr, BOLD, "[SRV][ERR] ");
-        fprintf(stderr, "No open connection!\n");
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[SRV][ERR] ");
+            fprintf(stderr, "No open connection!\n");
+        }
         return -1;
     }
 
     /* Don't write to a nonexistent or NULL pointer */
     if (data == NULL) {
-        cprintf(stderr, BOLD, "[SRV][ERR] ");
-        fprintf(stderr, "Received data is NULL!\n");
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[SRV][ERR] ");
+            fprintf(stderr, "Received data is NULL!\n");
+        }
         return -1;
     }
 
@@ -139,8 +166,10 @@ ssize_t ServerSocket::receive(void* data, size_t size)
     errno = 0;
     ssize_t bytes = read(this->connfd, data, size);
     if (bytes < 0) {
-        cprintf(stderr, BOLD, "[SRV][ERR] ");
-        fprintf(stderr, "read() failed: %s\n", strerror(errno));
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[SRV][ERR] ");
+            fprintf(stderr, "read() failed: %s\n", strerror(errno));
+        }
         errno = CANNOTREAD;
     }
 
@@ -159,15 +188,19 @@ ssize_t ServerSocket::send(void* data, size_t size)
 {
     /* Make sure there's a connection */
     if (this->connfd == 0) {
-        cprintf(stderr, BOLD, "[SRV][ERR] ");
-        fprintf(stderr, "No open connection!\n");
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[SRV][ERR] ");
+            fprintf(stderr, "No open connection!\n");
+        }
         return -1;
     }
 
     /* Don't send NULL data */
     if (data == NULL) {
-        cprintf(stderr, BOLD, "[SRV][ERR] ");
-        fprintf(stderr, "Tried to send NULL data.\n");
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[SRV][ERR] ");
+            fprintf(stderr, "Tried to send NULL data.\n");
+        }
         return -1;
     }
 
@@ -175,8 +208,10 @@ ssize_t ServerSocket::send(void* data, size_t size)
     errno = 0;
     ssize_t bytes = write(this->connfd, data, size);
     if (bytes < 0) {
-        cprintf(stderr, BOLD, "[SRV][ERR] ");
-        fprintf(stderr, "write() failed: %s\n", strerror(errno));
+        if (this->verbose) {
+            cprintf(stderr, BOLD, "[SRV][ERR] ");
+            fprintf(stderr, "write() failed: %s\n", strerror(errno));
+        }
     }
 
     return bytes;

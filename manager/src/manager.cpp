@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     Manager *mgr = new Manager();
 
     // Create socket to listen for client
-    ServerSocket *mgr_sock = new ServerSocket(port);
+    ServerSocket *mgr_sock = new ServerSocket(port, true);
     mgr_sock->start();
 
     // Continuously listen for requests and decide what to

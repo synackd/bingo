@@ -15,7 +15,7 @@ class ClientSocket: public Socket
         struct sockaddr_in srvAddr;     /**< The client's IP address */
 
     public:
-        ClientSocket(string ip, unsigned short port);
+        ClientSocket(string ip, unsigned short port, bool verbose);
         ~ClientSocket(void);
         int start(void);
         int stop(void);

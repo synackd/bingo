@@ -19,7 +19,7 @@ class ServerSocket: public Socket
         socklen_t cliAddrLen;           /**< The length of the client's IP address */
 
     public:
-        ServerSocket(unsigned short port);
+        ServerSocket(unsigned short port, bool verbose);
         ~ServerSocket(void);
         int start(void);
         int stop(void);
