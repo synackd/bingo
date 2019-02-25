@@ -212,7 +212,7 @@ void listener(Bingo *bng)
 
                     // Find the next available port
                     log(listen_fp, "Finding next available port...");
-                    ServerSocket *game_sock;                // Socket for testing availability
+                    ServerSocket *game_sock = NULL;         // Socket for testing availability
                     unsigned int next_port = me->getPort(); // Current default port
                     do {
                         // Reset socket if exists
@@ -913,7 +913,9 @@ unsigned int Bingo::negotiateGameplayPort(PlayerData player, unsigned int inputC
     info("Sent %d bytes from socket.", n);
 
     // Receiving playerGamePort
-    n = playerSocket->receive((void*) &playerResponse, sizeof(msg_t));
+    do {
+        n = playerSocket->receive((void*) &playerResponse, sizeof(msg_t));
+    } while(n == 0);
     info("Received %d bytes from socket.", n);
 
     playerGamePort = playerResponse.port_handshake.gamePort;
